@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+		ul{margin-bottom:0px;}
+		</style>
+	</head>
+	<body class="left-menu-body">
+		
+		<div class="menu-box">
+			<ul class="menu-list" id="homepage">
+				<li>
+					<a href="__URL__/rightFrame" target="frame_right_main" class="active"><i class=""></i> 欢迎页</a>
+				</li>
+			</ul>
+			
+			<ul class="menu-list" id="resLib">
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  数据采集</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/ResLib/historic" target="frame_right_main"><i class="icon-caret-right"></i>  历史上的今天</a></li>
+						<li><a href="__GROUP__/ResLib/famousQuotes" target="frame_right_main"><i class="icon-caret-right"></i>  名人名言</a></li>
+						<li><a href="__GROUP__/ResLib/baike" target="frame_right_main"><i class="icon-caret-right"></i>  百科知识</a></li>
+						<li><a href="__GROUP__/ResLib/humorJokes" target="frame_right_main"><i class="icon-caret-right"></i>  幽默笑话</a></li>
+						<li><a href="__GROUP__/ResLib/englishWords" target="frame_right_main"><i class="icon-caret-right"></i>  英语词条</a></li>
+						<li><a href="__GROUP__/ResLib/weather" target="frame_right_main"><i class="icon-caret-right"></i>  天气预报</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+			<ul class="menu-list" id="syscfg">
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  系统设置</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Syscfg/basicCfg" target="frame_right_main"><i class="icon-caret-right"></i> 基本设置</a></li>
+						<li><a href="__GROUP__/Syscfg/advancedCfg" target="frame_right_main"><i class="icon-caret-right"></i> 高级设置</a></li>
+						<li><a href="__GROUP__/Syscfg/securityCfg" target="frame_right_main"><i class="icon-caret-right"></i> 安全设置</a></li>
+						<li><a href="__GROUP__/Syscfg/nodesList" target="frame_right_main"><i class="icon-caret-right"></i> 模块管理</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+			<ul class="menu-list" id="ucenter">
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  用户管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Users/index" target="frame_right_main"><i class="icon-caret-right"></i> 管理员列表</a></li>
+						<li><a href="__GROUP__/Users/addUser" target="frame_right_main"><i class="icon-caret-right"></i> 添加管理员</a></li>
+						<li><a href="__GROUP__/Users/rolesList" target="frame_right_main"><i class="icon-caret-right"></i> 管理组列表</a></li>
+						<li><a href="__GROUP__/Users/addRole" target="frame_right_main"><i class="icon-caret-right"></i> 创建管理组</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+		</div>
+		
+		<div class="left-bottom-box">
+			<p class="text-center">&copy; 2009 - {:date('Y')} 山西久联网络科技有限公司 版权所有.</p>
+		</div>
+		
+		<div class="my-cover" style="display:none;"></div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/common.js"></script>
+		<script type="text/javascript">
+		$(function($) {
+			
+			$('.menu-box li').delegate('a', 'click', function() {
+				if($.trim($(this).attr('href')) != 'javascript:void(0);') {
+					pagePreLoader();
+				}
+			});
+			
+			// 导航级联展示效果
+			//$('.menu-list > li > a').click(function() {
+			$('.menu-box').delegate('.menu-list > li > a', 'click', function() {
+				var subMenu = $(this).siblings('ul').first();
+				
+				if (subMenu.length > 0) {
+					var isFolded = parseInt(subMenu.attr('data-folded'));
+				}
+				
+				$.each($('.menu-list').children('li'), function(i, o){
+					$(o).children('a').first().removeClass('hover').children('span').first().removeClass('un-folded').addClass('folded');
+					$(o).children('ul').first().attr('data-folded', 1).slideUp('fast');
+				});	
+				
+				if (subMenu.length > 0) {
+					if (isFolded) {
+						$(this).children('span').first().removeClass('folded').addClass('un-folded');
+						subMenu.attr('data-folded', 0).slideDown('fast');
+						$(this).addClass('hover');
+					} else {
+						$(this).children('span').first().removeClass('un-folded').addClass('folded');
+						subMenu.attr('data-folded', 1).slideUp('fast');
+						$(this).removeClass('hover');
+					}	
+				} else {
+					$('.menu-list > li > a').removeClass('active');
+					$(this).addClass('active');
+				}
+			});
+			
+			$('.menu-box').delegate('.menu-list li li a', 'click', function(){
+				$('.menu-list > li > a, .menu-list li li a').removeClass('active');
+				$(this).parents('ul').first().siblings('a').first().addClass('active');
+				$(this).addClass('active');
+			});
+		})
+		</script>
+	</body>
+</html>

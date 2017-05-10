@@ -1,0 +1,189 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__URL__/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li class="active">添加终端</li>
+</ol>
+
+<div class="row">
+	<div class="col-md-8">
+		<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+			<div class="form-group" id="addEndType">
+				<label class="col-sm-2 control-label">添加方式</label>
+				<div class="col-sm-3">
+					<label class="radio-inline">
+						<input type="radio" name="addEndType" id="" value="manu" checked> 手动输入
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="addEndType" id="" value="auto"> 自动添加
+					</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="endGrpSelector">所属终端分组</label>
+				<div class="col-sm-2">
+					<select class="form-control input-sm" name="groupclassid" id="endGrpSelector">
+						<option value="">请选择</option>
+						<volist name="groups" id="vo">
+							<php> if (!empty($vo['has_children'])) { </php>
+								<option value="{$vo.groupclassid}" disabled>{$vo.space} {$vo.groupname}</option>
+							<php> } else { </php>
+								<option value="{$vo.groupclassid}">{$vo.space} {$vo.groupname}</option>
+							<php> } </php>
+						</volist>
+					</select>
+				</div>
+			</div>
+			<div class="form-group manual-work">
+				<label class="col-sm-2 control-label" for="endID">终端编号</label>
+				<div class="col-sm-8">
+					<input class="form-control input-sm" type="text" name="endid" id="endID" value="" style="width:360px;">
+					<span style="position:absolute;top:7px;left:384px;"><i class="icon-exclamation-sign" style="font-size:;color:#666;"></i> 格式如T0001，多个之间用逗号隔开.</span>
+				</div>
+			</div>
+			<div class="form-group auto-work" style="display:none">
+				<label class="col-sm-2 control-label" for="endID">终端编号首字母</label>
+				<div class="col-sm-8">
+					<select class="form-control input-sm" name="header-letter" id="headerLetter" style="width:auto;">
+						<option value="A">A</option>
+						<option value="B">B</option>
+						<option value="C">C</option>
+						<option value="D">D</option>
+						<option value="E">E</option>
+						<option value="F">F</option>
+						<option value="G">G</option>
+						<option value="H">H</option>
+						<option value="I">I</option>
+						<option value="J">J</option>
+						<option value="K">K</option>
+						<option value="L">L</option>
+						<option value="M">M</option>
+						<option value="N">N</option>
+						<option value="O">O</option>
+						<option value="P">P</option>
+						<option value="Q">Q</option>
+						<option value="R">R</option>
+						<option value="S">S</option>
+						<option value="T" selected>T</option>
+						<option value="U">U</option>
+						<option value="V">V</option>
+						<option value="W">W</option>
+						<option value="X">X</option>
+						<option value="Y">Y</option>
+						<option value="Z">Z</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group auto-work" style="display:none">
+				<label class="col-sm-2 control-label" for="endID">添加数量</label>
+				<div class="col-sm-8">
+					<input class="form-control input-sm text-center" type="text" name="enumber" id="enumber" value="" style="width:60px;">
+					<span style="position:absolute;top:7px;left:84px;"><i class="icon-exclamation-sign" style="font-size:;color:#666;"></i> 只允许输入数字1-99.</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="">&nbsp;</label>
+				<div class="col-sm-4">
+					<input type="hidden" name="endType" value="{$Think.get.et|default='x86'}">
+					<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+					<button type="reset" class="btn btn-default btn-sm">取消</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="col-md-4 well" style="padding:10px">
+		<p><b>终端编号</b></p>
+		<p style="text-indent:2em;">格式形如T0001、H0102、V3002……</p>
+		<p><b>手动输入</b></p>
+		<p style="text-indent:2em;">该种方式添加时，需要输入符合格式的完整的终端编号，多个使用逗号隔开。</p>
+		<p><b>自动添加</b></p>
+		<p style="text-indent:2em;">该种方式添加时，需要输入指定首字母和待添加终端的数量，系统则会自动生成序号连续的终端编号。</p>
+		<p><b>PS：</b>一次添加多个终端时，如果存在重复的终端编号，系统会自动过滤，不予添加。</p>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var endType = '{$Think.get.et|default="x86"}',
+		rules = { groupclassid : { required : true }, endid : { required : true } },
+		messages = { groupclassid : { required : "必须设置一个终端组." }, endid : { required : "终端编号必填." } };
+	
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : rules,  
+        messages : messages,
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+	
+	$(':reset').first().click(function() {
+		window.location.href = '__URL__/index/et/' + endType;
+	});
+	
+	$('#addEndType ins').click(function() {
+		var type = $(this).siblings(':radio[name="addEndType"]').val();
+		switchAddType(type);
+	});
+	
+	$('#addEndType label.radio-inline').click(function() {
+		var type = $(this).find(':radio[name="addEndType"]').first().val();
+		switchAddType(type);
+	});
+	
+	function switchAddType(type) {
+
+		if (type == 'auto') {
+			
+			// 界面控制
+			$('.manual-work').hide();
+			$('.auto-work').show();
+			
+			// 更新表单验证规则
+			$('#endID').rules('remove');
+			$('#enumber').rules('add', {
+				required : true,
+				range : [1,99],
+				messages : {
+					required : '添加数量必填.',
+					range : '添加数量必须在1-99之间.'
+				}
+			});
+			
+		} else {
+			
+			// 界面控制
+			$('.manual-work').show();
+			$('.auto-work').hide();
+
+			// 更新表单验证规则
+			$('#enumber').rules('remove');
+			$('#endID').rules('add', {
+				required : true,
+				messages : {
+					required : '终端编号必填.'
+				}
+			});
+			
+		}
+		
+	}
+});
+</script>
+<include file="Public/footer" />

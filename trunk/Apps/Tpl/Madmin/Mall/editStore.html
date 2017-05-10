@@ -1,0 +1,322 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<style>
+#storeVideoUp .btn-default, #storeVideoUp .btn-default:hover, #storeVideoUp .btn-default:active, #storeVideoUp .btn-default:visited{background-color:#fff;border-color:#ccc;padding:3px 10px 4px;font-size:14px;outline:0;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="">商场管理</a></li>
+	<li><a href="">商铺管理</a></li>
+	<li class="active"><empty name="store">添加商铺<else/>修改商铺信息</empty></li>
+</ol>
+<form id="editStore" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeType">所属类型</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="type_id" id="storeType">
+				<option value="">请选择</option>
+				<volist name="storeTypes" id="vo">
+					<eq name="vo.ID" value="$store.type_id">
+						<option value="{$vo.ID}" selected>{$vo.space} {$vo.tName}</option>
+					<else/>
+						<php> if ($vo['has_children'] > 0) { </php>
+						<option value="{$vo.ID}" disabled>{$vo.space} {$vo.tName}</option>
+						<php> } else { </php>
+						<option value="{$vo.ID}">{$vo.space} {$vo.tName}</option>
+						<php> } </php>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeNo">商铺编号</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="store_no" id="storeNo" value="{$store.store_no}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeName">商铺名称（全称）</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="sname" id="storeName" value="{$store.sname}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeShortname">商铺名称（简称）</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="short_sname" id="storeShortname" value="{$store.short_sname}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storePYshort">名称拼音首字母</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="pyshort" id="storePYshort" value="{$store.pyshort}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">商铺LOGO</label>
+		<div class="col-sm-6">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload_logo" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"><!-- （建议上传图片尺寸：168 x 168 像素.） --></span>
+				<notempty name="store['logo']">
+				<span style="position:absolute;top:8px;left:114px;">
+					<label style="color:#555;font-weight:normal">
+						<eq name="store.logo" value="$store['store_cover']">						
+						<input type="checkbox" name="has_logo_as_cover" value="1" checked>
+						<else/>
+						<input type="checkbox" name="has_logo_as_cover" value="1">
+						</eq>
+					&nbsp;设置logo图为商铺形象宣传封面图</label>
+				</span>
+				</notempty>
+				<div id="uploadfyQueueList1"></div> 
+				<div class="showimg clearfix">
+					<notempty name="store['logo']">
+						<span><img src="/{$Think.config.upload_root_path}{$store.logoPath}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="logo" class="gcovers" value="{$store.logo}">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeFloor">所在楼层</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="floor" id="storeFloor" style="width:auto;">
+				<for start="1" end="$mallFloors" comparison="elt">
+					<eq name="i" value="$store.floor">
+					<option value="{$i}" selected>{$i}层</option>
+					<else />
+					<option value="{$i}">{$i}层</option>
+					</eq>
+				</for>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeAddress">商铺地址</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="adress" id="storeAddress" value="{$store.adress}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeManager">商铺负责人</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="store_manager" id="storeManager" value="{$store.store_manager}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeContact">联系方式</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="contact" id="storeContact" value="{$store.contact}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeNote">商铺介绍</label>
+		<div class="col-sm-8">
+			<!-- <textarea class="form-control" name="note" id="storeNote" rows="4">{$store.note}</textarea> -->
+			<script id="storeNote" name="note" type="text/plain" style="height:280px;">{$store.note}</script>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">热点标识图标</label>
+		<div class="col-sm-3">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload_hotico" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"><!-- （建议上传图片尺寸：168 x 168 像素.） --></span>
+				<div id="uploadfyQueueList2"></div> 
+				<div class="showimg clearfix">
+					<notempty name="store['hotico']">
+						<span><img src="/{$Think.config.upload_root_path}{$store.hoticoPath}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="hotico" class="gcovers" value="{$store.hotico}">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">形象宣传视频</label>
+		<!-- <div class="col-sm-6" id="storeVideoUp">
+			<input id="file_upload_video" class="btn btn-default btn-sm" name="file_upload" type="button" value="上传视频">
+			<span style="position:absolute;top:8px;left:114px;">（建议上传图片尺寸：168 x 168 像素.）</span>
+			<input type="hidden" name="hotico" class="gcovers" value="{$store.hotico}">
+		</div> -->
+		<div class="col-sm-6">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload_store_video" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;">（上传限制：视频文件大小不得大于50MB.）</span>
+				<div id="uploadfyQueueList3"></div> 
+				<div class="showimg clearfix">
+					<notempty name="store['store_video']">
+						<p style="padding:10px;"><b>已上传视频文件：</b>{$store.storeVideoPath}</p>
+					</notempty>
+				</div>
+				<input type="hidden" name="store_video" class="gcovers" value="{$store.store_video}">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="store_id" value="{$store.Id}">
+			<input type="hidden" name="classid" value="{$unid}">
+			<input type="hidden" name="spottype" value="shop">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.all.js"> </script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var tmpClassid = '{$unid|default=""}';
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/stores';
+	});
+	
+	var toolbars_for_txt = [['fullscreen', 'forecolor', 'fontfamily', 'fontsize', '|', 'bold', 'italic', 'underline', 'fontborder', 'strikethrough', '|', 'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', 'horizontal', 'date', 'time', '|', 'undo', 'redo',]];
+	var ueTxt = UE.getEditor('storeNote', {
+		serverUrl : '__GROUP__/Ajaxhandle/UEUploadImage',
+		toolbars : toolbars_for_txt,
+        elementPathEnabled : false,
+        wordCount : false
+	});
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload_logo').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'store', tmpClassID : tmpClassid, type : 'logo'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList1',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$('#file_upload_logo').closest('div.up-image-box').find(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+					$('#file_upload_logo').closest('div.up-image-box').find(".gcovers").first().val(re.resourceid);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+	
+	setTimeout(function(){
+		$('#file_upload_hotico').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'store', tmpClassID : tmpClassid, type : 'hotico'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList2',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$('#file_upload_hotico').closest('div.up-image-box').find(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+					$('#file_upload_hotico').closest('div.up-image-box').find(".gcovers").first().val(re.resourceid);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+	
+	setTimeout(function(){
+		$('#file_upload_store_video').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '视频',
+			'fileTypeExts' : '*.mpeg; *.mp4; *.wmv; *.avi; *.mkv; *.3gp',
+			'buttonText' : '<i class="icon-upload"></i>上传视频',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'video', 'isDBWrite' : 1, 'appModel' : 'store', tmpClassID : tmpClassid, type : 'video'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList3',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$('#file_upload_store_video').closest('div.up-image-box').find(".showimg").first().html('<p style="padding:10px;"><b>已上传视频文件：</b>' + re.pic + '</p>');
+					$('#file_upload_store_video').closest('div.up-image-box').find(".gcovers").first().val(re.resourceid);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+});
+</script>
+<include file="Public/footer" />

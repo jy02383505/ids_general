@@ -1,0 +1,436 @@
+<include file="Public/header" />
+<style>
+a.jl-btn-collapse{display:block;position:absolute;bottom:10px;right:6px;width:20px;height:20px;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;text-align:center;line-height:20px;}
+a.jl-btn-collapse i{font-size:16px;font-weight:bold;}
+a.jl-btn-collapse:hover i{color:#16a085}
+
+.playtime-list{margin-bottom:2px;}
+.playtime-list .lheader{border:1px solid #ddd;padding:12px;position:relative;background-color:#f8f8f8;}
+.playtime-list .lbody{border:1px solid #ddd;border-top:0;padding:8px 12px;position:relative;top:-2px;display:none;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目播放表管理</a></li>
+	<li class="active">创建节目播放表</li>
+</ol>
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plName">节目表名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="pl_name" id="plName" value="{$plist.pl_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">状态</label>
+		<div class="col-sm-3">
+			<neq name="plist.status" value="1">
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1" checked> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0"> 禁用</label>
+			<else/>
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1"> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0" checked> 禁用</label>
+			</neq>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plRemark">说明</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="plRemark" rows="3">{$plist.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">播放时间表</label>
+		<div class="col-sm-8">
+			<div class="playtime-list" id="weekday1">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 一</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody"">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday2">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 二</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday3">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 三</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday4">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 四</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday5">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 五</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday6">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 六</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="playtime-list" id="weekday7">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 日</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<table class="table">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								</td>
+								<td class="my-form-group jl-time-box" style="position:relative;">
+									<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+									<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<td><select class="form-control input-sm" style="width:200px;"></select></td>
+								<td><button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$plist.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<div id="timePicker" style="display:none;">
+	<div class="hours clearfix">
+		<a href="javascript:void(0);" data-hour='0'>0:00</a>
+		<a href="javascript:void(0);" data-hour='1'>1:00</a>
+		<a href="javascript:void(0);" data-hour='2'>2:00</a>
+		<a href="javascript:void(0);" data-hour='3'>3:00</a>
+		<a href="javascript:void(0);" data-hour='4'>4:00</a>
+		<a href="javascript:void(0);" data-hour='5'>5:00</a>
+		<a href="javascript:void(0);" data-hour='6'>6:00</a>
+		<a href="javascript:void(0);" data-hour='7'>7:00</a>
+		<a href="javascript:void(0);" data-hour='8'>8:00</a>
+		<a href="javascript:void(0);" data-hour='9'>9:00</a>
+		<a href="javascript:void(0);" data-hour='10'>10:00</a>
+		<a href="javascript:void(0);" data-hour='11'>11:00</a>
+		<a href="javascript:void(0);" data-hour='12'>12:00</a>
+		<a href="javascript:void(0);" data-hour='13'>13:00</a>
+		<a href="javascript:void(0);" data-hour='14'>14:00</a>
+		<a href="javascript:void(0);" data-hour='15'>15:00</a>
+		<a href="javascript:void(0);" data-hour='16'>16:00</a>
+		<a href="javascript:void(0);" data-hour='17'>17:00</a>
+		<a href="javascript:void(0);" data-hour='18'>18:00</a>
+		<a href="javascript:void(0);" data-hour='19'>19:00</a>
+		<a href="javascript:void(0);" data-hour='20'>20:00</a>
+		<a href="javascript:void(0);" data-hour='21'>21:00</a>
+		<a href="javascript:void(0);" data-hour='22'>22:00</a>
+		<a href="javascript:void(0);" data-hour='23'>23:00</a>
+	</div>
+	<div class="seconds clearfix" style="display:none;">
+		<div class="text-right"><i class="icon-reply to-back" style="cursor:pointer;"></i></div>
+	</div>
+	<div class="btn btn-default btn-xs close-btn">取消</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	function stopPropagation(e) {
+		if (e.stopPropagation)
+			e.stopPropagation();
+		else
+			e.cancelBubble = true;
+	}
+	
+	$('.jl-btn-collapse').click(function() {
+		var isOpen = $(this).attr('data-isopen')*1;
+		
+		if (isOpen) {
+			$(this).attr({'data-isopen' : 0, 'title' : '展开'}).children('i').removeClass('icon-angle-down').addClass('icon-angle-up');
+			$(this).closest('.playtime-list').find('.lbody').first().slideUp('fast');
+		} else {
+			$(this).attr({'data-isopen' : 1, 'title' : '收起'}).children('i').removeClass('icon-angle-up').addClass('icon-angle-down');
+			$(this).closest('.playtime-list').find('.lbody').first().slideDown('fast');
+		}
+	});
+
+    $(document).bind('click',function() {
+    	$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+    });
+    
+    $('.playtime-list').delegate('.jl-time-picker .close-btn', 'click', function() {
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+	});
+	
+    $('.playtime-list').delegate('.jl-time-picker', 'click',function(e) {
+        stopPropagation(e);
+    });
+	
+    $('.playtime-list').delegate('.jl-time-selector, #mainClosetime', 'click', function(e) {
+		if ($(this).siblings('.jl-time-picker').size() <= 0) {
+			var timer = $('#timePicker').clone();
+			timer.removeAttr('id').addClass('jl-time-picker');
+			$(this).closest('td').append(timer);
+		}
+		if ($(this).siblings('.jl-time-picker').css('display') == 'none') {
+			$('.jl-time-picker').hide();
+			$(this).siblings('.jl-time-picker').slideDown("fast");
+			stopPropagation(e);
+		}
+	});
+	
+	$('.playtime-list').delegate('.jl-time-picker .hours a', 'click', function() {
+		var hour = $(this).attr('data-hour')*1, secHtml = '';
+		
+		for (i=0; i<60; i++) {
+			secHtml += '<a href="javascript:void(0);">' + hour + ':' + ((i > 9) ? i : '0' + i) + '</a>';
+		}
+		
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$(this).addClass('selected');
+		$('.jl-time-picker .hours').hide();
+		$('.jl-time-picker .seconds').find('a').remove();
+		$('.jl-time-picker .seconds').append(secHtml).show();
+	});
+	
+	$('.playtime-list').delegate('.jl-time-picker .seconds a', 'click', function() {
+		$(this).closest('td').children(':text').first().val($(this).text());
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+	});
+	
+	$('.playtime-list').delegate('.jl-time-picker .seconds .to-back', 'click', function() {
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .seconds').hide();
+	});
+
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/index';
+	});
+	
+	$('.playtime-list').delegate('.add-program-play', 'click', function() {
+		var programPlayItem = $(this).closest('tr').clone();
+		$(this).closest('tbody').append(programPlayItem);
+	});
+	
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+            name : {  
+                required : true,
+            }
+        },  
+        messages : {
+            name : {  
+                required : "组名称必填." ,
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

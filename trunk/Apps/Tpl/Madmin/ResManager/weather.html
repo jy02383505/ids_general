@@ -1,0 +1,195 @@
+<include file="Public:header" />
+
+<ol class="breadcrumb">
+	<li><a href="javascript:void();">资源库</a></li>
+	<li class="active">天气预报</li>
+</ol>
+
+<div class="row well">
+	<form class="form-inline edit-form" role="form">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td class="text-right" width="120"><b>当前城市：</b>长沙
+					</td>
+					<td>
+						<!-- <select id="opera" class="form-control input-sm" onchange="changeherf()">
+							<option value="长沙">长沙</option>
+							<option value="太原">太原</option>
+							<option value="北京">北京</option>
+						</select> -->
+						<!-- <a href="__URL__/getWeatherData/city/长沙" id="setAddr" class="btn btn-default btn-sm">获取网络天气信息</a> -->
+                        <!-- <a href="__URL__/importWeatherData" class="btn btn-primary btn-sm">导出数据到Excel</a> -->
+                        <!-- <div id="fuploadBox" style="display:inline-block;margin:0;">
+							<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+						</div> -->
+					</td>
+					<td class="text-right">
+						<!-- <a href="javascript:void(0);" id="gatherNews" class="btn btn-primary btn-sm">获取网络新闻数据</a> -->
+						<a href="javascript:void(0);" id="importData" class="btn btn-primary btn-sm">导入数据（Zip）</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">天气信息（{$latestUpDate}）</h5>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th class="">日期</th>
+                <th class="">天气情况</th>
+                <th class="">图片</th>
+				<th class="">风力</th>
+				<th class="">温度</th>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="dataList">
+				<volist name="dataList" id="vo">
+					<tr>
+						<td>{$vo.date}</td>
+						<td>{$vo.weather}</td>
+                        <td>
+                        	<img src="__PUBLIC__/images/weather/icon/day/{$vo.dayPictureUrl}" width="48" />
+                        	<!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        	<img src="__PUBLIC__/images/weather/icon/night/{$vo.dayPictureUrl}" width="48" /></td> -->
+                        	</neq>
+						<td>{$vo.wind}</td>
+						<td>{$vo.temperature}</td>
+					</tr>
+				</volist>
+			<else />
+				<tr><td colspan="6" class="text-center">暂无数据.</td></tr>
+			</notempty>
+		</tbody>
+	</table>
+</div>
+
+<div class="my-cover" style="display:none;"></div> <!-- 遮罩层 -->
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title">数据导入</h4>
+		</div>
+		<div class="modal-body text-center">
+			<div class="jl-pluploader" id="JLPluploader" style="padding:20px;">
+				<button type="button" class="btn btn-primary btn-default jl-select-upfile" id="JLSelectUpfile" style="width:200px;margin:0 10px;">添加ZIP数据包</button>
+				<button type="button" class="btn btn-success btn-default jl-uploadfile" id="JLUploadfile" style="width:200px;margin:0 10px;" disabled>开始导入</button>
+			</div>
+			<div id="JLFileList">您的浏览器不支持 Flash, Silverlight 或者 HTML5.</div>
+			<p id="JLConsole" style="color:#a94442;display:none;"></p>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<include file="Public:jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/plupload.full.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/i18n/zh_CN.js"></script>
+<script type="text/javascript">
+$(function($){
+	
+	$('#importData').click(function() {
+		showFramesMasklayer();
+		setDivCenter('#resWindow');
+	});
+	
+	$('button.close, button.close2').click(function(){
+		$('#resWindow').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+	
+	var uploader = new plupload.Uploader({
+		
+		runtimes : 'html5,silverlight,flash,html4',
+		url : '__GROUP__/Ajaxhandle/importDataPlupload',
+		chunk_size: '1mb',
+		rename : false,
+		dragdrop: false,
+		prevent_duplicates: true,
+		multipart_params : {restype : 'weat'},
+		browse_button : 'JLSelectUpfile',
+		container: document.getElementById('JLPluploader'),
+		multi_selection : false,
+		
+		filters : {
+			max_file_size : '0',
+			mime_types: [
+				{title : "Zip files", extensions : "zip"}
+			]
+		},
+		
+		flash_swf_url : '__PUBLIC__/script/plupload2/Moxie.swf',
+		silverlight_xap_url : '__PUBLIC__/script/plupload2/Moxie.xap',
+
+		init: {
+			PostInit: function() {
+				$('#JLFileList').html('');
+				$('#JLConsole').html('');
+
+				$('#JLUploadfile').click(function() {
+					var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+					
+					loadingHtml += '<p style="font-size:72px;margin:30px auto 30px"><i class="icon-spinner icon-spin"></i></p>';
+					loadingHtml += '<p style="line-height:28px;">正在导入数据，请不要关闭当前窗口……</p>';
+					loadingHtml += '</div>';
+					$('#JLFileList').html(loadingHtml);
+					$('#JLPluploader').hide();
+					$('#resWindow button.close, #resWindow button.close2').attr({disabled : true});
+					uploader.start();
+					return false;
+				});
+			},
+
+			FilesAdded: function(up, files) {
+				plupload.each(files, function(file) {
+					$('#JLFileList').html('<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>');
+				});
+				
+				if (files.length > 0) {
+					$('#JLSelectUpfile').attr({disabled : true});
+					up.disableBrowse(true);
+					$('#JLUploadfile').removeAttr('disabled');
+				}
+			},
+
+			/*UploadProgress: function(up, file) {
+				document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '&nbsp;&nbsp;<span>' + file.percent + "%</span>";
+			},*/
+			
+			FileUploaded: function(up, file, info) {
+				var re = $.parseJSON(info.response);
+
+				if (re.error) {
+					$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+					$('#resWindow .loading-box').first().find('p:eq(1)').text(re.error.message);
+				} else {
+					$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+					$('#resWindow .loading-box').first().find('p:eq(1)').html('数据已成功导入！');
+				}
+				$('#resWindow button.close, #resWindow button.close2').removeAttr('disabled');
+			},
+
+			Error: function(up, err) {
+				$('#JLConsole').html("[ Error ]" + err.code + ": " + err.message).fadeIn().delay(3000).fadeOut();
+				$('#resWindow button.close, #resWindow button.close2').removeAttr('disabled');
+			}
+		}
+	});
+
+	uploader.init();
+	
+});
+</script>
+<include file="Public:footer" />

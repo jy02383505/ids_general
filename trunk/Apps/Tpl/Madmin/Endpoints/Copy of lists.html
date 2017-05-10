@@ -1,0 +1,97 @@
+<include file="Public/header" />
+<style>
+.right-main-body{margin:0;padding:0;}
+.data-list{margin:0;}
+</style>
+
+<div class="data-list" id="endsList">
+	<table class="table table-hover list-tbl">
+		<thead class="">
+			<tr>
+				<php>	if (checkAccess('EndPoints', 'del') || checkAccess('EndPoints', 'multiCfg')) {	</php>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<php>	}	</php>
+				<th><a href="javascript:void(0);">在线&nbsp;<span class="order-oper"><i class="icon-caret-down"></i></span></a></th>
+				<th><a href="javascript:void(0);">终端编号&nbsp;<span class="order-oper"><i class="icon-caret-down"></i></span></a></th>
+				<th>终端名称</th>
+				<th>终端分组</th>
+				<th>运行平台</th>
+				<th>终端IP</th>
+				<th>分辨率</th>
+				<th>主程序运行</th>
+				<th>软件版本</th>
+				<th>最后连线</th>
+				<th>当前状态</th>
+				<th>管理操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<volist name="tends" id="vo">
+			<tr>
+				<php>	if (checkAccess('EndPoints', 'del') || checkAccess('EndPoints', 'multiCfg')) {	</php>
+				<td><input type="checkbox" value="{$vo.tid}"></td>
+				<php>	}	</php>
+				<td>
+					<eq name="vo.touchEndPoint_Online" value="1">
+						<i class="icon-ok-sign" style="color:#3c763d;font-size:16px;"></i>
+					<else/>
+						<i class="icon-remove-sign" style="color:#a94442;font-size:16px;"></i>
+					</eq>
+				</td>
+				<td>{$vo.touchMainId}</td>
+				<td>{$vo.touchEndPointName}</td>
+				<td>{$vo.touchEndPoint_GroupClassName}</td>
+				<td>{$vo.touchEndPoint_runplat|default="未知"}</td>
+				<td>{$vo.touchEndPointIp}</td>
+				<td>{$vo.touchEndPoint_ScreenSize}</td>
+				<td>
+					<switch name="vo.TouchMainRunStatus">
+						<case value="Run_Ok">运行中</case>
+						<case value="Run_None">未运行</case>
+						<case value="Run_Unknow">未知</case>
+						<case value="Run_Error">运行错误</case>
+						<default />--
+					</switch>
+				</td>
+				<td>{$vo.touchMainVer}</td>
+				<td>{$vo.lastConnectServerTime}</td>
+				<td>{$vo.touchEndPointStatus}</td>
+				<td>
+					<php>	if (checkAccess('EndPoints', 'preview')) {	</php>
+					<a class="oper edit" href="__URL__/preview/tid/{$vo.tid}" target="_parent" title="查看详细"><i class="icon-search"></i></a>
+					<php>	}	</php>
+					<php>	if (checkAccess('EndPoints', 'edit')) {	</php>
+					<a class="oper edit" href="__URL__/edit/tid/{$vo.tid}" target="_parent" title="配置管理"><i class="icon-wrench"></i></a>
+					<php>	}	</php>
+					<php>	if (checkAccess('EndPoints', 'del')) {	</php>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/del/tid/{$vo.tid}" title="删除"><i class="icon-trash"></i></a>
+					<php>	}	</php>
+				</td>
+			</tr>
+		</volist>
+		</tbody>
+	</table>
+</div>
+
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+
+function myrefresh() {
+	window.location.reload();
+}
+
+//setTimeout('myrefresh()', 10000);
+
+$(function($){
+	
+	$('a.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+		<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+		<meta content="no-cache" http-equiv="pragma">
+		<meta content="0" http-equiv="expires">
+		<meta content="telephone=no, address=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes"> 
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/mobile.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			.usr-input-box{color:#f0f0f0;margin:108px 0 16px 328px;}
+			.usr-input-box .input-ele{margin-bottom:36px;}
+			.usr-input-box span{font-size:20px;display:inline-block;width:160px;text-align:right;}
+			.usr-input-box label{font-size:20px;display:inline-block;margin-right:36px;position:relative;top:3px;}
+			#searBtn{margin-left:168px;margin-top:10px;}
+			.msg-box{margin-top:12px;padding-left:142px;color:#c00;font-size:16px;display:none;}
+			.loading-box{display:none;}
+
+			.books-list{padding:0 12px;margin-top:6px;}
+			.books-item{position:relative;background-color:rgba(255, 255, 255, 0.1);margin:10px 42px;color:#fff;line-height:28px;width:240px;height:272px;}
+			.book-cover{display:block;width:240px;text-align:center;height:272px;}
+			.book-cover span{height:100%;display:inline-block;vertical-align:middle;}
+			.book-cover img{max-height:240px;max-width:240px;vertical-align:middle;}
+			.books-item .book-info{position:absolute;line-height:24px;text-align:center;width:100%;background:rgba(0, 0, 0, 0.65);bottom:0;}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="top-bar clearfix">
+				<span class="fl"><a href="__URL__/index" class="go-back">&lt;</a></span>
+				<span class="fl page-title">{$columnTitle}</span>
+				<span class="fr"><a href="__URL__/index" class="go-home">回到首页</a></span>
+			</div>
+			<div class="usr-input-box">
+				<form id="searForm" action="__URL__/searchResults" method="get">
+					<div class="input-ele">
+						<span>检索内容：</span>
+						<input type="text" class="input-text" name="qkeywords" id="searKeywords">
+					</div>
+					<div class="input-ele">
+						<span>查询类型：</span>
+						<select class="input-select" name="qtype" id="searType">
+							<option value="title">书名</option>
+							<option value="author">作者</option>
+							<option value="publisher">出版社</option>
+							<option value="ssh">索书号</option>
+						</select>
+					</div>
+					<div class="input-ele">
+						<span>查询方式：</span>
+						<ul style="position:relative;top:5px;display:inline-block;">
+							<li class="fl"><input type="radio" id="qway_1" name="qways" class="regular-radio" value="1" checked /><label for="qway_1">前方一致</label></li>
+							<li class="fl"><input type="radio" id="qway_2" name="qways" class="regular-radio" value="2" /><label for="qway_2">绝对一致</label></li>
+							<li class="fl"><input type="radio" id="qway_3" name="qways" class="regular-radio" value="3" /><label for="qway_3">模糊匹配</label></li>
+						</ul>
+					</div>
+					<button class="my-button" type="submit" id="searBtn">查 询</button>
+				</form>
+				<p class="msg-box"></p>
+			</div>
+			
+			<div class="loading-box">
+				<p style="text-align:center;margin-top:60px;color:#f0f0f0;font-size:18px;"><img src="__PUBLIC__/images/mobile/loading.gif" /></p>
+			</div>
+			<div class="books-list clearfix" style="min-height:200px;">
+			</div>
+					
+		</div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			var api_unid = 'f18ac237-da72-2c94-32f1-ed4bb612bb73';
+			
+			$('input[name="qways"]').wrap('<div class="radio-btn"><i></i></div>');
+			$('input[name="qways"]:checked').closest('.radio-btn').addClass('checkedRadio');
+			$(".radio-btn").on('click', function () {
+			    var _this = $(this),
+			        block = _this.parent().parent();
+			    block.find('input:radio').prop('checked', false);
+			    block.find(".radio-btn").removeClass('checkedRadio');
+			    _this.addClass('checkedRadio');
+			    _this.find('input:radio').prop('checked', true);
+			});
+			/* $('input[name="check-box"]').wrap('<div class="check-box"><i></i></div>');
+			$.fn.toggleCheckbox = function () {
+			    this.attr('checked', !this.prop('checked'));
+			}
+			$('.check-box').on('click', function () {
+			    $(this).find(':checkbox').toggleCheckbox();
+			    $(this).toggleClass('checkedBox');
+			}); */
+			
+			$('#searForm').submit(function(){
+				var sear_keywords = $.trim($('#searKeywords').val());
+				if (sear_keywords != '') {
+					return true;
+				} else {
+					setMessage('请先输入检索关键词！');
+					return false;
+				}
+			});
+			
+			/* $('#searBtn').click(function(){
+				var sear_keywords = $.trim($('#searKeywords').val());
+				var sear_type = $('#searType').val();
+				var sear_way = $('input[name="qways"]:checked').val();
+				// setMessage('<p>'+sear_keywords+'</p><p>'+sear_type+'</p><p>'+sear_way+'</p>');
+				
+				if (sear_keywords != '') {
+					$('.loading-box').first().show();
+					$('.usr-input-box').first().hide();
+					$('.books-list').empty();
+					
+					$.ajax({
+						url : '__URL__/getApiData',
+						type : 'post',
+						data : {type : 'searcher', apid : api_unid, sear_keywords : sear_keywords, sear_type : sear_type, sear_way : sear_way},
+						dataType : 'json',
+						timeout : 10000,
+						success: function(re) {
+							$('.loading-box').hide();
+							if (re.stat*1) {
+								var list_html = '';
+								$.each(re.books.datalist, function(i, book) {
+									list_html += '<div class="books-item fl clearfix">';
+									list_html += '<a href="__URL__/bookInfo/isbn/' + book.isbn + '" class="fl book-cover"><span></span><img src="'+ book.coverPath + '" /></a>';
+									list_html += '<p class="book-info">' + book.title + '</p>';
+									list_html += '</div>';
+								});
+								$('.books-list').first().html(list_html);
+							} else {
+								setMessage2('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />' + re.msg);
+							}
+						},
+						error: function() {
+							$('.loading-box').hide();
+							setMessage2('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />网络异常，请求失败！');
+						}
+					});
+					
+				} else {
+					setMessage('请先输入检索关键词！');
+				}
+			}); */
+			
+			function setMessage(contents) {
+				$('.msg-box').first().html(contents).fadeIn().delay(3000).fadeOut();
+			}
+			
+			function setMessage2(contents) {
+				$('.loading-box p').first().html(contents);
+			}
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,1491 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<link href="__PUBLIC__/flib/bt3/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<!-- <link rel="stylesheet" href="__PUBLIC__/flib/jpicker/css/jPicker-1.1.6.min.css">
+<link rel="stylesheet" href="__PUBLIC__/flib/jpicker/jPicker.css"> -->
+<link rel="stylesheet" href="__PUBLIC__/flib/minicolors/jquery.minicolors.css">
+<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap-spinner.css">
+<style type="text/css">
+/* #uploadfyQueueList{height:30px;line-height:30px;}
+.uploadify-queue-item{width:360px;max-width:360px;background:#e0e0e0;}
+.uploadify-progress{margin:0;}
+.uploadify-progress-bar{height:20px;}
+#upEPMainsoft{position:relative;top:1px;left:10px;} */
+.form-group label{margin:0;}
+.well{margin-bottom:10px;}
+#file_upload-button{line-height:21px !important;font-size:13px;}
+#file_upload-button .uploadify-button-text i{top:1px;}
+.endlist-header ul{padding-left:8px;}
+.endlist-header li{height:33px;line-height:33px;font-weight:bold;}
+#multiCfg .icheckbox_flat-green{top:-1px;}
+#multiCfg label{margin:0 0 0 16px;}
+div.jPicker{border:1px solid #aaa;border-radius:8px;-webkit-border-radius:8px;-moz-border-radius:8px;z-index:99999 !important;}
+table.jPicker{border:none;border-radius:8px;-webkit-border-radius:8px;-moz-border-radius:8px;background:#fff;}
+.jPicker td{vertical-align:top;}
+.jPicker div.Bar{margin:22px 10px 0 5px;width:24px;}
+.jPicker td.Text input{height:19px;border:1px solid #ccc;border-radius:4px;-webkit-border-radius:4px;;-moz-border-radius:4px;}
+.jPicker hr{margin:10px 0;}
+.jPicker .Grid span.QuickColor{width:19px;height:17px;}
+.jPicker .Button .Ok, .jPicker .Button .Cancel{border:1px solid #ccc;border-radius:4px;-webkit-border-radius:4px;-moz-border-radius:4px}
+.jPicker .Move{border:none;border-top-left-radius:8px;border-top-right-radius:8px;border-bottom:1px solid #aaa;}
+#pubNotice .form-control[readonly]{cursor:default;background-color:#f8f8f8;opacity:1;}
+#multiCfg .form-control[readonly]{cursor:default;background-color:#f8f8f8;opacity:1;}
+</style>
+
+<ol class="breadcrumb" style="margin-bottom:10px;">
+	<li><a href="__URL__/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li class="active">
+		<gt name="Think.get.epgId" value="0">
+			终端组 ：
+			<volist name="group.gpath" id="pg">
+				<neq name="i" value="1">
+					&nbsp;&nbsp;&gt;&nbsp;
+				</neq>
+				{$pg.groupname}
+			</volist>
+		<else />
+			全部终端
+		</gt>
+	</li>
+</ol>
+
+<div class="well">
+	<table class="table table-condensed bg-success">
+		<gt name="Think.get.epgId" value="0">
+		<tr style="border-bottom:1px solid #ddd;">
+		<else />
+		<tr style="">
+		</gt>
+			<td style="width:80px; border-right:1px solid #ddd;border-top:0;"><b>全局操作</b></td>
+			<td style="border-right:1px solid #ddd;border-top:0;width:332px;">
+				<span id="mainSoft">
+					<switch name="Think.get.et">
+					    <case value="azt">最新升级文件：{$Think.config.azt_latest_upfile}</case>
+					    <case value="azad">最新升级文件：{$Think.config.azad_latest_upfile}</case>
+					    <default />最新升级文件：{$Think.config.x86_latest_upfile}
+					</switch>
+				</span>
+			</td>
+			<td style="border-top:0;" colspan="4">
+				<div id="fuploadBox" style="display:inline-block;margin:0 0 0 10px;">
+					<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				</div>
+				<a href="__GROUP__/EndpointsGroups/index/et/{$Think.get.et|default='x86'}" type="button" id="endGrpLists" class="btn btn-primary btn-xs" style="margin-left:12px;">管理终端组</a>
+				<!-- <a href="__GROUP__/EndpointsGroups/add" type="button" id="addNewEndGrp" class="btn btn-info btn-xs" style="margin-left:12px;">创建终端组</a> -->
+				<a href="__URL__/addNewEnd/et/{$Think.get.et|default='x86'}" type="button" id="addNewEnd" class="btn btn-primary btn-xs" style="margin-left:12px;">添加终端</a>
+				<a href="__URL__/noticeMsg/type/grp/et/{$Think.get.et|default='x86'}" type="button" id="" class="btn btn-primary btn-xs" style="margin-left:12px;">查看历史插播消息</a>
+				<div id="upArea"></div>
+				<div class="my-cover" style="display:none;"></div>
+			</td>
+		</tr>
+	</table>
+	<table class="table table-condensed bg-warning">
+		<gt name="Think.get.epgId" value="0">
+		<tr>
+			<td style="width:125px !important;font-weight:bold;border-right:1px solid #ddd;border-top:0;"><b>终端组操作</b></td>
+			<td style="border-right:1px solid #ddd;width:180px;border-top:0;">
+				<!-- <a href="__GROUP__/EndpointsGroups/edit/id/{$Think.get.epgId}" type="button" id="editEndGrp" class="btn btn-info btn-xs" style="margin-left:12px;">修改终端组信息</a>
+				<a href="javascript:void(0);" data-url="__GROUP__/EndpointsGroups/del/id/{$Think.get.epgId}" type="button" id="delEndGrp" class="btn btn-info btn-xs" style="margin-left:12px;">删除终端组</a> -->
+				<div class="" style="display:inline-block;position:relative;top:3px;">
+					<select class="form-control input-sm" id="endPGrpSwitch" style="display:inline-block;width:168px;height:26px;line-height:26px;padding:0 8px;position:relative;top:-2px;">
+						<!-- <option value="0">全部</option> -->
+						<volist name="groups" id="vo">
+							<php> if ($_GET['epgId'] == $vo['id']) { </php>
+								<option value="{$vo.id}" selected>{$vo.space} {$vo.groupname}</option>
+							<php> } else { </php>
+								<option value="{$vo.id}">{$vo.space} {$vo.groupname}</option>
+							<php> } </php>
+						</volist>
+					</select>
+				</div>
+			</td>
+			<elt name="group.has_sub" value="0">
+			<td style="border-right:1px solid #ddd;width:500px;border-top:0;text-align:center;" class="grp-manager-td">
+			<else />
+			<td style="border-right:1px solid #ddd;width:500px;border-top:0;text-align:center;display:none;" class="grp-manager-td">
+			</elt>
+				<!-- <span style="display:inline-block;margin-right:16px;">组名称：{$group.groupname}</span> -->
+				<div class="grpTplInfo" style="display:inline-block;">
+					<eq name="Think.get.et" value="x86">
+						<notempty name="group.lastdatazip"><p style="color:#080;margin:0;">数据更新包：{$group.lastdatazip}</p></notempty>
+						<span class="label label-default" style="display:inline-block;margin-right:16px;">应用模板：{$group.tplname}</span>
+						<span class="label label-default" style="display:inline-block;margin-right:0px;">节目：{$group.projname}</span>
+					<else />
+						<span class="label label-default" style="display:inline-block;margin-right:16px;">节目播放表：{$group.projname}</span>
+					</eq>
+				</div>
+				<eq name="Think.get.et" value="x86">
+				<notempty name="group.tplclassid">
+				<div class="grpDataOper">
+				<else/>
+				<div class="grpDataOper" ><!--style="display:none;"-->
+				</notempty>
+					<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="ZipGroupData" style="margin-right:8px;">生成最新数据</button>
+					<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="DownLoadDataFile" style="margin-right:8px;">更新终端组数据</button>
+				</div>
+				<else />
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="DownLoadDataFile" style="margin-right:8px;">发布最新数据</button>
+				</eq>
+			</td>
+			<td style="border-right:1px solid #ddd;border-top:0;text-align:center">
+				<button type="button" class="btn btn-success btn-xs multi-cfg" data-type="grp" style="margin-right:8px;">配置终端组参数</button>
+				<!-- <button type="button" class="btn btn-info btn-xs multi-oper" data-type="grp" data-cmd="DownLoadDataFile" style="margin-right:8px;">发布终端组最新数据</button> -->
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="PublishNewMainSoft" style="margin-right:8px;">更新终端组软件版本</button>
+				<elt name="group.has_sub" value="0">
+				<button type="button" class="btn btn-success btn-xs multi-pubnotice" data-type="grp" data-cmd="" style="margin-right:0px;">插播消息</button>
+				</elt>
+			</td>
+			<td style="border-right:1px solid #ddd;width:260px;border-top:0;text-align:center">
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="RestartMain" style="margin-right:8px;">重启终端组主程序</button>
+				<eq name="Think.get.et" value="x86">
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="ShutdownMain" style="margin-right:0px;">关闭终端组主程序</button>
+				</eq>
+			</td>
+			<td style="width:260px;border-top:0;text-align:center">
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="RestartSystem" style="margin-right:8px;">重启终端组计算机</button>
+				<button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="CloseSystem" style="margin-right:0px;">关闭终端组计算机</button>
+			</td>
+		</tr>
+		</gt>
+	</table>
+</div>
+
+<div class="row" style="padding:7px 0 3px;background:#f5f5f5;">
+	<div class="col-md-6" style="padding-left:6px;"><b>终端列表</b></div>
+	<div class="col-md-6 text-right">
+		<label class="radio-inline" style="position:relative;top:2px;">
+			<input type="radio" name="autoRefresh" id="autoRefresh_yes" value="1"> 自动刷新
+		</label>
+		<label class="radio-inline" style="position:relative;top:2px;">
+			<input type="radio" name="autoRefresh" id="autoRefresh_no" value="0" checked> 手动刷新
+		</label>
+		<button type="button" class="btn btn-info btn-xs" id="freshEndLists" style="margin-left:8px;">刷新</button>
+	</div>
+</div>
+
+<div class="row border-color endlist-header" style="margin-bottom:0px;height:34px;/*min-width:1480px;*/">
+	<ul class="clearfix">
+		<li class="fl" style="width:26px;"><input type="checkbox" class="select-all" title="全选/全不选"></li>
+		<li class="fl" style="width:42px;"><a href="javascript:void(0);" data-orderby="online" data-order="1">在线&nbsp;<span class="order-oper"><i class="icon-caret-down"></i></span></a></li>
+		<li class="fl" style="width:72px;"><a href="javascript:void(0);" data-orderby="mainid" data-order="1">终端编号&nbsp;<span class="order-oper"><i class="icon-caret-down"></i></span></a></li>
+		<li class="fl" style="width:88px;">终端名称</li>
+		<li class="fl" style="width:72px;">终端分组</li>
+		<li class="fl" style="width:76px;">运行平台</li>
+		<li class="fl" style="width:88px;">终端IP</li>
+		<li class="fl" style="width:72px;">分辨率</li>
+		<li class="fl" style="width:76px;">主程序运行</li>
+		<li class="fl" style="width:72px;">软件版本</li>
+		<li class="fl" style="width:116px;">最后连线</li>
+		<li class="fl" style="width:88px;">数据更新状态</li>
+		<li class="fl" style="width:182px;">当前状态</li>
+		<li class="fl" style="width:78px;">管理操作</li>
+	</ul>
+</div>
+<div class="row border-color" id="endListsBox" style="margin-bottom:10px;/*min-width:1480px;*/">
+	<iframe id="endListsFrm" name="endlists" runat="server" src="__URL__/lists/et/{$Think.get.et|default='x86'}/epgId/{$Think.get.epgId|default=0}/orderby/online/order/1" width="100%" height="360" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes" allowtransparency="yes"></iframe>
+</div>
+
+<div class="well">
+	<table class="table table-condensed bg-danger">
+		<tr>
+			<td style="width:80px;font-weight:bold;border-right:1px solid #ddd;border-top:0;"><b>终端操作</b></td>
+			<td style="border-right:1px solid #ddd;border-top:0;width:360px;">
+				<php>	if (checkAccess('EndPoints', 'multiCfg')) {	</php>
+				<div class="" style="display:inline-block;position:relative;top:3px;">
+					<span style="position:relative;top:-2px;">移动选中终端到组：</span>
+					<select class="form-control input-sm" name="endPGrp_id" id="endPGrpID" style="display:inline-block;width:auto;height:24px;line-height:24px;padding:0 8px;position:relative;top:-1px;">
+						<option value="">请选择</option>
+						<volist name="groups" id="vo">
+							<php> if (!empty($vo['has_children'])) { </php>
+								<option value="{$vo.id}" disabled>{$vo.space} {$vo.groupname}</option>
+							<php> } else { </php>
+								<option value="{$vo.id}">{$vo.space} {$vo.groupname}</option>
+							<php> } </php>
+						</volist>
+					</select>
+					<button type="button" id="setEndGroup" class="btn btn-info btn-xs" style="position:relative;top:-3px;">保存</button>
+				</div>
+				<php>	}	</php>
+			</td>
+			<td style="border-top:0;border-right:1px solid #ddd;text-align:center">
+				<button type="button" class="btn btn-info btn-xs multi-cfg" data-type="eps" style="margin-right:8px;">配置选中终端参数</button>
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="DownLoadDataFile" style="margin-right:8px;">更新选中终端数据</button>
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="PublishNewMainSoft" style="margin-right:8px;">更新选中终端软件版本</button>
+				<button type="button" class="btn btn-info btn-xs multi-pubnotice" data-type="eps" data-cmd="" style="margin-right:0px;">插播消息</button>
+			</td>
+			<td style="border-right:1px solid #ddd;border-top:0;text-align:center">
+				<php>	if (checkAccess('EndPoints', 'del')) {	</php>
+				<button type="button" class="btn btn-info btn-xs multi-del" style="margin-left:0px;">删除选中终端</button>
+				<php>	}	</php>
+			</td>
+			<td style="border-right:1px solid #ddd;width:280px;border-top:0;text-align:center">
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="RestartMain" style="margin-right:8px;">重启选中终端主程序</button>
+				<eq name="Think.get.et" value="x86">
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="ShutdownMain" style="margin-right:0px;">关闭选中终端主程序</button>
+				</eq>
+			</td>
+			<td style="width:280px;border-top:0;text-align:center">
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="RestartSystem" style="margin-right:8px;">重启选中终端计算机</button>
+				<button type="button" class="btn btn-info btn-xs multi-oper" data-type="eps" data-cmd="CloseSystem" style="margin-right:0px;">关闭选中终端计算机</button>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<!-- 页面弹出层  -->
+<div id="alert-layer" style="display:none;"></div>
+<!-- 批量配置窗口  -->
+<div id="multiCfg" class="modal-dialog" style="display:none;min-width:360px;">
+	<div class="modal-content">
+		<form id="mcfgForm" class="form-horizontal" role="form" method="post" action="__URL__/multiCfg">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">批量配置</h5>
+		</div>
+		<div class="modal-body">
+				<table class="table">
+					<tbody>
+						<tr>
+							<td colspan="2" class="my-form-group text-center cfg-options" style="border:0;">
+								<label><input type="checkbox" name="isAutoRun" value=""> 开机自启</label>
+								<label><input type="checkbox" name="isAutoShutdown" value="auto-shutdown"> 定时关机</label>
+								<label><input type="checkbox" name="isShowVer" value=""> 版本提示</label>
+								<label><input type="checkbox" name="isAdsPlay" value="ad-delaytime"> 广告播放</label>
+								<label><input type="checkbox" name="isNeedPass" value="exit-pass"> 使用退出密码</label>
+							</td>
+						</tr>
+						<tr style="display:none">
+							<td class="text-right" width="180" style="border:0;"><b>终端名称</b></td>
+							<td class="my-form-group" style="border:0;">
+								<input class="form-control input-sm" type="text" name="epname" id="" value="" style="width:200px;">
+							</td>
+						</tr>
+						<tr style="">
+							<td class="text-right" width="180" style="border:0;"><b>开机时间</b></td>
+							<td class="my-form-group jl-time-box" style="border:0;position:relative;">
+								<input class="form-control input-sm" type="text" name="mainOpentime" id="mainOpentime" value="" style="display:inline-block;width:56px;" readonly>
+								<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<div class="jl-time-picker">
+									<div class="hours clearfix">
+										<a href="javascript:void(0);" data-hour='0'>0:00</a>
+										<a href="javascript:void(0);" data-hour='1'>1:00</a>
+										<a href="javascript:void(0);" data-hour='2'>2:00</a>
+										<a href="javascript:void(0);" data-hour='3'>3:00</a>
+										<a href="javascript:void(0);" data-hour='4'>4:00</a>
+										<a href="javascript:void(0);" data-hour='5'>5:00</a>
+										<a href="javascript:void(0);" data-hour='6'>6:00</a>
+										<a href="javascript:void(0);" data-hour='7'>7:00</a>
+										<a href="javascript:void(0);" data-hour='8'>8:00</a>
+										<a href="javascript:void(0);" data-hour='9'>9:00</a>
+										<a href="javascript:void(0);" data-hour='10'>10:00</a>
+										<a href="javascript:void(0);" data-hour='11'>11:00</a>
+										<a href="javascript:void(0);" data-hour='12'>12:00</a>
+										<a href="javascript:void(0);" data-hour='13'>13:00</a>
+										<a href="javascript:void(0);" data-hour='14'>14:00</a>
+										<a href="javascript:void(0);" data-hour='15'>15:00</a>
+										<a href="javascript:void(0);" data-hour='16'>16:00</a>
+										<a href="javascript:void(0);" data-hour='17'>17:00</a>
+										<a href="javascript:void(0);" data-hour='18'>18:00</a>
+										<a href="javascript:void(0);" data-hour='19'>19:00</a>
+										<a href="javascript:void(0);" data-hour='20'>20:00</a>
+										<a href="javascript:void(0);" data-hour='21'>21:00</a>
+										<a href="javascript:void(0);" data-hour='22'>22:00</a>
+										<a href="javascript:void(0);" data-hour='23'>23:00</a>
+									</div>
+									<div class="seconds clearfix" style="display:none;">
+										<div class="text-right"><i class="icon-reply to-back" style="cursor:pointer;"></i></div>
+									</div>
+									<div class="btn btn-default btn-xs close-btn">取消</div>
+								</div>
+							</td>
+						</tr>
+						<tr class="auto-shutdown" style="display:none">
+							<td class="text-right" width="180" style="border:0;"><b>关机时间</b></td>
+							<td class="my-form-group jl-time-box" style="border:0;position:relative;">
+								<input class="form-control input-sm" type="text" name="mainClosetime" id="mainClosetime" value="" style="display:inline-block;width:56px;" readonly>
+								<div class="jl-time-selector"><i class="icon-time"></i></div>
+								<div class="jl-time-picker">
+									<div class="hours clearfix">
+										<a href="javascript:void(0);" data-hour='0'>0:00</a>
+										<a href="javascript:void(0);" data-hour='1'>1:00</a>
+										<a href="javascript:void(0);" data-hour='2'>2:00</a>
+										<a href="javascript:void(0);" data-hour='3'>3:00</a>
+										<a href="javascript:void(0);" data-hour='4'>4:00</a>
+										<a href="javascript:void(0);" data-hour='5'>5:00</a>
+										<a href="javascript:void(0);" data-hour='6'>6:00</a>
+										<a href="javascript:void(0);" data-hour='7'>7:00</a>
+										<a href="javascript:void(0);" data-hour='8'>8:00</a>
+										<a href="javascript:void(0);" data-hour='9'>9:00</a>
+										<a href="javascript:void(0);" data-hour='10'>10:00</a>
+										<a href="javascript:void(0);" data-hour='11'>11:00</a>
+										<a href="javascript:void(0);" data-hour='12'>12:00</a>
+										<a href="javascript:void(0);" data-hour='13'>13:00</a>
+										<a href="javascript:void(0);" data-hour='14'>14:00</a>
+										<a href="javascript:void(0);" data-hour='15'>15:00</a>
+										<a href="javascript:void(0);" data-hour='16'>16:00</a>
+										<a href="javascript:void(0);" data-hour='17'>17:00</a>
+										<a href="javascript:void(0);" data-hour='18'>18:00</a>
+										<a href="javascript:void(0);" data-hour='19'>19:00</a>
+										<a href="javascript:void(0);" data-hour='20'>20:00</a>
+										<a href="javascript:void(0);" data-hour='21'>21:00</a>
+										<a href="javascript:void(0);" data-hour='22'>22:00</a>
+										<a href="javascript:void(0);" data-hour='23'>23:00</a>
+									</div>
+									<div class="seconds clearfix" style="display:none;">
+										<div class="text-right"><i class="icon-reply to-back" style="cursor:pointer;"></i></div>
+									</div>
+									<div class="btn btn-default btn-xs close-btn">取消</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>心跳间隔（秒）</b></td>
+							<td class="my-form-group" style="border:0;"><input class="form-control input-sm text-cener" type="text" name="epInterval" id="epInterval" value="" style="display:inline-block;width:62px;">&nbsp;<span class="my-help-txt">必须在10-60之间.</span></td>
+						</tr>
+						<tr class="ad-delaytime" style="display:none">
+							<td class="text-right" width="180" style="border:0;"><b>广告延时（分钟）</b></td>
+							<td class="my-form-group" style="border:0;"><input class="form-control input-sm text-cener" type="text" name="epDelayTime" id="epDelayTime" value="" style="display:inline-block;width:62px;">&nbsp;<span class="my-help-txt">必须在10-60之间.</span></td>
+						</tr>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>退出码</b></td>
+							<td class="my-form-group" style="border:0;"><input class="form-control input-sm" type="text" name="tclientExitcode" id="tclientExitcode" value="" style="display:inline-block;width:80px;"></td>
+						</tr>
+						<tr class="exit-pass" style="display:none">
+							<td class="text-right" width="180" style="border:0;"><b>退出密码</b></td>
+							<td class="my-form-group" style="border:0;"><input class="form-control input-sm" type="text" name="tclientExitPass" id="tclientExitPass" value="" style="display:inline-block;width:80px;"></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="loading-box" style="text-align:center;display:none;">
+					<p style="font-size:48px;margin-top:10px;"><i class="icon-spinner icon-spin"></i></p>
+					<p style="">正在发送操作请求，请稍等……</p>
+				</div> 
+				<p class="multi-cfg-info bg-danger border-radius4" style="display:none;height:28px;line-height:28px;text-align:center;width:74%;margin-bottom:0;margin:0 auto;">未输入配置参数！</p>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<input type="hidden" name="type" value="">
+			<input type="hidden" name="tids" value="">
+			<button type="submit" class="btn btn-info btn-sm">确定</button>
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+		</form>
+	</div>
+</div>
+<!-- 插播消息设置窗口  -->
+<div id="pubNotice" class="modal-dialog" style="display:none;min-width:662px;">
+	<div class="modal-content">
+		<form id="noticeForm" class="form-horizontal" role="form" method="post" action="__URL__/multiCfg">
+		<div id="alert-title" class="modal-header">
+			<button type="reset" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">编辑插播消息</h5>
+		</div>
+		<div class="modal-body" style="padding:15px 38px 15px 0;">
+				<table class="table">
+					<tbody>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>消息名称</b></td>
+							<td class="text-left" colspan="2" style="border:0;">
+								<input type="text" name="msgName" class="form-control input-sm" value="新消息_{:date('Y-m-d H:i:s')}" style="width:230px;">
+							</td>
+							<td class="text-left" colspan="1" style="border:0;">
+								<b>消息窗位置</b>
+								<label style="font-weight:normal;margin-left:10px;"><input type="radio" name="msgPosition" value="top"> 顶部</label>
+								<label style="font-weight:normal;margin-left:10px;"><input type="radio" name="msgPosition" value="bottom" checked> 底部</label>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-left" colspan="4" style="border:0;">
+								<b class="fl" style="margin-left:36px;">字体</b>
+								<select class="form-control input-sm fl" name="fontfamily" style="width:98px;margin-left:16px;">
+									<option value="微软雅黑">微软雅黑</option>
+									<option value="宋体">宋体</option>
+									<option value="黑体">黑体</option>
+									<option value="楷体">楷体</option>
+								</select>
+								<b class="fl" style="margin-left:36px;">字体大小</b>
+								<div class="input-group spinner fl" data-trigger="spinner" id="spinnerFontsize" style="width:72px;margin-left:16px;">
+									<input type="text" class="form-control input-sm spinner-fontsize" name="myfontsize" value="26" data-max="100" data-min="12" data-step="1" readonly>
+									<div class="input-group-addon" style="padding:6px 8px;">
+										<a href="javascript:;" class="spin-up" data-spin="up" style="height:8px;"><i class="icon-sort-up"></i></a>
+										<a href="javascript:;" class="spin-down" data-spin="down" style="height:8px;"><i class="icon-sort-down"></i></a>
+									</div>
+								</div>
+								<b class="fl" style="margin-left:30px;">滚动速度（秒）</b>
+								<div class="input-group spinner fl" data-trigger="spinner" id="spinnerSpeed" style="width:72px;margin-left:10px;">
+									<input type="text" class="form-control input-sm" name="msgSpeed" value="7" data-max="7" data-min="1" data-step="1" readonly>
+									<div class="input-group-addon" style="padding:6px 8px;">
+										<a href="javascript:;" class="spin-up" data-spin="up" style="height:8px;"><i class="icon-sort-up"></i></a>
+										<a href="javascript:;" class="spin-down" data-spin="down" style="height:8px;"><i class="icon-sort-down"></i></a>
+									</div>
+								</div>
+								<div class="help-tips" style="position:relative;display:inline-block;font-size:18px;height:30px;line-height:30px;margin-left:8px;top:1px;">
+									<i class="icon-question-sign"></i>
+									<div class="text-left" style="position:absolute;top:30px;right:-82px;width:225px;font-size:12px;line-height:18px;background:#f0f0f0;border:1px solid #e0e0e0;padding:8px;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;display:none;z-index:99;">
+										<ul style="margin:0;list-style-type:disc;list-style-position:inside;">
+											<li>1-7级，1级速度最快，7级最慢.</li>
+										</ul>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>开始时间</b></td>
+							<td class="form-group" style="border:0;">
+								<!-- <input class="form-control form_datetime input-sm" type="text" name="" id="" value="{:date('Y-m-d H:i')}" readonly style="width:200px;"> -->
+								<div class="input-group date form_datetime" data-date="" data-date-format="HH:ii" data-link-field="">
+									<input class="form-control input-sm" type="text" name="startTime" value="{:date('Y-m-d 08:00')}" readonly style="width:168px;">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+								</div>
+							</td>
+							<td class="text-right" width="180" style="border:0;"><b>文字颜色</b></td>
+							<td class="my-form-group" style="border:0;">
+								<!-- for jPicker -- <input class="form-control input-sm" type="text" name="" id="" value="ffffffff" readonly style="width:102px;display:inline-block;margin-right:4px;"><span id="forecolor"></span> -->
+								<input type="text" id="position-bottom-right1" class="form-control input-sm forecolor" name="fontcolor" data-position="bottom right" value="#ffffff" style="width:180px;" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>结束时间</b></td>
+							<td class="my-form-group" style="border:0;">
+								<!-- <input class="form-control form_datetime input-sm" type="text" name="" id="" value="{:date('Y-m-d H:i', strtotime('+1day'))}" readonly style="width:200px;"> -->
+								<div class="input-group date form_datetime" data-date="" data-date-format="HH:ii" data-link-field="">
+									<input class="form-control input-sm" type="text" name="endTime" value="{:date('Y-m-d 23:00')}" readonly style="width:168px;">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+								</div>
+							</td>
+							<td class="text-right" width="180" style="border:0;"><b>背景颜色</b></td>
+							<td class="my-form-group" style="border:0;">
+								<!-- for jPicker --  <input class="form-control input-sm" type="text" name="" id="" value="000000c9" readonly style="width:102px;display:inline-block;margin-right:4px;"><span id="backcolor"></span> -->
+								<input type="text" id="position-bottom-right2" class="form-control input-sm backcolor" name="backgroundColor" data-opacity="1" data-position="bottom right" value="#333333" style="width:180px;" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-left" colspan="4" style="border:0;padding-left:45px;">
+								<!-- <b>消息内容</b><br> -->
+								<textarea class="form-control" rows="6" id="noticeContents" placeholder="" style="height:132px;font-size:26px;color:#ffffff;background-color:#333333;">在此处输入消息内容</textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="loading-box" style="text-align:center;display:none;">
+					<p style="font-size:48px;margin-top:10px;"><i class="icon-spinner icon-spin"></i></p>
+					<p style="">正在发送操作请求，请稍等……</p>
+				</div> 
+				<p class="notice-cfg-info bg-danger border-radius4" style="display:none;height:28px;line-height:28px;text-align:center;width:74%;margin-bottom:0;margin:0 auto;">未输入配置参数！</p>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<input type="hidden" name="type" value="">
+			<input type="hidden" name="tids" value="">
+			<button type="submit" class="btn btn-info btn-sm">确定</button>
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+		</form>
+	</div>
+</div>
+
+<div class="my-cover"></div>
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title">信息提示</h4>
+		</div>
+		<div class="modal-body text-center">
+			<div class="loading-box" style="text-align:center;">
+				<p style="font-size:72px;margin:30px auto 30px"><i class="icon-spinner icon-spin"></i></p>
+				<p style="line-height:28px;">正在处理，请不要关闭当前窗口……</p></div>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/flib/bt3/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/flib/bt3/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript" src="__PUBLIC__/flib/bt3/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<!-- <script type="text/javascript" src="__PUBLIC__/flib/jpicker/jpicker-1.1.6.js"></script> -->
+<script type="text/javascript" src="__PUBLIC__/flib/bt3/js/jquery.spinner.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/flib/minicolors/jquery.minicolors.js"></script>
+<script type="text/javascript">
+	var refreshTimer;
+
+	function myrefresh() {
+		$("#endListsFrm")[0].contentWindow.location.reload();
+	}
+
+	function startTimer() {
+		refreshTimer = setInterval(myrefresh, 5000);
+	}
+
+	function stopTimer() {
+		clearInterval(refreshTimer);
+	}
+	
+	function switchRefreshWay(wayCode) {
+		if (wayCode) {
+			$('#freshEndLists').hide();
+			startTimer(); 
+		} else {
+			$('#freshEndLists').show();
+			stopTimer(); 
+		}
+	}
+	
+	function myAlert() {
+		$.kw.confirm('确认要删除吗？', function() {
+			console.log('haha......');
+		});
+	}
+$(function($){
+	
+	var epgId = {$Think.get.epgId|default=0},
+		endType = "{$Think.get.et|default='x86'}";
+	if (epgId > 0) {
+		var enodes = $('#enodes', window.parent.frame_left_menu.document).text();
+		$.each(jQuery.parseJSON(enodes), function(i, node) {
+			if (epgId == node.id) {
+				$('#endPoints', window.parent.frame_left_menu.document).find('a').removeClass('curSelectedNode');
+				$('a#' + node.tId + '_a', window.parent.frame_left_menu.document).addClass('curSelectedNode');
+			}
+		})
+	}
+	
+	$('.help-tips').hover(
+		function() {
+			$(this).children('div').first().show();
+		},
+		function() {
+			$(this).children('div').first().hide();
+		}
+	);
+	
+	function stopPropagation(e) {
+		if (e.stopPropagation)
+			e.stopPropagation();
+		else
+			e.cancelBubble = true;
+	}
+	
+    $(document).bind('click',function() {
+    	$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+    });
+	
+	$('#endListsFrm').height($(window).height() - 300);
+
+	$(".form_datetime").datetimepicker({format : 'yyyy-mm-dd hh:ii', language:  'zh-CN', autoclose : true, minuteStep: 1, pickerPosition: 'bottom-left'});
+	
+	$('.forecolor').first().minicolors({
+		defaultValue: $(this).attr('data-defaultValue') || '',
+		theme: 'bootstrap',
+		opacity: false,
+		change: function(hex, opacity) {
+			try {
+				var color_val = '';
+				if( opacity ) {
+					var hex_opacity = rgba2Hex(opacity),
+						hex_rgb = hex.slice(1),
+						real_hex_rgb = '';
+					real_hex_rgb = hex_rgb.length > 6 ? hex_rgb.slice(2) : hex_rgb;
+					color_val = '#' + hex_opacity + real_hex_rgb;
+				} else {
+					color_val = hex;
+				}
+				$(this).siblings('.minicolors-values-box').first().text(color_val).show();
+				$('#noticeContents').css({'color' : hex});
+			} catch(e) {}
+		}
+	});
+	
+	$('.backcolor').first().minicolors({
+		defaultValue: $(this).attr('data-defaultValue') || '',
+		theme: 'bootstrap',
+		opacity: true,
+		change: function(hex, opacity) {
+			try {
+				var color_val = '';
+				if( opacity ) {
+					var hex_opacity = rgba2Hex(opacity),
+						hex_rgb = hex.slice(1),
+						real_hex_rgb = '';
+					real_hex_rgb = hex_rgb.length > 6 ? hex_rgb.slice(2) : hex_rgb;
+					color_val = '#' + hex_opacity + real_hex_rgb;
+				} else {
+					color_val = hex;
+				}
+				$(this).siblings('.minicolors-values-box').first().text(color_val).show();
+				$('#noticeContents').css({'opacity' : opacity, 'background-color' : hex});
+			} catch(e) {}
+		}
+	});
+	
+	$('select[name="fontfamily"]').change(function() {
+		var fontfamily = $(this).val();
+		$('#noticeContents').css({'font-family' : fontfamily});
+	});
+	
+	$("#spinnerFontsize" ).spinner('changed', function(e, newVal, oldVal) {
+		$('#noticeContents').css({'font-size' : newVal});
+	});
+	
+	$('.modal-dialog').delegate('.minicolors-values-box', 'click', function() {
+		$('.backcolor').first().minicolors('show');
+	});
+	
+	function rgba2Hex(my_var) {
+    	var reg = /[^\d\.]+/g;
+    	if (reg.test(my_var)) {
+    		my_var = my_var.replace(/[^\d\.]+/g, "");
+    	}
+    	var val = parseFloat(my_var) || 0;
+    	val = Math.max(Math.min(val, 1), 0);
+    	var aa = Math.round(val * 0xFF);
+    	aa = aa.toString(16);
+    	if (aa.length < 2) {
+    		aa = "0" + aa;
+    	}
+    	
+    	return aa;
+    }
+	
+	/* $.fn.jPicker.defaults.images.clientPath='__PUBLIC__/flib/jpicker/images/';
+	var localization = {
+			text: {
+				title: '拖动鼠标选中一个颜色',
+				newColor: '选中颜色',
+				currentColor: '当前颜色',
+				ok: '确定',
+				cancel: '取消'
+			},
+			tooltips: {
+				colors: {
+					newColor: '点击‘确定’提交新选颜色',
+					currentColor: '点击这里还原当前颜色'
+				},
+				buttons: {
+					ok: '提交选中的颜色',
+					cancel: '取消并恢复当前颜色'
+				},
+				hue: {
+					radio: ' ',
+					textbox: ' '
+				},
+				saturation: {
+					radio: ' ',
+					textbox: ' '
+				},
+				value: {
+					radio: ' ',
+					textbox: ' '
+				},
+				red: {
+					radio: ' ',
+					textbox: ' '
+				},
+				green: {
+					radio: ' ',
+					textbox: ' '
+				},
+				blue: {
+					radio: ' ',
+					textbox: ' '
+				},
+				alpha: {
+					radio: ' ',
+					textbox: ' '
+				},
+				hex: {
+					textbox: ' ',
+					alpha: ' '
+				}
+			}
+		};
+	$('#forecolor').jPicker({
+		window : { expandable : true, title : '', alphaSupport : false, position : {x : 'center', y : 'center'}},
+		color : { active : new $.jPicker.Color({ahex:'ffffff'}) },
+		localization : localization
+		},
+		function(color, context) {
+			var all = color.val('all');
+			$(this).siblings(':text').first().val(all.ahex);
+		}
+	);
+	
+	$('#backcolor').jPicker({
+		window : { expandable : true, title : '', alphaSupport : true, position : {x : 'center', y : 'center'}},
+		color : { active : new $.jPicker.Color({ahex:'000000c9'}) },
+		localization : localization
+		},
+		function(color, context) {
+			var all = color.val('all');
+			$(this).siblings(':text').first().val(all.ahex);
+		}
+	); */
+	
+	$(':radio[name="autoRefresh"]').siblings('ins').click(function() {
+		switchRefreshWay($(this).siblings(':radio[name="autoRefresh"]').first().val()*1);
+	});
+	
+	$(':radio[name="autoRefresh"]').closest('label').click(function() {
+		switchRefreshWay($(this).find(':radio[name="autoRefresh"]').first().val()*1);
+	});
+	
+	$('#freshEndLists').click(function() {
+		$("#endListsFrm")[0].contentWindow.location.reload();
+	});
+	
+	/* -- for debug --
+	$('#endListsFrm').load(function(){
+		//console.log($('#endListsFrm').contents().find('#endsList :checkbox:checked').size());
+		//$("#endListsFrm")[0].contentWindow.tesmy(); 
+	}); */
+	
+	
+	$('.endlist-header a[data-orderby]').click(function() {
+		var orderby = $(this).attr('data-orderby'),
+			order = $(this).attr('data-order')*1,
+			url = '__URL__/lists/et/' + endType + '/epgId/{$Think.get.epgId|default=0}';
+			$(this).attr('data-order', order ? 0 : 1);
+			$(this).find('span.order-oper i').removeClass(order ? 'icon-caret-up' : 'icon-caret-down').addClass(order ? 'icon-caret-down' : 'icon-caret-up');
+			$('#endListsFrm').attr('src', url + '/orderby/' + orderby + '/order/' + order);
+	});
+	
+	$('#endPGrpSwitch').change(function() {
+		var gid = $(this).val()*1;
+		$('#endListsFrm').attr('src', '__URL__/lists/et/' + endType + '/epgId/' + gid);
+		
+		var enodes = $('#enodes', window.parent.frame_left_menu.document).text();
+		$.each(jQuery.parseJSON(enodes), function(i, node) {
+			if (gid == node.id) {
+				$('#endPoints', window.parent.frame_left_menu.document).find('a').removeClass('curSelectedNode');
+				$('a#' + node.tId + '_a', window.parent.frame_left_menu.document).addClass('curSelectedNode');
+			}
+		});
+		
+		$.post('__GROUP__/Ajaxhandle/getEndGroupInfo', {id : gid, et : endType}, function(re) {
+			
+			var g_path = ' 全部终端', tpl_name = '未指定', proj_name = '未绑定';
+			
+			if (re.stat*1) {
+				g_path = ' 终端组 ： ' + re.data.gpath;
+				tpl_name = re.data.tplname;
+				proj_name = re.data.projname;
+			
+				$('.breadcrumb li.active').first().html(g_path);
+				if (re.data.has_sub*1 <= 0) {
+					var bindInfo = '';
+					if (endType == 'x86') {
+						if (re.data.lastdatazip)	bindInfo += '<p style="color:#080;margin:0;">数据更新包：' + re.data.lastdatazip + '</p>';
+						bindInfo += '<span class="label label-default" style="display:inline-block;margin-right:16px;">应用模板：' + tpl_name + '</span><span class="label label-default" style="display:inline-block;margin-right:0px;">节目：' + proj_name + '</span>';
+					} else {
+						bindInfo = '<span class="label label-default" style="display:inline-block;margin-right:0px;">节目播放表：' + proj_name + '</span>';
+					}
+					$('.grpTplInfo').html(bindInfo);
+					$('.grp-manager-td').show();
+					$('.multi-pubnotice[data-type="grp"]').show();
+				} else {
+					$('.multi-pubnotice[data-type="grp"]').hide();
+					$('.grp-manager-td').hide();
+				}
+				
+				if ($.trim(re.data.tplclassid) == '') {
+					$('.grpDataOper').hide();
+				} else {
+					$('.grpDataOper').show();
+				}
+			}
+		}, 'json');
+	});
+	
+	$('.select-all').siblings('ins').click(function(){
+		var isChecked = $(this).siblings('.select-all').first().prop('checked'),
+			listObj = $('#endListsFrm').contents().find('#endsList');
+		
+		$('.select-all').prop({'checked' : isChecked});
+		listObj.find(':checkbox').prop({'checked' : isChecked});
+		
+		if (isChecked) {
+			$('.select-all').parent('div').addClass('checked');
+			listObj.find(':checkbox').parent('div').addClass('checked');
+		} else {
+			$('.select-all').parent('div').removeClass('checked');
+			listObj.find(':checkbox').parent('div').removeClass('checked');
+		}
+	});
+	
+	$('button.close, button[type="reset"]').click(function(){
+		var form_ID = $(this).closest('.modal-dialog').attr('id');
+		if (form_ID == 'multiCfg') {
+			
+			$('#' + form_ID).find(':text').val('');
+			$('#' + form_ID).find(':checkbox').prop({'checked' : false}).parent('div').removeClass('checked');
+			$('#' + form_ID).find('tr[class]').hide();
+			$('#multiCfg :text[name="epname"]').closest('tr').hide();
+			
+		} else if (form_ID == 'pubNotice') {
+			
+			$('#' + form_ID).find(':radio').prop({'checked' : false}).parent('div').removeClass('checked');
+			$('#' + form_ID).find(':radio:eq(1)').prop({'checked' : true}).parent('div').addClass('checked');
+			//$('#' + form_ID).find(':text, :hidden, textarea').val('');
+			$('.forecolor').first().val('#ffffff').minicolors('settings', {defaultValue: '#ffffff'});
+			$('.forecolor').first().closest('.minicolors ').find('.minicolors-swatch-color').first().css({'background-color': '#ffffff'});
+			$('.backcolor').first().val('#333333').minicolors('settings', {defaultValue: '#333333'});
+			$('.backcolor').first().closest('.minicolors ').find('.minicolors-swatch-color').first().css({'background-color': '#333333'});
+			$('#noticeContents').css({'color' : '#ffffff', 'font-family' : '微软雅黑', 'font-size' : '26px', 'background-color' : '#333333'});
+		}
+		$('#alert-layer, #' + form_ID + ', #' + form_ID + ' .loading-box').hide();
+	});
+	
+	$('#epgFilter').change(function() {
+		window.location.href = '__URL__/index/epgId/' + $(this).val();
+	});
+	
+	/* 单个删除终端组 */
+	$('#delEndGrp').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	/* 批量操作终端（组）  */
+	$('.multi-oper').click(function() {
+		var tids = null,
+			type = $.trim($(this).attr('data-type')),
+			cmd = $.trim($(this).attr('data-cmd'));
+		
+		if (type == 'eps') {
+			tids = getSelectedEndsIds();
+			
+			if (!tids) {
+				$.kw.alert('没有选中任何终端！');
+				return false;
+			}
+		} else {
+			var gid = $('#endPGrpSwitch').val()*1;
+			tids = gid ? gid : 'all';
+		}
+		
+		$.kw.confirm('确认要执行该操作吗？', function() {
+			loadingSwitch(1);
+			$.ajax({
+				url:'__URL__/soapClientWay',
+				type:'post',
+				async:true,
+				data:{type : type, cmd : cmd, tids : tids, endType : endType},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						//$.kw.alert('发布成功！');
+						loadingResult(1, '发布成功！');
+					} else {
+						//$.kw.alert(re.msg);
+						loadingResult(0, re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+		
+	});
+	
+	/* 批量插播消息 */
+	$('.table').delegate('.multi-pubnotice', 'click', function(){
+		var type = $(this).attr('data-type'), tids = '';
+		
+		if (type == 'eps') {
+			tids = getSelectedEndsIds();
+			
+			if (!tids) {
+				$.kw.alert('没有选中任何终端！');
+				return false;
+			}
+		} else {
+			var gid = $('#endPGrpSwitch').val()*1;
+			tids = gid ? gid : 'all';
+		}
+		
+		$('#pubNotice :hidden[name="type"]').val(type);
+		$('#pubNotice :hidden[name="tids"]').val(tids);
+		$('#pubNotice button[type="submit"]').show();
+		$('#pubNotice button[type="reset"]:eq(1)').text('取消');
+		$('#pubNotice .modal-body table').show();
+		$('#pubNotice button.jl-btn-save').show();
+		$('#position-bottom-right2').val('#ff333333');
+		setDivCenter('#pubNotice');
+	});
+	
+	/* 批量配置终端 */
+	$('.table').delegate('.multi-cfg', 'click', function(){
+		var type = $(this).attr('data-type'), tids = '';
+		
+		if (type == 'eps') {
+			//tids = getSelectedEndsIds();
+			var checkedItems = $('#endListsFrm').contents().find('#endsList').first().find(':checkbox:checked');
+			
+			if (checkedItems.size() <= 0) {
+				$.kw.alert('没有选中任何终端！');
+				return false;
+			}
+			
+			$.each(checkedItems, function(i, o){
+				tids += $(o).val() + '-';
+			});
+
+			if (checkedItems.size() == 1) {
+				var tid = $(checkedItems[0]).val();
+				$('#multiCfg :text[name="epname"]').closest('tr').show();
+				$.post('__GROUP__/Ajaxhandle/getTEndpointCfgInfo', {tid : tid}, function(re){
+					if (re.stat*1) {
+						$('#multiCfg :text[name="epname"]').val(re.data.touchEndPointName);
+						$('#multiCfg :text[name="epInterval"]').val(re.data.touchEndPointInterval);
+						$('#multiCfg :text[name="tclientExitcode"]').val(re.data.touchMainExitCode);
+						$('#multiCfg :text[name="mainOpentime"]').val(re.data.touchEndPointOpenTime);
+						if ($.trim(re.data.isAutoRun) != '' && re.data.isAutoRun.toLowerCase() == 'true') {
+							$('#multiCfg :checkbox[name="isAutoRun"]').prop({'checked' : true}).closest('div').addClass('checked');
+						}
+						if ($.trim(re.data.isAutoClose) != '' && re.data.isAutoClose.toLowerCase() == 'true') {
+							$('#multiCfg :checkbox[name="isAutoShutdown"]').prop({'checked' : true}).closest('div').addClass('checked');
+							$('#multiCfg :text[name="mainClosetime"]').val(re.data.touchMainCloseTime).closest('tr').show();
+						}
+						if ($.trim(re.data.isShowVerTips) != '' && re.data.isShowVerTips.toLowerCase() == 'true') {
+							$('#multiCfg :checkbox[name="isShowVer"]').prop({'checked' : true}).closest('div').addClass('checked');
+						}
+						if ($.trim(re.data.isAdsPlay) != '' && re.data.isAdsPlay.toLowerCase() == 'true') {
+							$('#multiCfg :checkbox[name="isAdsPlay"]').prop({'checked' : true}).closest('div').addClass('checked');
+							$('#multiCfg :text[name="epDelayTime"]').val(re.data.touchMainAdsDelayTime).closest('tr').show();
+						}
+						if ($.trim(re.data.needPassword) != '' && re.data.needPassword.toLowerCase() == 'true') {
+							$('#multiCfg :checkbox[name="isNeedPass"]').prop({'checked' : true}).closest('div').addClass('checked');
+							$('#multiCfg :text[name="tclientExitPass"]').val(re.data.exitPassword).closest('tr').show();
+						}
+					}
+				}, 'json');
+			}
+			
+		} else {
+			var gid = $('#endPGrpSwitch').val()*1;
+			tids = gid ? gid : 'all';
+		}
+		
+		$('#multiCfg :hidden[name="type"]').val(type);
+		$('#multiCfg :hidden[name="tids"]').val(tids);
+		$('#multiCfg button[type="submit"]').show();
+		$('#multiCfg button[type="reset"]').text('取消');
+		$('#multiCfg .modal-body table').show();
+		setDivCenter('#multiCfg');
+	});
+	
+	$('.cfg-options').find('ins').click(function() {
+		var cbx_obj = $(this).siblings(':checkbox').first(),
+			op_type = $.trim(cbx_obj.val()),
+			is_checked = cbx_obj.prop('checked');
+		if (op_type != '') {
+			if (is_checked) {
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().show();
+			} else {
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().find(':text').val('');
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().find('.my-form-group').removeClass('has-error');
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().hide();
+			}
+		}
+		$(document).click();
+	});
+	
+	$('.cfg-options').find('label').click(function() {
+		var cbx_obj = $(this).find(':checkbox').first(),
+			op_type = $.trim(cbx_obj.val()),
+			is_checked = cbx_obj.prop('checked');
+		if (op_type != '') {
+			if (is_checked) {
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().show();
+			} else {
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().find(':text').val('');
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().find('.my-form-group').removeClass('has-error');
+				$('.cfg-options').closest('tbody').find('tr.' + op_type).first().hide();
+			}
+		}
+		$(document).click();
+	});
+	
+	/* 验证批量设置信息 */
+	$('#mcfgForm').validate({
+		errorElement : 'span',
+		errorClass : 'my-help-block',
+		focusInvalid : true,  
+        rules : {  
+            epInterval : {  
+                //required : true,
+                range : [10,60]
+            },
+            epDelayTime : {  
+                //required : true,
+                range : [1,60]
+            }
+        },  
+        messages : {  
+            epInterval : {  
+                //required : "心跳时间必填." ,
+                range : "必须在10-60之间."
+            },  
+            epDelayTime : {  
+                //required : "屏保延时时间必填." ,
+                range : "必须在1-60之间."
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.my-form-group').addClass('has-error');  
+        },  
+
+        success : function(label) { 
+            label.closest('.my-form-group').removeClass('has-error');  
+            label.parent('td').find('.my-help-txt').show();  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {
+            element.parent('td').append(error);  
+            element.parent('td').find('.my-help-txt').hide();  
+        },  
+		submitHandler: function(form) {
+			//form.submit();
+			
+			var type = $.trim($('#multiCfg :hidden[name="type"]').val()),
+				tids = $.trim($('#multiCfg :hidden[name="tids"]').val()),
+				epname = $.trim($('#multiCfg :text[name="epname"]').val()),
+				isAutoRun = $('#multiCfg :checkbox[name="isAutoRun"]').prop('checked') ? 1 : 0,
+				isAutoShutdown = $('#multiCfg :checkbox[name="isAutoShutdown"]').prop('checked') ? 1 : 0,
+				mainClosetime = $.trim($('#mainClosetime').val()),
+				maiOpentime = $.trim($('#mainOpentime').val()),
+				isShowVer = $('#multiCfg :checkbox[name="isShowVer"]').prop('checked') ? 1 : 0,
+				isAdsPlay = $('#multiCfg :checkbox[name="isAdsPlay"]').prop('checked') ? 1 : 0,
+				epDelayTime = $.trim($('#epDelayTime').val())*1,
+				isNeedPass = $('#multiCfg :checkbox[name="isNeedPass"]').prop('checked') ? 1 : 0,
+				tclientExitPass = $.trim($('#tclientExitPass').val()),
+				epInterval = $.trim($('#epInterval').val())*1,
+				tclientExitcode = $.trim($('#tclientExitcode').val());
+			var formdata = {'type':type,'tids':tids, 'epName' : epname, 'isAutoRun':isAutoRun,'isAutoShutdown':isAutoShutdown,'mainClosetime':mainClosetime,'maiOpentime':maiOpentime,'isShowVer':isShowVer,'isAdsPlay':isAdsPlay,'epDelayTime':epDelayTime,'isNeedPass':isNeedPass,'tclientExitPass':tclientExitPass,'epInterval':epInterval,'tclientExitcode':tclientExitcode, endType : endType};
+			/* console.log(type);
+			console.log(tids);
+			console.log(isAutoRun);
+			console.log(isAutoShutdown);
+			console.log(mainClosetime);
+			console.log(isShowVer);
+			console.log(isAdsPlay);
+			console.log(epDelayTime);
+			console.log(isNeedPass);
+			console.log(tclientExitPass);
+			console.log(epInterval);
+			console.log(tclientExitcode);
+			return false; */
+			/* var params = [];
+			if (mainClosetime != '') params.push({'mainClosetime':mainClosetime});
+			if (epInterval > 10 && epInterval < 100) params.push({'epInterval':epInterval});
+			if (epDelayTime > 10 && epDelayTime < 100) params.push({'epDelayTime':epDelayTime});
+			if (tclientExitcode != '') params.push({'tclientExitcode':tclientExitcode}); */
+				
+			// if ((type == 'eps' || type == 'grp') && (tids != '') && params.length > 0) {}
+			/* if ((type == 'eps' || type == 'grp') && (tids != '') && ((mainClosetime != '') || (epInterval > 10 && epInterval < 100) || (epDelayTime > 10 && epDelayTime < 100) || (tclientExitcode != ''))) { */
+				
+				/* params.push({'type':type});
+				params.push({'tids':tids}); */
+				$('button[type="submit"]').hide();
+				$('button[type="reset"]').text('关闭');
+				$('#multiCfg .modal-body table').hide();
+				$('#multiCfg .loading-box').first().find('i').first().removeClass().addClass('icon-spinner icon-spin').css({'color':'#555'});
+				$('#multiCfg .loading-box').first().find('p:eq(1)').text('正在发送操作请求，请稍等……');
+				$('#multiCfg .loading-box').show();
+				$.ajax({
+					url: '__URL__/soapClientMultiWay',
+					type: 'post',
+					async: true,
+					data: formdata,
+					dataType: 'json',
+					success:function(re) {
+						if (re.stat*1) {
+							$('#multiCfg .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass(' icon-ok-sign').css({'color':'#2ecc71'});
+							$('#multiCfg .loading-box').first().find('p:eq(1)').text('操作请求发送成功！请注意查看终端状态……');
+						} else {
+							$('#multiCfg .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-remove-sign').css({'color':'#e74c3c'});
+							$('#multiCfg .loading-box').first().find('p:eq(1)').text(re.msg);
+						}
+					},
+					error:function(){
+						$('#multiCfg .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign').css({'color':'#e74c3c'});
+						$('#multiCfg .loading-box').first().find('p:eq(1)').text('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+				
+			/* } else {
+				$('.multi-cfg-info').fadeIn().delay(3000).fadeOut();;
+			} */
+			
+			return false;
+		}
+	});
+	
+	$('#pubNotice button[type="submit"]').click(function() {
+		var noticeForm = $('#noticeForm'),
+			type = $.trim(noticeForm.find(':hidden[name="type"]').first().val()),
+			tids = $.trim(noticeForm.find(':hidden[name="tids"]').first().val()),
+			msgName = $.trim(noticeForm.find(':text[name="msgName"]').first().val()),
+			msgFontfamily = $.trim(noticeForm.find('select[name="fontfamily"]').val()),
+			msgFontsize = $.trim(noticeForm.find(':text[name="myfontsize"]').first().val()),
+			msgFontcolor = $.trim(noticeForm.find(':text[name="fontcolor"]').first().val()),
+			msgBackcolor = $.trim(noticeForm.find(':text[name="backgroundColor"]').first().siblings('.minicolors-values-box').first().text()),
+			msgPosition = $.trim(noticeForm.find(':radio:checked[name="msgPosition"]').val()),
+			msgSpeed = $.trim(noticeForm.find(':text[name="msgSpeed"]').first().val()),
+			msgStartTime = $.trim(noticeForm.find(':text[name="startTime"]').first().val()),
+			msgEndTime = $.trim(noticeForm.find(':text[name="endTime"]').first().val()),
+			msgContent = $.trim(noticeForm.find('textarea').first().val());
+		
+		if (msgName == '') {
+			$('.notice-cfg-info').html('消息名称必填！').fadeIn().delay(3000).fadeOut();
+			return false;
+		}
+		
+		if (msgContent == '') {
+			$('.notice-cfg-info').html('消息内容必填！').fadeIn().delay(3000).fadeOut();
+			return false;
+		}
+		
+		if (msgBackcolor == '') {
+			msgBackcolor = $.trim(noticeForm.find(':text[name="backgroundColor"]').first().val());
+		}
+		
+		var postData = {'type' : type, 'tids' : tids, 'name' : msgName, 'fontfamily' : msgFontfamily, 'fontsize' : msgFontsize, 'fontcolor' : msgFontcolor, 'backcolor' : msgBackcolor, 'position' : msgPosition, 'speed' : msgSpeed, 'starttime' : msgStartTime, 'endtime' : msgEndTime, 'contents' : msgContent, endType : endType};
+			
+		$('#pubNotice button[type="submit"]').hide();
+		$('#pubNotice .modal-body table').hide();
+		$('#pubNotice button[type="reset"], #pubNotice .close').attr({disabled : true});
+		$('#pubNotice .loading-box').first().find('i').first().removeClass().addClass('icon-spinner icon-spin').css({'color':'#555'});
+		$('#pubNotice .loading-box').first().find('p:eq(1)').text('正在发送操作请求，请稍等……');
+		$('#pubNotice .loading-box').show();
+		$.ajax({
+			url: '__URL__/sendNotice',
+			type: 'post',
+			async: true,
+			data: postData,
+			dataType: 'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+					$('#pubNotice .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass(' icon-ok-sign').css({'color':'#2ecc71'});
+					$('#pubNotice .loading-box').first().find('p:eq(1)').text('操作请求发送成功！请注意查看终端状态……');
+					$('#pubNotice button[type="reset"]:eq(1)').text('关闭');
+				} else if (re.stat*1 == -1) {
+					$('#pubNotice button[type="submit"]').show();
+					$('#pubNotice .modal-body table').show();
+					$('#pubNotice .loading-box').hide();
+					$('.notice-cfg-info').html(re.msg).fadeIn().delay(3000).fadeOut();;
+				} else {
+					$('#pubNotice .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-remove-sign').css({'color':'#e74c3c'});
+					$('#pubNotice .loading-box').first().find('p:eq(1)').text(re.msg);
+					$('#pubNotice button[type="reset"]:eq(1)').text('关闭');
+				}
+				$('#pubNotice button[type="reset"], #pubNotice .close').removeAttr('disabled');
+			},
+			error:function(){
+				$('#pubNotice .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign').css({'color':'#e74c3c'});
+				$('#pubNotice .loading-box').first().find('p:eq(1)').text('由于网络异常导致操作失败，请刷新页面重试....');
+				$('#pubNotice button[type="reset"], #pubNotice .close').removeAttr('disabled');
+				$('#pubNotice button[type="reset"]:eq(1)').text('关闭');
+			}
+		});
+		return false;
+	});
+	
+	/* 批量删除选中的终端 */
+	$('.table').delegate('.multi-del', 'click', function(){
+		var tids = getSelectedEndsIds();
+		
+		if (!tids) {
+			$.kw.alert('没有选中任何终端！');
+			return false;
+		}
+		
+		$.kw.confirm('确认要删除吗？', function() {
+			$.ajax({
+				url:'__URL__/del',
+				type:'post',
+				async:true,
+				data:{tids : tids},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						//window.location.reload();
+						$.kw.alert('操作成功', '', function() {
+						  
+                          	$.ajax({
+                        				url:'__URL__/refreshList',
+                        				type:'post',
+                        				async:true,
+                        				data:{cmd : 'RefreshList'},
+                        				dataType:'json',
+                        				success:function(re){
+                        					if (re.stat*1) {
+                        						//$.kw.alert('发布成功！');
+                        						//loadingResult(1, '发布成功！');
+                        					} else {
+                        						//$.kw.alert(re.msg);
+                        						loadingResult(0, re.msg);
+                       					}
+                        				},
+                        				error:function(){
+                        					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+                        				}
+                        			});
+                          
+							var src = $('#endListsFrm').attr('src');
+							$('#endListsFrm').attr('src', src);
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+            
+		});
+	});
+	
+	// Uploadify 上传升级文件（单个文件）
+	var fileTypeExts = '{$Think.config.soft_type_exts|default=""}';
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '文件',
+			'fileTypeExts' : fileTypeExts,
+			'buttonText' : '<i class="icon-upload"></i> 上传终端升级文件',
+			'width' : 150,
+			'height' : 24,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'soft', 'endType' : endType},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'checkExisting' : '__GROUP__/Ajaxhandle/checkExisting',
+			'queueID'  : 'upArea',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onDialogClose', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$('#' + file.id).find('.data').html(' - 上传成功');
+					$("#mainSoft").html('最新升级文件：' + re.savePath);
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '';
+					
+				if (succCount > 0) {
+					resultHtml = '<div style="font-size:14px;"><p class="text-success text-center"><i class="icon-ok-sign" style="font-size:32px;color:#2ecc71;position:relative;top:6px;"></i> 文件上传成功.</p>';
+				} else {
+					resultHtml += '<p class="text-danger text-center"><i class="icon-remove-sign" style="font-size:32px;color:#e74c3c;position:relative;top:6px;"></i> 文件上传失败.</p></div>';
+				}
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+					//console.log(queuedFile.id);
+				}
+				/*
+				setTimeout(function(){
+					$('#upArea').hide();
+					hideFramesMasklayer();
+				}, 5000);
+				*/
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+	
+	function getSelectedEndsIds() {
+		var tids = '', checkedItems = $('#endListsFrm').contents().find('#endsList').first().find(':checkbox:checked');
+		
+		if (checkedItems.size() <= 0) {
+			return false;
+		}
+		
+		$.each(checkedItems, function(i, o){
+			tids += $(o).val() + '-';
+		});
+		
+		return tids;
+	}
+	
+	/* 对选中的终端进行分组设置  */
+    
+    
+    
+    
+    
+	$('#setEndGroup').click(function() {
+		var tids = '', grpid = $('#endPGrpID').val()*1;
+		
+        	type = $.trim($(this).attr('data-type')),
+			//cmd = $.trim($(this).attr('data-cmd'));
+        
+		tids = getSelectedEndsIds();
+		if (!tids) {
+			$.kw.alert('没有选中任何终端！');
+			return false;
+		}
+		
+		if (!grpid) {
+			$.kw.alert('未选择终端组');
+			return false;
+		}
+			
+		
+		$.kw.confirm('确认要执行该操作吗？', function() {
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/setEndGroup',
+				type:'post',
+				async:true,
+				data:{tids : tids, gid : grpid},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						$.kw.alert('操作成功！', '', function() {
+						  
+                                	$.ajax({
+                        				url:'__URL__/refreshList',
+                        				type:'post',
+                        				async:true,
+                        				data:{cmd : 'RefreshList'},
+                        				dataType:'json',
+                        				success:function(re){
+                        					if (re.stat*1) {
+                        						//$.kw.alert('发布成功！');
+                        						//loadingResult(1, '发布成功！');
+                        					} else {
+                        						//$.kw.alert(re.msg);
+                        						loadingResult(0, re.msg);
+                        					}
+                        				},
+                        				error:function(){
+                       					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+                        				}
+                        			});
+                          
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+	});
+	
+	$('.jl-time-picker .close-btn').click(function() {
+		var curr_picker = $(this).closest('.jl-time-picker');
+		curr_picker.find('.hours').show();
+		curr_picker.find('.hours a').removeClass('selected');
+		curr_picker.find('.seconds').hide();
+		curr_picker.hide();
+	});
+	
+    $('.jl-time-picker').bind('click',function(e) {
+        stopPropagation(e);
+    });
+	
+	$('#mainOpentime, .jl-time-selector, #mainClosetime').click(function(e) {
+		if ($(this).siblings('.jl-time-picker').css('display') == 'none') {
+			$(this).siblings('.jl-time-picker').slideDown("fast");
+			stopPropagation(e);
+		}
+	});
+	
+	$('.jl-time-picker .hours a').click(function() {
+		var hour = $(this).attr('data-hour')*1, secHtml = '',
+			curr_picker = $(this).closest('.jl-time-picker');
+		
+		for (i=0; i<60; i++) {
+			secHtml += '<a href="javascript:void(0);">' + hour + ':' + ((i > 9) ? i : '0' + i) + '</a>';
+		}
+		
+		$(this).addClass('selected');
+		curr_picker.find('.hours a').removeClass('selected');
+		curr_picker.find('.hours').hide();
+		curr_picker.find('.seconds').find('a').remove();
+		curr_picker.find('.seconds').append(secHtml).show();
+	});
+	
+	$('.jl-time-picker .seconds').delegate('a', 'click', function() {
+		var curr_picker = $(this).closest('.jl-time-picker');
+		$(this).closest('td').children(':text').first().val($(this).text());
+		curr_picker.find('.hours').show();
+		curr_picker.find('.hours a').removeClass('selected');
+		curr_picker.find('.seconds').hide();
+		curr_picker.hide();
+	});
+	
+	$('.jl-time-picker .seconds .to-back').click(function() {
+		var curr_picker = $(this).closest('.jl-time-picker');
+		curr_picker.find('.hours').show();
+		curr_picker.find('.seconds').hide();
+	});
+});
+</script>
+<include file="Public/footer" />

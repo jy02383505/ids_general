@@ -1,0 +1,45 @@
+<!--lym-->
+<include file="Public/header" />
+<style>
+	.ajaxSetExigent:hover{cursor: pointer;}
+</style>
+
+<volist name="rows" id="row">
+	<div class="panel panel-primary">
+		<div class="panel-heading" style="background: rgb(17, 148, 154);">
+			<h4>{$row[scencename]}</h4>
+		</div>
+		<div class="panel-body">
+			<table class="table table-striped table-hover table-bordered">
+				<tr>
+					<th>id</th>
+					<th>场景名称</th>
+					<th>父场景ID</th>
+					<th>紧急场景(点击可修改)</th>
+					<th>操作</th>
+				</tr>
+				<volist name="row[next]" id="scene">
+					<tr>
+						<td>{$scene[id]}</td>	
+						<td>{$scene[scencename]}</td>
+						<td>{$scene[parentscence_id]}</td>
+						<td><span class="ajaxSetExigent" data-pid="{$scene[parentscence_id]}" data-id="{$scene[id]}">{$scene[isExgentScene]?是:否}</span></td>
+						<td><a href="{:U('play')}/scene_id/{$scene[id]}">播放计划</a></td>	
+					</tr>
+				</volist>
+			</table>
+		</div>
+	</div>
+</volist>
+
+<include file="Public/jsLoader" />
+<script>
+$('.ajaxSetExigent').click(function() {
+	var id = $(this).attr('data-id');
+	var pid = $(this).attr('data-pid');
+	$.post('{:U("setExigent")}', {"pid": pid, "id": id}, function(data){
+		alert(data);
+	})
+});
+</script>
+<include file="Public/footer" />

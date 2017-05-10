@@ -1,0 +1,116 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">添加模块</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="nodGrp">父级模块</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="pid" id="nodGrp">
+				<empty name="pnodes">
+				<option value="0">顶级模块</option>
+				</empty>
+				<volist name="pnodes" id="vo">
+					<eq  name="vo.id" value="$nod.pid">
+						<option value="{$vo.id}" selected>{$vo.space}{$vo.title}</option>
+					<else/>
+						<eq  name="vo.id" value="$nod.id">
+							<option value="{$vo.id}" disabled>{$vo.space}{$vo.title}</option>
+						<else/>
+							<option value="{$vo.id}">{$vo.space}{$vo.title}</option>
+						</eq>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="nodeName">模块名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="name" id="nodName" value="{$nod.name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrName">模块标题</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="title" id="nodTitle" value="{$nod.title}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">状态</label>
+		<div class="col-sm-3">
+			<eq name="nod.status" value="1">
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1" checked> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0"> 禁用</label>
+			<else/>
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1"> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0" checked> 禁用</label>
+			</eq>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="roleRemark">备注</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="roleRemark" rows="4">{$nod.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$nod.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/nodesList';
+	});
+	
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+            name : {  
+                required : true,
+            },
+            title : {
+            	required : true
+            }
+        },  
+        messages : {
+            name : {  
+                required : "模块名称必填.",
+            },
+            title : {
+            	required : '模块标题必填.'
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

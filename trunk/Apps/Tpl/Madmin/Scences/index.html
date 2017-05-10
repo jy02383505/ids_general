@@ -1,0 +1,159 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<ol class="breadcrumb">
+	<li>内容管理</li>
+	<volist name="crumb" id="vo">
+		<li><a href="__GROUP__/Scences/index/sid/{$vo.id}">{$vo.scencename}</a></li>
+	</volist>
+	<li class="active">{$scence.scencename}</li>
+</ol>
+
+<form id="scenceForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<input type="hidden" name="sid" value="{$scence.classid}">
+	<input type="hidden" name="sbgid" value="{$scence.bgInfo.id}">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="scenceName">场景名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="scencename" id="scenceName" value="{$scence.scencename}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label">背景图片</label>
+		<div class="col-sm-8">
+			<div class="up-image-box">
+				<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				<div id="uploadfyQueueList"></div> 
+				<div class="showimg clearfix">
+					<notempty name="scence['bgInfo']">
+						<span><img src="/{$Think.config.upload_root_path}{$scence.bgInfo.filepath}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="cover_image" class="gcovers" value="{$scence.bgInfo.filepath}">
+				<input type="hidden" name="savename" value="{$uniName}">
+			</div>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="scenceName">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" id="submitBtn" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	// 同步更新左侧菜单的场景名称
+	//$('#scence-'+'{$scence.id}', window.parent.frame_left_menu.document).find('a font').first().text('{$scence.short_scencename}');
+	var scenID = {$scence.id|default=0},
+		scenPID = '{$scence.parentscence_id|default=""}',
+		isHomeScence = '{$scence.ishomescence|default="False"}',
+		targetObjID = '{$Think.get.treeId|default="scences_1"}',
+		postData = null;
+	$('#' + targetObjID + '_span', window.parent.frame_left_menu.document).text('{$scence.short_scencename}');
+	
+	$('#scenceName').keyup(function(event) {
+		var scenName = $.trim($(this).val());
+		//if (event.which >= 33 && event.which <= 40) return;
+		/* var scenName = $.trim($(this).val()).toLowerCase(),
+			re = /<|>|\\|\/|:|\?|\"|\*|\|/g;
+		scenName = scenName.replace(re, '');
+		$(this).val(scenName); */
+		
+		if (scenName == '') {
+			showValidateRsInfo('#scenceName', 0, '场景名称不能为空！');
+		} else {
+			showValidateRsInfo('#scenceName', 1);
+			if (isHomeScence == 'False') {
+				postData = {type : 'scence', inputName : scenName, ID : scenID, PID : scenPID}
+				checkUniNameByAJAX('__GROUP__/Ajaxhandle/checkUniName', true, postData);
+			}
+		}
+	});
+	
+	$('#scenceForm').submit(function() {
+		if (isHomeScence == 'False') {
+			var scenName = $.trim($('#scenceName').val()),
+				postData = {type : 'scence', inputName : scenName, ID : scenID, PID : scenPID},
+				isSubmit = false;
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/checkUniName',
+				type:'post',
+				data:postData,
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1 > 0) {
+						showValidateRsInfo('#scenceName', 1);
+						$('#submitBtn').removeAttr('disabled');
+						isSubmit = true;
+					} else {
+						showValidateRsInfo('#scenceName', 0, re.msg);
+						$('#submitBtn').attr({disabled:true});
+					}
+				},
+				error:function() {
+					$('#submitBtn').attr({disabled:true});
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+			return isSubmit;
+		} else {
+			return true;
+		}
+	});
+	
+	// Uploadify 批量上传
+	var sname = $(':hidden[name="savename"]').val();
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp;',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', savename : sname},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                $(".gcovers").first().val(re.savePath);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+	
+});
+</script>
+<include file="Public/footer" />

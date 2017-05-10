@@ -1,0 +1,130 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">终端管理</a></li>
+	<li class="active">编辑终端</li>
+</ol>
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__URL__/edit">
+<table class="table table-bordered table-condensed">
+	<tbody>
+		<tr>
+			<td class="text-right" width="20%"><b>终端状态</b></td>
+			<td>
+				<eq name="vo.touchEndPoint_Online" value="1">
+					<span class="text-success"><b>在线</b></span>　
+				<else/>
+					<span class="text-danger"><b>离线</b></span>　
+				</eq>
+				（<a href="">刷新</a>）
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>终端编号</b></td>
+			<td>{$tend.touchMainId}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>计算机名</b></td>
+			<td>{$tend.touchEndPoint_ComputerName}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>硬盘使用情况</b></td>
+			<td>{$tend.touchEndPoint_DiskTotalSize}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>CPU速率</b></td>
+			<td>{$tend.touchEndPoint_CpuRate}</td>
+		</tr>
+		<tr class="my-form-group">
+			<td class="text-right" width="20%"><b>终端名称</b></td>
+			<td><input class="form-control input-sm" type="text" name="epName" id="epName" value="{$tend.touchEndPointName}" style="display:inline-block;width:120px;">&nbsp;</td>
+		</tr>
+		<tr class="my-form-group">
+			<td class="text-right" width="20%"><b>心跳间隔（秒）</b></td>
+			<td><input class="form-control input-sm" type="text" name="epInterval" id="epInterval" value="{$tend.touchEndPointInterval}" style="display:inline-block;width:120px;">&nbsp;<span class="my-help-txt">心跳时间必须在10-99之间.</span></td>
+		</tr>
+		<tr class="my-form-group">
+			<td class="text-right" width="20%"><b>屏保延时（分）</b></td>
+			<td><input class="form-control input-sm" type="text" name="epDelayTime" id="epDelayTime" value="{$tend.touchMainAdsDelayTime}" style="display:inline-block;width:120px;">&nbsp;<span class="my-help-txt">屏保延时时间必须在10-99之间.</span></td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>终端截图</b></td>
+			<td>
+				<notempty name="tend.lastShotSnap">
+					<img src="/{$Think.config.upload_comm_path}/shotsnap/{$tend.lastShotSnap}" class="img-thumbnail" style="max-width:280px;max-height:280px;margin-bottom:8px;">
+				<else/>
+					<img src="__PUBLIC__/images/demo.png" class="img-thumbnail" style="max-width:280px;max-height:280px;margin-bottom:8px;">
+				</notempty>
+				<br><button type="button" class="btn btn-info btn-sm">终端截图</button>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%"><b>未完成任务列表</b><br>【<a href="javascript:void(0);">清空任务列表</a>】</td>
+			<td><span class="text-danger">暂无任务</span></td>
+		</tr>
+		<tr>
+			<td class="text-right" width="20%">&nbsp;</td>
+			<td>
+				<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+				<button type="reset" class="btn btn-default btn-sm">取消</button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	$('#editForm').validate({
+		errorElement : 'span',
+		errorClass : 'my-help-block',
+		focusInvalid : true,  
+        rules : {  
+        	epName : {  
+                required : true  
+            },  
+            epInterval : {  
+                required : true,
+                range : [10,99]
+            },
+            epDelayTime : {  
+                required : true,
+                range : [10,99]
+            }
+        },  
+        messages : {  
+        	epName : {  
+                required : "终端名称必填."  
+            },
+            epInterval : {  
+                required : "心跳时间必填." ,
+                range : "心跳时间必须在10-99之间."
+            },  
+            epDelayTime : {  
+                required : "屏保延时时间必填." ,
+                range : "屏保延时时间必须在10-99之间."
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.my-form-group').addClass('has-error');  
+        },  
+
+        success : function(label) { 
+            label.closest('.my-form-group').removeClass('has-error');  
+            label.parent('td').find('.my-help-txt').show();  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {
+            element.parent('td').append(error);  
+            element.parent('td').find('.my-help-txt').hide();  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

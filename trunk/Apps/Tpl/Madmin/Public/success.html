@@ -1,0 +1,21 @@
+<include file="Public/header" />
+<div class="bg-success border-radius4 clearfix" style="padding:16px;">
+	<div class="fl" style="margin-right:20px;width:40%;text-align:right;"><i class="icon-ok-sign" style="font-size:60px;color:#2ecc71;line-height:90px;"></i></div>
+	<div class="fl">
+		<h3>{$message}</h3>
+		<p>页面自动 <a id="href" href="{$jumpUrl}">跳转</a> 等待时间： <b id="wait">{$waitSecond}</b></p>
+	</div>
+</div>
+<script type="text/javascript">
+(function(){
+	var wait = document.getElementById('wait'),href = document.getElementById('href').href;
+	var interval = setInterval(function(){
+		var time = --wait.innerHTML;
+		if(time <= 0) {
+			location.href = href;
+			clearInterval(interval);
+		};
+	}, 1000);
+})();
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+		<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+		<meta content="no-cache" http-equiv="pragma">
+		<meta content="0" http-equiv="expires">
+		<meta content="telephone=no, address=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes"> 
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/mobile.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			.books-list{padding:0 12px;margin-top:6px;}
+			.books-item{position:relative;background-color:rgba(255, 255, 255, 0.1);margin:10px 42px;color:#fff;line-height:28px;width:240px;height:272px;}
+			.book-cover{display:block;width:240px;text-align:center;height:272px;}
+			.book-cover span{height:100%;display:inline-block;vertical-align:middle;}
+			.book-cover img{max-height:240px;max-width:240px;vertical-align:middle;}
+			.books-item .book-info{position:absolute;line-height:24px;text-align:center;width:100%;background:rgba(0, 0, 0, 0.65);bottom:0;}
+		</style>
+	</head>
+	<body>
+		<if condition="$Think.get.type eq 'wtzx'">
+		<div class="container">
+		<else />
+		<div class="container clearfix">
+		</if>
+			<div class="top-bar clearfix">
+				<span class="fl"><a href="__URL__/index" class="go-back">&lt;</a></span>
+				<span class="fl page-title">{$column.title}</span>
+				<span class="fr"><a href="__URL__/index" class="go-home">回到首页</a></span>
+			</div>
+			<if condition="$Think.get.type eq 'wtzx'">
+				<volist name="articles" id="vo">
+					<div class="" style="padding:0 12px;margin-top:28px;">
+						<h1 style="color:#f0f0f0;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.5);">&nbsp;<font style="font-size:12px;">》</font>{$vo.dir_name}</h1>
+						<volist name="vo.datalist" id="eq">
+							<div style="background-color:rgba(255, 255, 255, 0.1);margin:10px auto;padding:10px;color:#fff;line-height:28px;">
+								<p>问：{$eq.article_name}</p>
+								<p>答：{$eq.article_content}</p>
+							</div>
+						</volist>
+					</div>
+				</volist>
+			<elseif condition="$Think.get.type eq 'xsll'" />
+				<div class="books-list clearfix" style="min-height:200px;">
+					<p style="text-align:center;margin-top:148px;color:#f0f0f0;font-size:18px;"><img src="__PUBLIC__/images/mobile/loading.gif" /></p>
+				<!-- <volist name="articles" id="vo">
+					<div class="books-item clearfix">
+						<div class="fl book-cover"><img src="{$vo.coverPath}" /></div>
+						<div class="fl book-info">
+							<p><span>书名：</span>{$vo.title}（ISBN：{$vo.isbn}）</p>
+							<p><span>作者：</span>{$vo.author}</p>
+							<p><span>出版社：</span>{$vo.publisher}</p>
+							<p><span>出版日期：</span>{$vo.pubdate}</p>
+							<p><span>价格：</span>{$vo.price}</p>
+							<p><span>页数：</span>{$vo.pages}</p>
+							<p><span>简介：</span>{$vo.summary}</p>
+						</div>
+					</div>
+				</volist> -->
+				</div>
+			<else />
+				<ul class="data-list clearfix">
+					<volist name="articles" id="vo">
+						<li class="fl clearfix">
+							<a href="__URL__/contents/type/{$Think.get.type}/classId/{$vo.article_classid}">
+								<span class="datetime">[ {$vo.create_time} ]</span> {$vo.article_name}
+							</a>
+						</li>
+					</volist>
+				</ul>
+				<div class="pagination">
+					{$pager}
+				</div>
+			</if>
+		</div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			var nav_type = "{$Think.get.type|default=''}",
+				api_unid = '06176c99-c250-163a-7fb5-73edcb6eb564';
+			
+			if (nav_type == 'xsll') {
+				
+				$.ajax({
+					url : '__URL__/getApiData',
+					type : 'post',
+					data : {type : nav_type, apid : api_unid},
+					dataType : 'json',
+					timeout : 10000,
+					async: true,
+					success: function(re) {
+						if (re.stat*1) {
+							var list_html = '';
+							$.each(re.books, function(i, book) {
+								list_html += '<div class="books-item fl clearfix">';
+								list_html += '<a href="__URL__/bookInfo/isbn/' + book.isbn + '" class="fl book-cover"><span></span><img src="'+ book.coverPath + '" /></a>';
+								/* list_html += '<div class="fl book-info">';
+								list_html += '<p><span>书名：</span>' + book.title + '（ISBN：' + book.isbn + '）</p>';
+								list_html += '<p><span>作者：</span>' + book.author + '</p>';
+								list_html += '<p><span>出版社：</span>' + book.publisher + '</p>';
+								list_html += '<p><span>出版日期：</span>' + book.pubdate + '</p>';
+								list_html += '<p><span>价格：</span>' + book.price + '</p>';
+								list_html += '<p><span>页数：</span>' + book.pages + '</p>';
+								list_html += '<p><span>简介：</span>' + book.summary + '</p>';
+								list_html += '</div>'; */
+								list_html += '<p class="book-info">' + book.title + '</p>';
+								list_html += '</div>';
+							});
+							$('.books-list').first().html(list_html);
+						} else {
+							setMessage('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />' + re.msg);
+						}
+					},
+					error: function() {
+						setMessage('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />网络异常，请求失败！');
+					}
+				});
+			
+			}
+			
+			function setMessage(contents) {
+				$('.books-list p').first().html(contents);
+			}
+		});
+		</script>
+	</body>
+</html>

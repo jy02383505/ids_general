@@ -1,0 +1,85 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="">商场管理</a></li>
+	<li><a href="">商铺分类管理</a></li>
+	<li class="active">分类列表</li>
+</ol>
+
+<!-- <div id="" class="row well">
+	<table class="table">
+		<tbody>
+			<tr>
+				<td class="text-right" width="90" style="border-top:0;"><b>组名称：</b></td>
+				<td style="border-top:0;">
+					<select class="form-control input-sm" id="nodeFilter" style="width:auto;">
+						<option value="0">全部</option>
+						<volist name="pnodes" id="vo">
+							<eq  name="vo.id" value="$Think.get.nid">
+								<option value="{$vo.id}" selected>{$vo.space}{$vo.title}</option>
+							<else/>
+								<option value="{$vo.id}">{$vo.space}{$vo.title}</option>
+							</eq>
+						</volist>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div> -->
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th style="width:60px;">序号</th>
+				<th>分类名称</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="storeTypes" id="vo">
+			<tr>
+				<td>{$vo.ID}</td>
+				<td>
+					{$vo.space}
+					<eq name="vo.has_children" value="1">
+						<i class="icon-caret-down" style="cursor:pointer;"></i>
+					<else/>
+						<i class="icon-caret-right" style="cursor:pointer;"></i>
+					</eq>
+					&nbsp;&nbsp;
+					{$vo.tName}
+				</td>
+				<td>
+					<a class="oper edit" href="__URL__/editStoreType/tid/{$vo.ID}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/delStoreType/tid/{$vo.ID}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>&nbsp;</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	/* $('#nodeFilter').change(function() {
+		window.location.href = '__URL__/nodesList/nid/' + $(this).val();
+	}); */
+});
+</script>
+<include file="Public/footer" />

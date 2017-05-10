@@ -1,0 +1,812 @@
+<include file="Public/header" />
+<style>
+a.jl-btn-collapseall{display:none;position:absolute;bottom:10px;right:6px;width:20px;height:20px;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;text-align:center;line-height:20px;}
+a.jl-btn-collapseall i{font-size:16px;font-weight:bold;}
+a.jl-btn-collapseall:hover i{color:#16a085}
+a.jl-btn-collapse{display:block;position:absolute;bottom:10px;right:6px;width:20px;height:20px;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;text-align:center;line-height:20px;}
+a.jl-btn-collapse i{font-size:16px;font-weight:bold;}
+a.jl-btn-collapse:hover i{color:#16a085}
+
+.list-toolbar, .playtime-list{margin-bottom:2px;}
+.list-toolbar, .playtime-list .lheader{border:1px solid #ddd;padding:12px;position:relative;background-color:#f8f8f8;}
+.list-toolbar{background-color:#f0f0f0;border-bottom-width:2px;}
+.playtime-list .lbody{border:1px solid #ddd;border-top:0;padding:8px 12px;position:relative;top:-2px;display:none;text-align:right;}
+.playtime-list .lbody table{text-align:left;}
+.playtime-list .lbody table .oper{margin:0 10px;}
+.playtime-list .lbody table .oper i{font-size:14px;}
+.playtime-list .lbody .add-program-play{}
+.playtime-list .lbody .apply-item-to{display:none;}
+.playtime-list .lbody .copy-item-from{display:none;}
+table td label{margin:10px 20px 0 0;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目播放管理</a></li>
+	<li class="active"><gt name="plist.id" value="0">编辑<else />创建</gt>节目播放表</li>
+</ol>
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plName">节目表名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="pl_name" id="plName" value="{$plist.pl_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">状态</label>
+		<div class="col-sm-3">
+			<neq name="plist.status" value="1">
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1"> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0" checked> 禁用</label>
+			<else/>
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1" checked> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0"> 禁用</label>
+			</neq>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plRemark">说明</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="plRemark" rows="3">{$plist.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">节目播放计划</label>
+		<div class="col-sm-8">
+		
+			<div class="border-top-radius4 list-toolbar">
+				<b>周节目播放表</b>
+				<div class="help-tips fr hide" style="position:relative;display:inline-block;font-size:18px;height:30px;line-height:30px;margin-left:8px;top:-4px;">
+					<i class="icon-question-sign"></i>
+					<div class="text-left" style="position:absolute;top:28px;right:-10px;width:225px;font-size:12px;line-height:18px;background:#f2dede;border:1px solid #e0e0e0;padding:8px;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;display:none;z-index:99;">
+						<ul style="margin:0;list-style-type:disc;list-style-position:inside;">
+							<li>批量上传：上传50MB以内的文件.</li>
+							<li>大文件上传：允许上传50MB以上的文件.</li>
+						</ul>
+					</div>
+				</div>
+				<button type="button" class="btn btn-info btn-xs fr mutli-oper-list">批处理</button>
+				<a href="javascript:void(0);" class="jl-btn-collapseall" data-isopen="0" title="全部展开"><i class="icon-double-angle-up"></i></a>
+			</div>
+			
+			<div class="playtime-list" id="weekday1" data-weekday="1">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 一</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- <tr>
+								<td><span data-field="startPlaytime"></span></td>
+								<td><span data-field="finishedPlaytime"></span></td>
+								<td><span data-field="programName"></span></td>
+							</tr> -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday2" data-weekday="2">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 二</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday3" data-weekday="3">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 三</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday4" data-weekday="4">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 四</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday5" data-weekday="5">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 五</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday6" data-weekday="6">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 六</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="playtime-list" id="weekday7" data-weekday="7">
+				<div class="border-radius4 lheader">
+					<span class="label label-primary">星 期 日</span>
+					<a href="javascript:void(0);" class="jl-btn-collapse" data-isopen="0" title="展开"><i class="icon-angle-up"></i></a>
+				</div>
+				<div class="border-bottom-radius4 lbody">
+					<button type="button" class="btn btn-info btn-xs add-program-play">添加节目</button>
+					<button type="button" class="btn btn-info btn-xs apply-item-to">应用于</button>
+					<button type="button" class="btn btn-info btn-xs copy-item-from">复制导入</button>
+					<table class="table" style="display:none;">
+						<thead>
+							<tr>
+								<td>开始时间</td>
+								<td>结束时间</td>
+								<td>播放节目</td>
+								<td>操作</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plRemark">屏保节目</label>
+		<div class="col-sm-8">
+			<select class="form-control input-sm" name="ad_program_classid" style="width:262px;">
+				<option value="">-- 请选择 --</option>
+				<volist name="programs" id="vo">
+					<eq name="vo.tplclassid" value="$plist.ad_program_classid"> 
+						<option value="{$vo.tplclassid}" selected>{$vo.tplname}</option>
+					<else />
+						<option value="{$vo.tplclassid}">{$vo.tplname}</option>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="plRemark">空闲时播放节目</label>
+		<div class="col-sm-8">
+			<select class="form-control input-sm" name="def_program_classid" style="width:262px;">
+				<option value="">-- 请选择 --</option>
+				<volist name="programs" id="vo">
+					<eq name="vo.tplclassid" value="$plist.def_program_classid"> 
+						<option value="{$vo.tplclassid}" selected>{$vo.tplname}</option>
+					<else />
+						<option value="{$vo.tplclassid}">{$vo.tplname}</option>
+					</eq>
+				</volist>
+			</select>
+			<span style="position:absolute;top:7px;left:284px;"><i class="icon-exclamation-sign" style="font-size:;color:#666;"></i> 节目播放计划中，相邻的两个节目切换播放存在时间间隔时，播放此项设置的节目.</span>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$plist.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<!-- 页面弹出层  -->
+<div id="alert-layer" style="display:none;"></div>
+<!-- 批量配置窗口  -->
+<div id="editPlayItem" class="modal-dialog" style="display:none;min-width:360px;">
+	<div class="modal-content">
+		<form id="mcfgForm" class="form-horizontal" role="form" method="" action="">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">添加播放节目</h5>
+		</div>
+		<div class="modal-body">
+				<table class="table">
+					<tbody>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>选择节目</b></td>
+							<td class="my-form-group" style="border:0;">
+								<select class="form-control input-sm" id="TBAProgSelector" style="width:auto;"></select>
+							</td>
+						</tr>
+						<tr class="auto-shutdown" style="">
+							<td class="text-right" width="180" style="border:0;"><b>开始播放时间</b></td>
+							<td class="my-form-group jl-time-box" style="border:0;position:relative;">
+								<input class="form-control input-sm jl-time-input" type="text" name="startPlaytime" id="startPlaytime" value="" style="display:inline-block;width:90px;" readonly>
+								<div class="jl-time-selector" style="left:96px;"><i class="icon-time"></i></div>
+								<div class="jl-time-picker">
+									<div class="hours clearfix">
+										<a href="javascript:void(0);" data-hour='0'>0:00</a>
+										<a href="javascript:void(0);" data-hour='1'>1:00</a>
+										<a href="javascript:void(0);" data-hour='2'>2:00</a>
+										<a href="javascript:void(0);" data-hour='3'>3:00</a>
+										<a href="javascript:void(0);" data-hour='4'>4:00</a>
+										<a href="javascript:void(0);" data-hour='5'>5:00</a>
+										<a href="javascript:void(0);" data-hour='6'>6:00</a>
+										<a href="javascript:void(0);" data-hour='7'>7:00</a>
+										<a href="javascript:void(0);" data-hour='8'>8:00</a>
+										<a href="javascript:void(0);" data-hour='9'>9:00</a>
+										<a href="javascript:void(0);" data-hour='10'>10:00</a>
+										<a href="javascript:void(0);" data-hour='11'>11:00</a>
+										<a href="javascript:void(0);" data-hour='12'>12:00</a>
+										<a href="javascript:void(0);" data-hour='13'>13:00</a>
+										<a href="javascript:void(0);" data-hour='14'>14:00</a>
+										<a href="javascript:void(0);" data-hour='15'>15:00</a>
+										<a href="javascript:void(0);" data-hour='16'>16:00</a>
+										<a href="javascript:void(0);" data-hour='17'>17:00</a>
+										<a href="javascript:void(0);" data-hour='18'>18:00</a>
+										<a href="javascript:void(0);" data-hour='19'>19:00</a>
+										<a href="javascript:void(0);" data-hour='20'>20:00</a>
+										<a href="javascript:void(0);" data-hour='21'>21:00</a>
+										<a href="javascript:void(0);" data-hour='22'>22:00</a>
+										<a href="javascript:void(0);" data-hour='23'>23:00</a>
+									</div>
+									<div class="seconds clearfix" style="display:none;">
+										<div class="text-right"><i class="icon-reply to-back" style="cursor:pointer;"></i></div>
+									</div>
+									<div class="btn btn-default btn-xs close-btn">取消</div>
+								</div>
+							</td>
+						</tr>
+						<tr class="auto-shutdown" style="">
+							<td class="text-right" width="180" style="border:0;"><b>结束播放时间</b></td>
+							<td class="my-form-group jl-time-box" style="border:0;position:relative;">
+								<input class="form-control input-sm jl-time-input" type="text" name="finishPlaytime" id="finishPlaytime" value="" style="display:inline-block;width:90px;" readonly>
+								<div class="jl-time-selector" style="left:96px;"><i class="icon-time"></i></div>
+								<div class="jl-time-picker">
+									<div class="hours clearfix">
+										<a href="javascript:void(0);" data-hour='0'>0:00</a>
+										<a href="javascript:void(0);" data-hour='1'>1:00</a>
+										<a href="javascript:void(0);" data-hour='2'>2:00</a>
+										<a href="javascript:void(0);" data-hour='3'>3:00</a>
+										<a href="javascript:void(0);" data-hour='4'>4:00</a>
+										<a href="javascript:void(0);" data-hour='5'>5:00</a>
+										<a href="javascript:void(0);" data-hour='6'>6:00</a>
+										<a href="javascript:void(0);" data-hour='7'>7:00</a>
+										<a href="javascript:void(0);" data-hour='8'>8:00</a>
+										<a href="javascript:void(0);" data-hour='9'>9:00</a>
+										<a href="javascript:void(0);" data-hour='10'>10:00</a>
+										<a href="javascript:void(0);" data-hour='11'>11:00</a>
+										<a href="javascript:void(0);" data-hour='12'>12:00</a>
+										<a href="javascript:void(0);" data-hour='13'>13:00</a>
+										<a href="javascript:void(0);" data-hour='14'>14:00</a>
+										<a href="javascript:void(0);" data-hour='15'>15:00</a>
+										<a href="javascript:void(0);" data-hour='16'>16:00</a>
+										<a href="javascript:void(0);" data-hour='17'>17:00</a>
+										<a href="javascript:void(0);" data-hour='18'>18:00</a>
+										<a href="javascript:void(0);" data-hour='19'>19:00</a>
+										<a href="javascript:void(0);" data-hour='20'>20:00</a>
+										<a href="javascript:void(0);" data-hour='21'>21:00</a>
+										<a href="javascript:void(0);" data-hour='22'>22:00</a>
+										<a href="javascript:void(0);" data-hour='23'>23:00</a>
+									</div>
+									<div class="seconds clearfix" style="display:none;">
+										<div class="text-right"><i class="icon-reply to-back" style="cursor:pointer;"></i></div>
+									</div>
+									<div class="btn btn-default btn-xs close-btn">取消</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="loading-box" style="text-align:center;display:none;">
+					<p style="font-size:48px;margin-top:10px;"><i class="icon-spinner icon-spin"></i></p>
+					<p style="">正在发送操作请求，请稍等……</p>
+				</div> 
+				<p class="jl-notice bg-danger border-radius4" style="display:none;height:28px;line-height:28px;text-align:center;width:74%;margin-bottom:0;margin:0 auto;"></p>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<input type="hidden" name="weekday" value="">
+			<input type="hidden" name="itemclassid" value="">
+			<button type="button" class="btn btn-info btn-sm jl-btn-save">确定</button>
+			<button type="button" class="btn btn-default btn-sm jl-btn-cancel">取消</button>
+		</div>
+		</form>
+	</div>
+</div>
+
+<div id="multiEeditPlayItem" class="modal-dialog" style="display:none;min-width:420px;">
+	<div class="modal-content">
+		<form id="mcfgForm" class="form-horizontal" role="form" method="" action="">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">批处理</h5>
+		</div>
+		<div class="modal-body">
+				<table class="table">
+					<tbody>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>节目单日播放列表（源）</b></td>
+							<td class="my-form-group" style="border:0;">
+								<select class="form-control input-sm" id="weekdaySelector" style="width:auto;"></select>
+							</td>
+						</tr>
+						<tr>
+							<td class="text-right" width="180" style="border:0;"><b>应用于（目标）</b></td>
+							<td style="border:0;">
+								<label><input type="checkbox" class="weekday-cbx" value="1"> 星期一</label>
+								<label><input type="checkbox" class="weekday-cbx" value="2"> 星期二</label>
+								<label><input type="checkbox" class="weekday-cbx" value="3"> 星期三</label>
+								<label><input type="checkbox" class="weekday-cbx" value="4"> 星期四</label>
+								<label><input type="checkbox" class="weekday-cbx" value="5"> 星期五</label>
+								<label><input type="checkbox" class="weekday-cbx" value="6"> 星期六</label>
+								<label><input type="checkbox" class="weekday-cbx" value="7"> 星期日</label>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="loading-box" style="text-align:center;display:none;">
+					<p style="font-size:48px;margin-top:10px;"><i class="icon-spinner icon-spin"></i></p>
+					<p style="">正在发送操作请求，请稍等……</p>
+				</div> 
+				<p class="jl-notice bg-danger border-radius4" style="display:none;height:28px;line-height:28px;text-align:center;width:74%;margin-bottom:0;margin:0 auto;"></p>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-info btn-sm jl-btn-save">确定</button>
+			<button type="button" class="btn btn-default btn-sm jl-btn-cancel">取消</button>
+		</div>
+		</form>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	$('.help-tips').hover(
+		function() {
+			$(this).children('div').first().show();
+		},
+		function() {
+			$(this).children('div').first().hide();
+		}
+	);
+	
+	function stopPropagation(e) {
+		if (e.stopPropagation)
+			e.stopPropagation();
+		else
+			e.cancelBubble = true;
+	}
+	
+	$('.jl-btn-collapseall').click(function() {
+		var isOpen = $(this).attr('data-isopen')*1;
+		
+		if (isOpen) {
+			$(this).attr({'data-isopen' : 0, 'title' : '全部展开'}).children('i').removeClass('icon-double-angle-down').addClass('icon-double-angle-up');
+			$('.playtime-list').find('.lbody').slideUp('fast');
+		} else {
+			$(this).attr({'data-isopen' : 1, 'title' : '全部收起'}).children('i').removeClass('icon-double-angle-up').addClass('icon-double-angle-down');
+			$('.playtime-list').find('.lbody').slideDown('fast');
+		}
+	});
+	
+	$('.jl-btn-collapse').click(function() {
+		var isOpen = $(this).attr('data-isopen')*1,
+			weekday = $(this).closest('.playtime-list').attr('data-weekday');
+		
+		if (isOpen) {
+			$(this).attr({'data-isopen' : 0, 'title' : '展开'}).children('i').removeClass('icon-angle-down').addClass('icon-angle-up');
+			$(this).closest('.playtime-list').find('.lbody').first().slideUp('fast');
+			//$(this).closest('.playtime-list').find('.lbody .loading-box').remove();
+		} else {
+			$(this).attr({'data-isopen' : 1, 'title' : '收起'}).children('i').removeClass('icon-angle-up').addClass('icon-angle-down');
+			$(this).closest('.playtime-list').find('.lbody').first().slideDown('fast');
+			//$(this).closest('.playtime-list').find('.lbody').first().append(getLoadBoxHtml());
+			
+			$.post('__GROUP__/Sessionhandle/getWeekdayItem', {weekDay : weekday}, function(re) {
+				if (re) {
+					var playItemHtml = '';
+					$.each(re, function(i, o) {
+						playItemHtml += '<tr data-id="' + i + '">';
+						playItemHtml += '<td><span data-field="startPlaytime">' + o.startPlaytime + '</span></td>';
+						playItemHtml += '<td><span data-field="finishedPlaytime">' + o.finishedPlaytime + '</span></td>';
+						playItemHtml += '<td><span data-field="programName">' + o.programName + '</span></td>';
+						playItemHtml += '<td><a class="oper edit" href="javascript:void(0);" title="修改"><i class="icon-pencil"></i></a>';
+						playItemHtml += '<a class="oper del" href="javascript:void(0);" title="移除"><i class="icon-trash"></i></a></td>';
+						playItemHtml += '</tr>';
+					});
+					$('#weekday' + weekday).find('table tbody').first().empty().append(playItemHtml);
+					$('#weekday' + weekday).find('table').show();
+				}
+			}, 'json');
+		}
+	});
+	
+	function getLoadBoxHtml() {
+		var loadBoxHtml = '<div class="loading-box" style="text-align:center;">';
+			loadBoxHtml += '<p style="font-size:48px;margin-top:10px;"><i class="icon-spinner icon-spin"></i></p>';
+			loadBoxHtml += '<p style="">正在加载数据，请稍等……</p>';
+			loadBoxHtml += '</div>';
+			
+		return loadBoxHtml;
+	}
+
+    $(document).bind('click',function() {
+    	$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+    });
+    
+    $('.jl-time-picker .close-btn').click(function() {
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+	});
+	
+    $('.jl-time-picker').click(function(e) {
+        stopPropagation(e);
+    });
+	
+    $('.jl-time-selector, .jl-time-input').click(function(e) {
+		if ($(this).siblings('.jl-time-picker').css('display') == 'none') {
+			$('.jl-time-picker').hide();
+			$(this).siblings('.jl-time-picker').slideDown("fast");
+			stopPropagation(e);
+		}
+	});
+	
+	$('.jl-time-picker .hours a').click(function() {
+		var hour = $(this).attr('data-hour')*1, secHtml = '';
+		
+		for (i=0; i<60; i++) {
+			secHtml += '<a href="javascript:void(0);">' + hour + ':' + ((i > 9) ? i : '0' + i) + '</a>';
+		}
+		
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$(this).addClass('selected');
+		$('.jl-time-picker .hours').hide();
+		$('.jl-time-picker .seconds').find('a').remove();
+		$('.jl-time-picker .seconds').append(secHtml).show();
+	});
+	
+	$('.jl-time-picker .seconds').delegate('a', 'click', function() {
+		$(this).closest('td').children(':text').first().val($(this).text());
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .hours a').removeClass('selected');
+		$('.jl-time-picker .seconds').hide();
+		$('.jl-time-picker').hide();
+	});
+	
+	$('.jl-time-picker .seconds .to-back').click(function() {
+		$('.jl-time-picker .hours').show();
+		$('.jl-time-picker .seconds').hide();
+	});
+
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/index';
+	});
+	
+	$('.add-program-play').click(function() {
+		$('#editPlayItem .jl-btn-save').first().attr('disabled', true);
+		$('#editPlayItem :hidden[name="weekday"]').first().val($(this).closest('.playtime-list').attr('data-weekday'));
+		$.post('__GROUP__/Ajaxhandle/getTBAPrograms', function(re) {
+			if (re) {
+				var options = '';
+				$.each(re, function(i, o) {
+					options += '<option value="' + o.tplclassid + '">' + o.tplname + '</option>';
+				});
+				$('#TBAProgSelector').empty().append(options);
+				$('#editPlayItem .jl-btn-save').first().removeAttr('disabled');
+			}
+		}, 'json');
+		setDivCenter('#editPlayItem');
+	});
+	
+	$('#editPlayItem .close, #editPlayItem .jl-btn-cancel').click(function() {
+		closeEditPlayItemWindow();
+	});
+
+	function closeEditPlayItemWindow() {
+		$('#editPlayItem :text').val('');
+		$('#editPlayItem .jl-notice').empty().hide();
+		$('#alert-layer, #editPlayItem').hide();
+	}
+	
+	$('#editPlayItem .jl-btn-save').click(function() {
+		var thisObj = this,
+			weekday = $(this).closest('#editPlayItem').find(':hidden[name="weekday"]').first().val(),
+			itemclassid = $.trim($(this).closest('#editPlayItem').find(':hidden[name="itemclassid"]').first().val()),
+			classid = $('#TBAProgSelector').val(),
+			programName = $("#TBAProgSelector").find("option:selected").text(),
+			startTime = $('#startPlaytime').val(),
+			endTime = $('#finishPlaytime').val();
+		if (!compareTime(startTime, endTime)) {
+			$('#editPlayItem .jl-notice').first().empty().text('结束播放时间必须大于开始播放时间！').show();
+			return false;
+		} else {
+			$('#editPlayItem .jl-notice').empty().hide();
+		}
+		
+		$.ajax({
+			url:'__GROUP__/Sessionhandle/addTBAProgram',
+			type:'post',
+			async:false,
+			data:{weekDay : weekday, itemClassID : itemclassid, programClassID : classid, startPlaytime : startTime, finishedPlaytime : endTime},
+			dataType:'json',
+			success:function(re){
+				if (re.stat*1) {
+					//$.kw.alert('发布成功！');
+					if (itemclassid != '') {
+						var itemObj = $('tr[data-id="' + itemclassid + '"]').first();
+						itemObj.find('span[data-field="startPlaytime"]').text(startTime);
+						itemObj.find('span[data-field="finishedPlaytime"]').text(endTime);
+						itemObj.find('span[data-field="programName"]').text(programName);
+					} else {
+						var playItemHtml = '<tr data-id="' + re.insID + '">';
+						playItemHtml += '<td><span data-field="startPlaytime">' + startTime + '</span></td>';
+						playItemHtml += '<td><span data-field="finishedPlaytime">' + endTime + '</span></td>';
+						playItemHtml += '<td><span data-field="programName">' + programName + '</span></td>';
+						playItemHtml += '<td><a class="oper edit" href="javascript:void(0);" title="修改"><i class="icon-pencil"></i></a>';
+						playItemHtml += '<a class="oper del" href="javascript:void(0);" title="移除"><i class="icon-trash"></i></a></td>';
+						playItemHtml += '</tr>';
+						
+						$('#weekday' + weekday).find('table tbody').first().append(playItemHtml);
+						$('#weekday' + weekday).find('table').show();
+					}
+					closeEditPlayItemWindow();
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function(){
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+	});
+	
+	$('.mutli-oper-list').click(function(){
+		$('#multiEeditPlayItem .jl-btn-save').first().attr('disabled', true);
+		$.post('__GROUP__/Sessionhandle/getWeekdayEnabled', function(re) {
+			if (re.stat*1) {
+				var options = '<option value="">-- 请选择 --</option>';
+				$.each(re.data, function(i, o) {
+					options += '<option value="' + i + '">' + o + '</option>';
+				});
+				$('#weekdaySelector').empty().append(options);
+				$('#multiEeditPlayItem .jl-btn-save').first().removeAttr('disabled');
+			} else {
+				$('#multiEeditPlayItem .jl-notice').first().empty().text('没有可用的节目单日播放列表（源）！无法进行批量操作！').show();
+			}
+		}, 'json');
+		setDivCenter('#multiEeditPlayItem');
+	});
+	
+	$('#weekdaySelector').change(function(){
+		var weekday = $(this).val();
+		$('#multiEeditPlayItem').find('td label :checkbox').closest('label').show();
+		$('#multiEeditPlayItem').find('td label :checkbox[value="' + weekday + '"]').closest('label').hide();
+	});
+
+	$('#multiEeditPlayItem .close, #multiEeditPlayItem .jl-btn-cancel').click(function() {
+		$(this).closest('#multiEeditPlayItem').find(':checkbox').prop({'checked' : false}).parent('div').removeClass('checked');
+		$('#multiEeditPlayItem .modal-body table').show();
+		$('#multiEeditPlayItem .jl-notice').empty().hide();
+		$('#multiEeditPlayItem .modal-body .loading-box').hide();
+		$('#multiEeditPlayItem .jl-btn-save').show();
+		$('#multiEeditPlayItem .jl-btn-cancel').text('取消');
+		$('#alert-layer, #multiEeditPlayItem').hide();
+	});
+	
+	$('#multiEeditPlayItem .jl-btn-save').click(function() {
+		var thisObj = this,
+			source = $('#weekdaySelector').val()*1,
+			dest = '',
+			checkedItems = $('#multiEeditPlayItem').find('label :checkbox:checked');
+		
+		if (!source) {
+			$('#multiEeditPlayItem .jl-notice').first().empty().text('必须选择一个节目单日播放列表（源）！').show();
+			return false;
+		} else {
+			$('#multiEeditPlayItem .jl-notice').empty().hide();
+		}
+		
+		if (checkedItems.size() <= 0) {
+			$('#multiEeditPlayItem .jl-notice').first().empty().text('必须至少选择一个应用目标！').show();
+			return false;
+		} else {
+			$('#multiEeditPlayItem .jl-notice').empty().hide();
+		}
+		
+		$.each(checkedItems, function(i, obj){
+			dest += ((i+1 == 1) ? '' : ',') + $(obj).val();
+		});
+		
+		$('#multiEeditPlayItem .modal-body table').hide();
+		$('#multiEeditPlayItem .loading-box').first().find('i').first().removeClass('icon-ok-sign text-succes icon-exclamation-sign text-danger').addClass('icon-spinner icon-spins');
+		$('#multiEeditPlayItem .loading-box').first().find('p:eq(1)').text('正在发送操作请求，请稍等……');
+		$('#multiEeditPlayItem .loading-box').show();
+		
+		$.ajax({
+			url:'__GROUP__/Sessionhandle/addMultiTBAProgram',
+			type:'post',
+			async:false,
+			data:{sourceWeekday : source, destWeekdays : dest},
+			dataType:'json',
+			success:function(re){
+				if (re.stat*1) {
+					$('#multiEeditPlayItem .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+					$('#multiEeditPlayItem .loading-box').first().find('p:eq(1)').text('操作成功！');
+					$('#multiEeditPlayItem .jl-btn-save').hide();
+					$('#multiEeditPlayItem .jl-btn-cancel').text('关闭');
+				} else {
+					$('#multiEeditPlayItem .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+					$('#multiEeditPlayItem .loading-box').first().find('p:eq(1)').text('操作失败！请刷新页面后重试……');
+					$('#multiEeditPlayItem .jl-btn-save').hide();
+					$('#multiEeditPlayItem .jl-btn-cancel').text('关闭');
+				}
+			},
+			error:function(){
+				$('#multiEeditPlayItem .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+				$('#multiEeditPlayItem .loading-box').first().find('p:eq(1)').text('操作失败！请刷新页面后重试……');
+				$('#multiEeditPlayItem .jl-btn-save').hide();
+				$('#multiEeditPlayItem .jl-btn-cancel').text('关闭');
+			}
+		});
+	});
+	
+	$('.lbody').delegate('a.edit', 'click', function() {
+		var weekday = $(this).closest('.playtime-list').attr('data-weekday'),
+			itemclassid = $(this).closest('tr').attr('data-id');
+		
+		$('#editPlayItem .jl-btn-save').first().attr('disabled', true);
+		$('#editPlayItem :hidden[name="weekday"]').first().val($(this).closest('.playtime-list').attr('data-weekday'));
+		$.post('__GROUP__/Sessionhandle/getWeekdayProgramItem', {weekDay : weekday, itemClassid : itemclassid}, function(re) {
+			if (re.stat*1) {
+				var options = '';
+				$.each(re.data.programs, function(i, o) {
+					var isSelected = o.tplclassid == re.data.item.programClassid ? ' selected' : '';
+					options += '<option value="' + o.tplclassid + '"' + isSelected + '>' + o.tplname + '</option>';
+				});
+				$('#TBAProgSelector').empty().append(options);
+				$('#startPlaytime').val(re.data.item.startPlaytime),
+				$('#finishPlaytime').val(re.data.item.finishedPlaytime);
+				$('#editPlayItem :hidden[name="itemclassid"]').first().val(itemclassid);
+				$('#editPlayItem .jl-btn-save').first().removeAttr('disabled');
+				setDivCenter('#editPlayItem');
+			} else {
+				$.kw.alert('页面数据错误，请重试……');
+				return false;
+			}
+		}, 'json');
+	});
+	
+	$('.lbody').delegate('a.del', 'click', function() {
+		var weekday = $(this).closest('.playtime-list').attr('data-weekday'),
+			itemclassid = $(this).closest('tr').attr('data-id');
+		
+		$.post('__GROUP__/Sessionhandle/delTBAProgram', {weekDay : weekday, itemClassid : itemclassid}, function(re) {
+			if (re.stat*1) {
+				$('tr[data-id="' + itemclassid + '"]').remove();
+			} else {
+				$.kw.alert('页面数据错误，请重试……');
+				return false;
+			}
+		}, 'json');
+	});
+	
+	function compareTime(startTime, endTime) {
+		var startTimeArr = startTime.split(':'),
+			endTimeArr = endTime.split(':'),
+			startHour = parseInt(startTimeArr[0]),
+			startMinute = parseInt(startTimeArr[1]),
+			endHour = parseInt(endTimeArr[0]),
+			endMinute = parseInt(endTimeArr[1]);
+		
+		if ((endHour > startHour) || (endHour == startHour && endMinute > startMinute)) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,109 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">模块列表</li>
+</ol>
+
+<div id="" class="row well">
+	<table class="table">
+		<tbody>
+			<tr>
+				<td class="text-right" width="90" style="border-top:0;"><b>组名称：</b></td>
+				<td style="border-top:0;">
+					<select class="form-control input-sm" id="nodeFilter" style="width:auto;">
+						<option value="0">全部</option>
+						<volist name="pnodes" id="vo">
+							<eq  name="vo.id" value="$Think.get.nid">
+								<option value="{$vo.id}" selected>{$vo.space}{$vo.title}</option>
+							<else/>
+								<option value="{$vo.id}">{$vo.space}{$vo.title}</option>
+							</eq>
+						</volist>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th>序号</th>
+				<th>模块标题</th>
+				<th>模块名称</th>
+				<th>唯一标识（ID）</th>
+				<th>模块说明</th>
+				<th>显示/隐藏</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="nodes" id="vo">
+			<tr>
+				<td>{$i}</td>
+				<td>
+					{$vo.space}
+					<eq name="vo.has_children" value="1">
+						<i class="icon-caret-down" style="cursor:pointer;"></i>
+					<else/>
+						<i class="icon-caret-right" style="cursor:pointer;"></i>
+					</eq>
+					&nbsp;&nbsp;
+					{$vo.title}
+				</td>
+				<td><div style="width:500px;word-wrap: break-word;overflow:hidden;">{$vo.name}</div></td>
+				<td>{$vo.node_id}</td>
+				<td>{$vo.remark}</td>
+				<td>
+					<eq name="vo.display" value="1">
+						<i class="icon-ok" style="color:#3c763d;"></i>
+					<else/>
+						<i class="icon-remove" style="color:#a94442;"></i>
+					</eq>
+				</td>
+				<td>
+					<eq name="vo.status" value="1">
+						<i class="icon-ok" style="color:#3c763d;"></i>
+					<else/>
+						<i class="icon-remove" style="color:#a94442;"></i>
+					</eq>
+				</td>
+				<td>
+					<a class="oper edit" href="__URL__/editNode/nid/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/delNode/nid/{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	$('#nodeFilter').change(function() {
+		window.location.href = '__URL__/nodesList/nid/' + $(this).val();
+	});
+});
+</script>
+<include file="Public/footer" />

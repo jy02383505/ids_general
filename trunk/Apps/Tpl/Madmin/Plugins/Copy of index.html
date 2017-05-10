@@ -1,0 +1,223 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li>内容管理</li>
+	<li>{$plugins.belong_scencename}</li>
+	<li class="active">{$plugins.name}</li>
+</ol>
+
+<div id="pluginsInfo" class="row" style="margin:36px 0;">
+	<form class="form-inline" role="form">
+		<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label" for="pluginsName">插件名称：</label>
+				<input type="text" class="form-control input-sm" id="pluginsName" value="{$plugins.name}" data-value="{$plugins.name}">
+				<button type="button" id="savePluginsName" class="btn btn-info btn-sm">保存</button>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label" for="pluginsName">插件类型：</label>
+				<p class="form-control-static">{$plugins.type_name}</p>
+			</div>
+		</div>
+	</form>
+</div>
+
+<style>
+	#pluginsDataList h5{border-bottom:2px solid #11949A;padding:8px;font-weight:700;}
+	#pluginsDataList .pdata-item{padding:0 8px;}
+	#pluginsDataList .pdata-item .title-bar{background:#f0f0f0;border-bottom:1px solid #e1e1e1;padding:8px 10px;}
+	#pluginsDataList .pdata-item .title-bar i{font-size:14px;}
+	#pluginsDataList .pdata-item .title-bar .oper{display:inline-block;padding:0 4px;margin:0 5px;}
+	#pluginsDataList .pdata-item .pdata-content{display:block;text-align:center;padding:8px;border:1px solid #f0f0f0;border-top:0;}
+	#pluginsDataList .pdata-item .pdata-content .pic-item{height:200px;width:180px;text-align:center;background:#eee;border-radius:4px;-webkit-border-radius:4px;-moz-border-radius:4px;margin:12px 22px}
+	#pluginsDataList .pdata-item .pdata-content .pic-item .pic-box{height:160px;width:180px;text-align:center;border-bottom:1px solid #e1e1e1;margin-bottom:6px;position:relative;line-height:160px;}
+	#pluginsDataList .pdata-item .pdata-content .pic-item .pic-box .pic-masker{display:none;height:36px;width:180px;text-align:center;line-height:36px;position:absolute;top:0;left:0;}
+	#pluginsDataList .pdata-item .pdata-content .pic-item .pic-box .pic-masker a{display:inline-block;padding:4px;margin:0 5px;}
+	#pluginsDataList .pdata-item .pdata-content .pic-item .pic-box .pic-masker i{font-size:18px;}
+	#pluginsDataList .pdata-item .pdata-content .pic-item .btn-sm{padding:4px 8px;}
+	#pluginsDataList .pdata-item .pdata-content img{max-height:160px;max-width:160px;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box{position:relative;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-btn{display:inline-block;width:80px;height:80px;overflow:hidden;line-height:80px;position:absolute;top:56px;left:50px;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-btn i{font-size:72px;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-btn input{position:absolute;top:0;right:0;margin:0;border:solid transparent;opacity:0;filter:alpha(opacity=0);cursor:pointer;height:100%;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-progress{position:relative;width:90%;margin:0 auto;top:130px;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-progress .bar{display:block;width:0%;background:#2ECC71;height:1px;}
+	#pluginsDataList .pdata-item .pdata-content .upload-box .myup-progress .percent{display:none;}
+</style>
+
+<div id="pluginsDataList">
+	<h5>已绑定到该插件的数据：</h5>
+	<div class="pdata-item">
+		<div class="title-bar clearfix">
+			<div class="fl">
+				<i class="icon-folder-open-alt"></i>　<span class="pdata-name">数据名称（文件夹）</span>
+			</div>
+			<div class="fr">
+				<a class="oper view" href="javascript:void(0);" title="查看详细"><i class="icon-search"></i></a>
+				<a class="oper edit" href="javascript:void(0);" title="编辑"><i class="icon-pencil"></i></a>
+				<a class="oper del" href="javascript:void(0);" title="删除"><i class="icon-trash"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="pdata-item">
+		<div class="title-bar clearfix">
+			<div class="fl">
+				<i class="icon-picture"></i>　<span class="pdata-name">数据名称（图片类型）</span>
+			</div>
+			<div class="fr">
+				<a class="oper view" href="javascript:void(0);" title="查看详细"><i class="icon-search"></i></a>
+				<a class="oper edit" href="javascript:void(0);" title="编辑"><i class="icon-pencil"></i></a>
+				<a class="oper del" href="javascript:void(0);" title="删除"><i class="icon-trash"></i></a>
+			</div>
+		</div>
+		<div class="pdata-content clearfix">
+			<div class="pic-item fl">
+				<div class="pic-box">
+					<img src="__PUBLIC__/images/demo.png" />
+					<div class="pic-masker trans-bg">
+						<a class="oper zoomin" href="javascript:void(0);" title="查看原图"><i class="icon-zoom-in"></i></a>
+						<a class="oper rm" href="javascript:void(0);" title="删除"><i class="icon-trash"></i></a>
+					</div>
+				</div>
+				<div class="clearfix">
+					<div class="fl" style="margin-left:8px;"><input class="form-control input-sm" type="text" value="" style="width:120px;"></div>
+					<div class="fr" style="margin-right:8px;"><button type="button" class="btn btn-default btn-sm">保存</button></div>
+				</div>
+			</div>
+			<div class="pic-item upload-box fl">
+				<div class="myup-btn"> 
+					<i class="icon-upload-alt"></i>
+					<input class="fileupload" type="file" name="gcover">
+				</div> 
+				<div class="myup-progress"> 
+  					<span class="bar"></span><span class="percent">0%</span > 
+				</div>
+				<input type="hidden" name="cover_image" class="gcovers" value="{$scence.bgInfo.filepath}">
+				<input type="hidden" class="savename" value="{$uniName}">
+			</div>
+		</div>
+	</div>
+	<div class="pdata-item">
+		<div class="title-bar clearfix">
+			<div class="fl">
+				<i class="icon-folder-open-alt"></i>　<span class="pdata-name">数据名称（文件夹）</span>
+			</div>
+			<div class="fr">
+				<a class="oper view" href="javascript:void(0);" title="查看详细"><i class="icon-search"></i></a>
+				<a class="oper edit" href="javascript:void(0);" title="编辑"><i class="icon-pencil"></i></a>
+				<a class="oper del" href="javascript:void(0);" title="删除"><i class="icon-trash"></i></a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/plugins/jquery.form.js"></script>
+<script type="text/javascript">
+$(function($){
+	$('.title-bar').hover(
+		function() { $(this).css('background-color', '#e5e5e5'); },
+		function() { $(this).css('background-color', '#f0f0f0'); }
+	);
+	
+	$('.title-bar .view').click(function(){
+		$(this).parents('.title-bar').first().siblings('.pdata-content').first().slideToggle('fast');
+	});
+	
+	$('.pic-box').hover(
+		function() { $(this).children('.pic-masker').first().slideDown('fast'); },	
+		function() { $(this).children('.pic-masker').first().slideUp('fast'); }	
+	);
+	
+	$('#savePluginsName').click(function(){
+		var newPname = $.trim($('#pluginsName').val()),
+			oldPname = $.trim($('#pluginsName').attr('data-value'));
+		
+		if (newPname == '') {
+			$.kw.alert('插件名称不能为空！');
+		} else if (newPname != oldPname) {
+			$.ajax({
+				url:'__CONTROLLER__/modifyPluginsNameByAjax',
+				type:'post',
+				data:{pid:'{$plugins.id}',pname:newPname},
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1 > 0) {
+						// 同步更新左侧菜单的场景名称
+						$('#plugins-'+'{$plugins.id}', window.parent.frame_left_menu.document).find('a font').first().text(newPname);
+						$.kw.alert('操作成功！');
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		}
+	});
+	
+	// 异步单图上传
+	$(".fileupload").wrap("<form class='myupload' action='__MODULE__/Ajaxhandle/uploadImage' method='post' enctype='multipart/form-data'></form>");
+	$(".fileupload").change(function() {
+		console.log('urr');
+		var upContainer = $(this).parents('.upload-box').first(),
+	   		btn = upContainer.find('.myup-btn i').first(),
+	   		bar = upContainer.find('.bar').first(),
+	   		percent = upContainer.find('.percent').first(),
+	   		progress = upContainer.find('.myup-progress').first(),
+	   		gcovers = upContainer.find('.gcovers').first();
+		
+		upContainer.find(".myupload").first().ajaxSubmit({
+			dataType: 'json',
+	           //数据格式为json
+	           beforeSend: function() { //开始上传
+	               progress.show(); //显示进度条
+	               var percentVal = '0%'; //开始进度为0%
+	               bar.width(percentVal); //进度条的宽度
+	               percent.html(percentVal).show(); //显示进度为0%
+	           },
+	           uploadProgress: function(event, position, total, percentComplete) {
+	               var percentVal = percentComplete + '%'; //获得进度
+	               bar.width(percentVal); //上传进度条宽度变宽
+	               percent.html(percentVal); //显示上传进度百分比
+	           },
+	           success: function(data) { //成功
+	               //获得后台返回的json数据，显示文件名，大小，以及删除按钮
+		           	if(data.stat) {
+		                //显示上传后的图片
+		                var html = '<div class="pic-item fl">';
+		                html += '<div class="pic-box"><img src="' + data.url + '" />';
+		                html += '<div class="pic-masker trans-bg">';
+		                html += '<a class="oper zoomin" href="javascript:void(0);" title="查看原图"><i class="icon-zoom-in"></i></a>';
+		                html += '<a class="oper rm" href="javascript:void(0);" title="删除"><i class="icon-trash"></i></a>';
+		                html += '</div>';
+		                html += '</div>';
+		                html += '<div class="clearfix">';
+		                html += '<div class="fl" style="margin-left:8px;"><input class="form-control input-sm" type="text" value="" style="width:120px;"></div>';
+		                html += '<div class="fr" style="margin-right:8px;"><button type="button" class="btn btn-default btn-sm">保存</button></div>';
+		                html += '</div>';
+		                html += '</div>';
+		                /* showimg.append('<span><img src="' + data.url + '" /><i class="bui-ext-mask hide"></i><i class="x-icon x-icon-error del-img hide" data-target="' + data.savePath + '" title="删除">x</i></span>'); */
+		                $('.upload-box').first().before(html);
+		                var gList = $.trim(gcovers.val());
+		                gcovers.val(gList + ',' + data.savePath);
+		           	} else {
+		                bar.width('0');
+		                percent.html('0%');
+		           		$.kw.alert(data.msg);
+		           	}
+	           },
+	           error: function(xhr) { //上传失败
+	               bar.width('0');
+	               $.kw.alert("上传失败");
+	               //files.html(xhr.responseText); //返回失败信息
+	           }
+	       });
+	   });
+});
+</script>
+<include file="Public/footer" />

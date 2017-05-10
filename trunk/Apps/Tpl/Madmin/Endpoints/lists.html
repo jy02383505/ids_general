@@ -1,0 +1,104 @@
+<include file="Public/header" />
+<style>
+.right-main-body{margin:0;padding:0;}
+.data-list{margin:0;}
+.data-list ul{padding-left:8px;border-bottom:1px solid #ddd;margin:0;}
+.data-list li{height:42px;line-height:42px;font-weight:normal;}
+.data-list li a.oper{top:0;}
+.data-list li a.oper i{font-size:16px;}
+.icheckbox_flat-green, .iradio_flat-green{top:-3px;}
+</style>
+
+<div class="data-list" id="endsList">
+
+	<volist name="tends" id="vo">
+		<ul class="clearfix">
+			<php>	if (checkAccess('EndPoints', 'del') || checkAccess('EndPoints', 'multiCfg')) {	</php>
+			<li class="fl" style="width:26px;"><input type="checkbox" value="{$vo.tid}"></li>
+			<php>	}	</php>
+			<li class="fl" style="width:42px;">
+				<eq name="vo.touchEndPoint_Online" value="1">
+					<i class="icon-ok-sign" style="color:#3c763d;font-size:16px;"></i>
+				<else/>
+					<i class="icon-remove-sign" style="color:#a94442;font-size:16px;"></i>
+				</eq>
+			</li>
+			<li class="fl" style="width:72px;">{$vo.touchMainId}</li>
+			<li class="fl" style="width:88px;overflow:hidden;">{$vo.touchEndPointName}</li>
+			<li class="fl" style="width:72px;overflow:hidden;" title="终端组CLASSID：{$vo.touchEndPoint_GroupClassId}">{$vo.touchEndPoint_GroupClassName}</li>
+			<li class="fl" style="width:76px;">{$vo.touchEndPointSortTxt|default="未知"}</li>
+			<li class="fl" style="width:100px;">{$vo.touchEndPointIp}</li>
+			<li class="fl" style="width:80px;">{$vo.touchEndPoint_ScreenSize}</li>
+			<li class="fl" style="width:76px;">
+				<switch name="vo.TouchMainRunStatus">
+					<case value="Run_Ok">运行中</case>
+					<case value="Run_None">未运行</case>
+					<case value="Run_Unknow">未知</case>
+					<case value="Run_Error">运行错误</case>
+					<default />--
+				</switch>
+			</li>
+			<li class="fl" style="width:72px;">{$vo.touchMainVer}</li>
+			<li class="fl" style="width:126px;">{$vo.lastConnectServerTime}</li>
+			<li class="fl text-center" style="width:88px;" title="组最新数据包：{$vo.group_lastdatazip}&#10;终端已下载包：{$vo.lastdatazip}"><eq name="vo.is_latest_ver" value="1"><span class="label label-success">已更新</span><else /><span class="label label-danger">待更新</span></eq></li>
+			<li class="fl" style="width:42px;">
+            	<!--客户端在线，则一定是能Ping通，当客户端不在线时，才Ping-->
+            	<eq name="vo.touchEndPoint_Online" value="1">
+                	<span class="glyphicon glyphicon-transfer" style="color:#009900;font-size:18px;" title="服务端Ping终端IP：通"></span>
+                <else />
+                     <eq name="vo.PingStatus" value="1">
+                        <span class="glyphicon glyphicon-transfer" style="color:#009900;font-size:18px;" title="服务端Ping终端IP：通"></span>
+                    <else/>
+                        <span class="glyphicon glyphicon-transfer" style="color:#999999;font-size:18px;" title="服务端主动Ping终端IP：不通"></span>
+                    </eq>               
+                </eq>
+			</li>
+			<li class="fl" style="width:182px;overflow:hidden;">{$vo.touchEndPointStatus}</li>
+			<li class="fl" style="width:78px;">
+				<php>	if (checkAccess('EndPoints', 'preview')) {	</php>
+				<a class="oper edit" style="padding:0 4px;margin:0;" href="__URL__/preview/et/{$Think.get.et|default='x86'}/tid/{$vo.tid}" target="_parent" title="查看详细"><i class="icon-search"></i></a>
+				<php>	}	</php>
+				<php>	if (checkAccess('EndPoints', 'edit')) {	</php>
+				<a class="oper edit" style="padding:0 4px;margin:0;" href="__URL__/edit/et/{$Think.get.et|default='x86'}/tid/{$vo.tid}" target="_parent" title="配置管理"><i class="icon-wrench"></i></a>
+				<php>	}	</php>
+				<php>	if (checkAccess('EndPoints', 'del')) {	</php>
+				<a class="oper del" style="padding:0 4px;margin:0;" href="javascript:void(0);" data-url="__URL__/del/tid/{$vo.tid}" title="删除"><i class="icon-trash"></i></a>
+				<php>	}	</php>
+			</li>
+
+		</ul>
+	</volist>
+</div>
+
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	
+	$('a.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	$('.data-list ul').hover(
+		function() { $(this).css('background-color', '#f5f5f5'); },
+		function() { $(this).css('background-color', '#ffffff'); }
+	);
+	
+	$('#endsList').find(':checkbox').siblings('ins').click(function(){
+		var allItems = $('#endsList').find(':checkbox').size(),
+			checkedItems = $('#endsList').find(':checkbox:checked').size();
+			$('.select-all').prop({'checked' : (allItems == checkedItems)});
+			
+			if (allItems == checkedItems) {
+				$('.select-all', window.parent.document).parent('div').addClass('checked');
+			} else {
+				$('.select-all', window.parent.document).parent('div').removeClass('checked');
+			}
+	});
+	
+});
+</script>
+<include file="Public/footer" />

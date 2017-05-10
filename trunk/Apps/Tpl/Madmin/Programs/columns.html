@@ -1,0 +1,181 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+	<li class="active">栏目列表</li>
+</ol>
+
+<div class="row well">
+	<div class="col-md-6">
+		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td class="text-right" width="90"><b>所属节目：</b></td>
+						<td>
+							{$program.program_name}
+						</td>
+						<td class="text-right" width="90"><b>所属栏目组：</b></td>
+						<td>
+							{$group.dirgroup_name}
+						</td>
+						<td class="text-right" width="90"><b>模板：</b></td>
+						<td>
+							<volist name="tpls" id="tpl" key="k">
+								<if condition="$k eq 1">
+									{$tpl}
+								<else/>
+									<b>，</b>{$tpl}
+								</if>
+							</volist>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-6 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<a href="__URL__/addColumn/gid/{$group.dirgroup_classid}" type="button" class="btn btn-info btn-sm" id="addNewColumn">新建栏目</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th>#ID</th>
+				<th>栏目名称</th>
+				<th>图标</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="columns" id="vo">
+			<tr>
+				<td>{$vo.id}</td>
+				<td>
+					<eq name="vo.has_children" value="1">
+						<a href="__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}/cid/{$vo.classid}" title="管理文章">{$vo.dir_name}</a>
+					<else/>
+						<a href="__URL__/articles/gid/{$group.dirgroup_classid}/id/{$vo.classid}" title="管理文章">{$vo.dir_name}</a>
+					</eq>
+					<switch name="vo.dir_type">
+						<case value="spotdir"><i class="icon-map-marker" title="热点地图" style="color:#888;position:relative;top:1px;font-size:14px;"></i></case>
+						<case value="routedir"><i class="icon-retweet" title="热点地图" style="color:#888;position:relative;top:1px;font-size:14px;"></i></case>
+					</switch>
+				</td>
+				<td>
+					<notempty name="vo.dir_ico_path">
+						<img src="/{$Think.config.upload_root_path}{$vo.dir_ico_path}" style="max-width:40px;max-height:40px;">
+					</notempty>
+				</td>
+				<td>
+					<eq name="vo.status" value="1">
+						<i class="icon-ok" style="color:#3c763d;"></i>
+					<else/>
+						<i class="icon-remove" style="color:#a94442;"></i>
+					</eq>
+				</td>
+				<td>
+					<a class="oper edit" href="__URL__/editColumn/gid/{$group.dirgroup_classid}/id/{$vo.classid}" title="编辑"><i class="icon-pencil"></i></a>
+					<neq name="vo.has_children" value="1">
+					<a class="oper edit" href="__URL__/articles/gid/{$group.dirgroup_classid}/id/{$vo.classid}" title="管理文章"><i class="icon-sitemap"></i></a>
+					</neq>
+					<a class="oper del" href="javascript:void(0);" data-gid="{$group.dirgroup_classid}" data-id="{$vo.classid}" data-url="__URL__/delColumn/gid/{$group.dirgroup_classid}/id/{$vo.classid}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">&nbsp;</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	
+	var dirgroupClassId = $.trim('{$Think.get.id|default=""}');
+	var columnClassId = $.trim('{$Think.get.cid|default=""}');
+	var treeId = $.trim('{$Think.get.treeId|default=""}');
+	
+	//if (treeId == '') {
+	//}
+	
+	/* $('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	}); */
+	
+	$('.del').click(function() {
+		var group_clazzid = $.trim($(this).attr('data-gid')),
+			clazzid = $.trim($(this).attr('data-id'));
+		
+		if (clazzid == '' || group_clazzid == '') {
+			$.kw.alert('页面数据错误，请刷新页面重试……');
+			return false;
+		}
+		
+		$.kw.confirm('确认要删除该栏目组吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__URL__/delColumn',
+				data:{'id' : clazzid, 'gid' : group_clazzid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						var programTrees = window.parent.programTree;
+						var nodeObj = programTrees.getNodeByParam("unid", clazzid, null);
+							
+						programTrees.removeNode(nodeObj);
+						
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请重试……');
+				}
+			});
+		});
+	});
+
+	if (dirgroupClassId != '' || columnClassId != '') {
+		var nodeUnid = columnClassId != '' ? columnClassId : dirgroupClassId,
+			programTrees = window.parent.programTree,
+			nodeObj = programTrees.getNodeByParam("unid", nodeUnid, null);
+
+		//programTrees.expandNode(nodeObj, true, false, true);
+		$('#programs', window.parent.frame_left_menu.document).find('a').removeClass('curSelectedNode');
+		$("#" + nodeObj.tId + "_a", window.parent.frame_left_menu.document).addClass('curSelectedNode');
+		
+	}
+});
+</script>
+<include file="Public/footer" />

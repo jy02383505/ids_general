@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+		<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+		<meta content="no-cache" http-equiv="pragma">
+		<meta content="0" http-equiv="expires">
+		<meta content="telephone=no, address=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes"> 
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/mobile.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+		*{padding:0;margin:0;font-family:"Microsoft Yahei","Helvetica Neue",Helvetica,"Hiragino Sans GB","WenQuanYi Micro Hei",sans-serif !important;color:#f0f0f0 !important;}
+		li{list-style:none;}
+		img{border:none;max-width:98% !important;}
+		a{text-decoration:none;outline:none;hide-focus:expression(this.hideFocus=true);}
+		
+		/* play */
+		.play{width:700px;height:580px;overflow:hidden;position:relative;margin:0 auto;}
+		.mask-layer{position:absolute;width:100%;height:100%;top:0px;right:0px;bottom:0px;left:0px;filter:alpha(opacity=0);background-color:#000;opacity:0;-moz-opacity:0;z-index:9999;}
+		.play ul{position:absolute;top:0;left:0;z-index:1;}
+		.play ul li{width:700px;height:580px;float:left;position:relative;}
+		.play ul li p{font-size:14px;color:#f0f0f0;line-height:20px;text-align:left;text-indent:2em;margin-top:10px;}
+		.play ul li img{width:700px;height:420px;}
+		#next,#prev{display:block;position:absolute;top:172px;width:40px;height:80px;text-align:center;background:url(__PUBLIC__/images/next-prev.png) no-repeat;z-index:999;}
+		#prev{left:36px;background-position:0 -60px;}
+		#next{right:36px;background-position:-40px -60px;}
+		.arti-contents{padding:0 20px;color:#fff !important;line-height:20px !important;}
+		.arti-contents p{text-indent:2em !important;}
+		td{border:1px solid #e0e0e0;}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="top-bar clearfix">
+				<span class="fl"><a href="javascript:location.href=document.referrer;" class="go-back">&lt;</a></span>
+				<span class="fl page-title">{$articleInfo.article_name_short}</span>
+				<span class="fr"><a href="__URL__/index" class="go-home">回到首页</a></span>
+			</div>
+			<div style="/* height:712px;overflow:auto; */">
+				<!-- h2 class="text-center" style="color:#fff;font-size:16px;font-weight:normal;line-height:22px;padding:0 100px;text-align:center;margin-top:28px;">{$articleInfo.article_name}</h2>
+				<p style="text-align:center;color:#ccc;margin:12px 0;">{$articleInfo.create_time}</p -->
+				<if condition="$Think.get.type eq 'qqxw'">
+					<notempty name="pictures">
+						<div style="width:100%;text-align:center;margin:28px auto 0;position:relative;">
+							<a href="javascript:void(0);" id="next"></a>
+							<a href="javascript:void(0);" id="prev"></a>
+							<div class="play" id="play">
+								<ul>
+									<volist name="pictures" id="vo">
+										<li>
+											<img src="/{$Think.config.upload_root_path}{$vo.filepath}" alt="" />
+											<p class="text"><span style="display:inline-block;width:32px;height:32px;text-align:center;line-height:32px;text-indent:0;background:rgba(255, 255, 255, 0.24);border-radius:16px;color:#f0f0f0;position:relative;top:-4px;left:-10px;font-size:16px;font-weight:bold;font-style:oblique;">{$i}</span> {$vo.news_note}</p>
+										</li>
+									</volist>
+								</ul>
+							</div>
+						</div>
+					</notempty>
+				<elseif condition="$Think.get.type eq 'wtzx'" />
+				<else />
+					<div class="arti-contents">{$articleInfo.article_content}</div>
+				</if>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			/* --------------------------------------   相册效果   ----------------------------------------- */
+			
+			var oDiv = $("#play");  //外部盒子
+			var count = $("#play ul li").length;  //内部图片数量
+			var countwidth = $("#play ul li").width();  //图片边框宽度
+			var oUl = $("#play ul").css("width",count*countwidth);  //ul li总宽度
+			var now = 0;
+			var next = $("#next");
+			var prev = $("#prev");
+			//图片循环事件
+			function tab(index){
+				now = index;
+				oUl.stop(true,false).animate({"left":-countwidth * now},400);
+			}
+			
+			//下一张点击事件
+			next.click(function(){
+				//clearInterval(timer);
+				now++;
+				if(now==count){
+					now=0;
+				}
+				tab(now);
+				//timer=setInterval(autoRun, 2000);
+			});
+			//上一张点击事件
+			prev.click(function(){
+				//clearInterval(timer);
+				now--;
+				if(now==-1){
+					now=count-1;
+				}
+				tab(now);
+				//timer=setInterval(autoRun, 2000);
+			});
+			//自动轮播定义
+			function autoRun(){
+				now++;
+				if(now==count){
+					now=0;
+				}
+				tab(now);
+			};
+			//var timer=setInterval(autoRun, 3000);
+			/* --------------------------------------   相册效果   ----------------------------------------- */
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,86 @@
+<include file="Public/header" />
+<style>
+	a.down:link {color: #FF0000}     /* 未访问的链接 */
+	a.down:visited {color: #FF0000}  /* 已访问的链接 */
+	a.down:hover {color: #FF0000}}    /* 当有鼠标悬停在链接上 */
+	a.down:active {color: #FF0000}   /* 被选择的链接 */
+</style>
+<div class="well" style="padding:0 10px;">
+	<div class="row">
+		<div class="col-sm-4">
+			<h3>欢迎回来，{$Think.session.username}！</h3>
+			<p>上次登录时间：{$Think.session.last_login_time}.</p>
+		</div>
+        <div class="col-md-5">
+        	<div style="padding-top:30px;">
+            <php>	if (checkAccess('Programs', 'multiCheckPrograms,multiCheckGroup,multiCheckDir,multiCheckArticles') || checkAccess('ResLib', 'multiCheckWorldNews,multiCheckHistoric,multiCheckFamousQuotes,multiCheckBaike,multiCheckHumorJokes') ) {	</php>
+            	<a href="__GROUP__/Programs/ProgramsCheckIndex" target="frame_right_main"><button type="button" class="btn btn-info" title="包括节目、栏目组、栏目、文章、各类资源的待审核总数">待审核 <span class="badge">{$allCountDS}</span></button></a>
+                <a href="__GROUP__/Programs/ProgramsCheckIndex/type/programs/checked/bh" target="frame_right_main" title="包括节目、栏目组、栏目、文章、各类资源的被驳回总数"><button type="button" class="btn btn-info" style="margin-left:5px;">被驳回 <span class="badge">{$allCountBH}</span></button></a>
+            <php>	}	</php>
+            </div>
+        </div>
+		<div class="col-sm-3">
+			<a href="/down/index.html" target="_blank" class="down" title="下载测试软件">
+			<div class="pull-right" style="margin:20px;text-align:right;">
+				<i class="glyphicon glyphicon-download-alt" aria-hidden="true" style="float:left;font-size:16pt;margin:2px;"></i>
+				<div style="float:left;height:60px;line-height:30px;font-size:14pt;margin-left:5px;">测试软件下载</div>
+			</div>
+			</a>
+		</div>
+	</div>	
+</div>
+<?php
+//var_dump($roleAccessCons);
+//var_dump($_SESSION['role']);
+?>
+<div class="data-list-table">
+	<div class="dlt-tilbar">
+		<h5>运行环境</h5>
+	</div>
+	<table class="table">
+		<tbody>
+			<volist name="sysinfo" id="vo">
+				<tr>
+					<td>{$vo.title}</td>
+					<td>{$vo.val}</td>
+				</tr>
+			</volist>
+				<tr id="trfbl">
+					<td>推荐分辨率</td>
+					<td>1920 * 1080
+                    <span id="fbl" style="padding-left:20px;"></span>
+                    </td>
+				</tr>
+				<tr>
+					<td>后台系统版本</td>
+					<td>{$Think.config.SYSTEM_VERSION}</td>
+				</tr>
+             	<tr>
+                <td>插件：</td>
+                <td><a href="__GROUP__/Home/Soft/index" target="_blank" title="服务器或客户端环境需要的插件下载">插件下载</a></td>
+                </tr>    
+                
+				<tr>
+					<td>测试<?PHP echo 'http://'.C("TSERVER_IP").':'.C("SOAP_PORT").'?wsdl';?></td>
+					<td><a href="__GROUP__/Test/Index" target="frame_right_main">进入测试</a></td>
+				</tr>
+		</tbody>
+	</table>
+
+</div>
+
+<div style="padding-top:10px;margin-top:36px;border-top:1px solid #ccc;">
+	<p class="text-center">{$Think.config.a_copyright}　{$Think.config.a_aftersales}</p>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	var fbl = " 当前屏幕分辨率：" + screen.width + " * " + screen.height;
+	if (screen.width<1920){
+		$("#trfbl").css("color","red");
+	}
+	$("#fbl").html(fbl);
+});
+</script>
+<include file="Public/footer" />

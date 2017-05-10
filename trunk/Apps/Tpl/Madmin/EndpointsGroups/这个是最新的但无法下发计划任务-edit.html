@@ -1,0 +1,262 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__GROUP__/Endpoints/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li><a href="__URL__/index/et/{$Think.get.et|default='x86'}">终端组列表</a></li>
+	<li class="active"><gt name="epg.id" value="0">修改<else />添加</gt>终端组</li>
+</ol>
+<p class="bg-warning text-center egp-msgbox" style="padding:8px 12px;color:#333;position:relative;">
+	<i class="icon-warning-sign" style="color:#a94442"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span>如果尝试创建一个下级子属终端组，操作成功后，该组的上级组的<eq name="Think.get.et" value="azt">节目播放表<else />模板及播放计划</eq>设置会被自动取消！</span>
+	<i class="icon-remove fr" style="cursor:pointer"></i>
+</p>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="pGroup">上级组</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="parent_classid" id="pGroup">
+				<option value="">顶级组</option>
+				<volist name="pGrps" id="grp">
+					<eq name="grp.groupclassid" value="$epg.parent_classid">
+						<option value="{$grp.groupclassid}" selected>{$grp.space} {$grp.groupname}</option>
+					<else />
+						<php> if (in_array($grp['groupclassid'], $childrenGrps) || $grp['has_sub_ends'] > 0 || $grp['level'] == 3) { </php>
+							<option value="{$grp.groupclassid}" disabled>{$grp.space} {$grp.groupname}</option>
+						<php> } else { </php>
+							<option value="{$grp.groupclassid}">{$grp.space} {$grp.groupname}</option>
+						<php> } </php>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="groupName">组名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="groupname" id="groupName" value="{$epg.groupname}">
+		</div>
+	</div>
+	<empty name="realChildrenGrps">
+	<div class="form-group">
+	<else />
+	<div class="form-group" style="display:none;">
+	</empty>
+		<label class="col-sm-2 control-label" for="tplclassID"><eq name="Think.get.et" value="azt">节目播放表设置<else />模板设置</eq></label>
+		<div class="col-sm-10">
+			<select class="form-control input-sm" name="tplclassid" id="tplclassID" style="width:auto;">
+				<option value=""> -- 请选择 -- </option>
+				<volist name="tpls" id="tpl">
+					<eq name="tpl.tplclassid" value="$epg.tplclassid">
+						<option value="{$tpl.tplclassid}" selected>{$tpl.tplname}</option>
+					<else />
+						<option value="{$tpl.tplclassid}">{$tpl.tplname}</option>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<eq name="Think.get.et" value="x86">
+	<div class="form-group hide">
+		<label class="col-sm-2 control-label" for="tplclassID">广告设置</label>
+		<div class="col-sm-10">
+			<select class="form-control input-sm" name="adsclassid" id="adsclassID" style="width:auto;">
+				<option value=""> -- 请选择 -- </option>
+				<volist name="adsList" id="ads">
+					<eq name="ads.dir_resourceid" value="$epg.adsclassid">
+						<option value="{$ads.dir_resourceid}" selected>{$ads.adstitle}</option>
+					<else />
+						<option value="{$ads.dir_resourceid}">{$ads.adstitle}</option>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	</eq>
+    
+	<empty name="realChildrenGrps">
+
+         <div class="form-group">
+        
+            <label class="col-sm-2 control-label" for="tplclassID">播放计划</label>
+            <div class="col-sm-10">
+                <select class="form-control input-sm" name="PlayPlanId" id="PlayPlanId" style="width:auto;">
+                    <option value=""> -- 请选择 -- </option>
+                    <volist name="playPlans" id="playPlans">
+                        <eq name="playPlans.Id" value="$epg.PlayPlanId">
+                            <option value="{$playPlans.Id}" selected>{$playPlans.Name}</option>
+                        <else />
+                            <option value="{$playPlans.Id}">{$playPlans.Name}</option>
+                        </eq>
+                    </volist>
+                </select>
+            </div>
+        </div>       
+     
+	<else />
+         <div class="form-group">
+            <label class="col-sm-2 control-label" for="tplclassID">播放计划</label>
+            <div class="col-sm-10 " >
+                <p class="form-control-static">有下级分组的分组，不能指定播放计划</p>
+            </div>
+        </div>  
+    </empty>
+
+	<empty name="realChildrenGrps">
+         <div class="form-group">
+            <label class="col-sm-2 control-label" for="tplclassID">开关机计划</label>
+            <div class="col-sm-1">
+                <select class="form-control input-sm" name="PowerPlanId" id="PowerPlanId" style="width:auto;">
+                    <option value=""> -- 请选择 -- </option>
+                    <volist name="powerPlans" id="powerPlans">
+                        <eq name="powerPlans.Id" value="$epg.PowerPlanId">
+                            <option value="{$powerPlans.Id}" selected>{$powerPlans.Name}</option>
+                        <else />
+                            <option value="{$powerPlans.Id}">{$powerPlans.Name}</option>
+                        </eq>
+                    </volist>
+                </select>
+            </div>
+            <div class="col-sm-2">
+            	<eq name="ACTION_NAME" value="edit">
+                    
+                    <button type="button" class="btn btn-success btn-xs multi-oper" data-type="grp" data-cmd="PowerOnOffTime" <gt name="epg.PowerPlanId" value="0"><else/>disabled</gt> >下发开关机计划</button>
+                    
+                </eq>
+            </div>
+        </div>       
+     
+	<else />
+         <div class="form-group">
+            <label class="col-sm-2 control-label" for="tplclassID">开关机计划</label>
+            <div class="col-sm-10 " >
+                <p class="form-control-static">有下级分组的分组，不能指定开关机计划</p>
+            </div>
+        </div>  
+    </empty>    
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$epg.id}">
+			<input type="hidden" name="endType" value="{$Think.get.et|default='x86'}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<div class="my-cover"></div>
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title">信息提示</h4>
+		</div>
+		<div class="modal-body text-center">
+			<div class="loading-box" style="text-align:center;">
+				<p style="font-size:72px;margin:30px auto 30px"><i class="icon-spinner icon-spin"></i></p>
+				<p style="line-height:28px;">正在处理，请不要关闭当前窗口……</p></div>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	var endType = '{$Think.get.et|default="x86"}';
+
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/index/et/' + endType;
+	});
+	
+	$('.egp-msgbox i.icon-remove').click(function() {
+		$(this).closest('p').fadeOut();
+	});
+
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+        	groupname : {  
+                required : true,
+            }
+        },  
+        messages : {
+        	groupname : {  
+                required : "组名称必填." ,
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			/* var parentClassId = $.trim($('#pGroup').val());
+			if (parentClassId != '') {
+				$.kw.confirm('本次操作将会创建一个下级子属终端组，操作成功后，该组的上级组的模板会被自动取消！<br>确认要继续保存吗？', function() {
+					form.submit();
+				});
+				return false;
+			} else { */
+				form.submit();
+			//}
+		}
+	});
+	
+	/* 批量操作终端（组）  */
+	$('.multi-oper').click(function() {
+		
+		var tids = null,
+			type = $.trim($(this).attr('data-type')),
+			cmd = $.trim($(this).attr('data-cmd'));//取到命令
+		
+
+			var gid = '{$epg.id}';
+			var tids = gid;
+		
+		$.kw.confirm('确认要执行该操作吗？', function() {
+			loadingSwitch(1);
+			$.ajax({
+				url:'/Endpoints/soapClientWay',
+				type:'post',
+				async:true,
+				data:{type : type, cmd : cmd, tids : tids, endType : endType},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						$.kw.alert(re.msg);
+					//	loadingResult(1, '发布成功！');
+					} else {
+						//$.kw.alert(re.msg);
+						loadingResult(0, re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+		
+	});
+
+		
+});
+</script>
+<include file="Public/footer" />

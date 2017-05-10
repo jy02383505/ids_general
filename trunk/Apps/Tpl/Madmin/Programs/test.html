@@ -1,0 +1,49 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+<!-- <link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/zTreeStyle/zTreeStyle.css"> -->
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+
+<div class="row res-box">
+	<input type="hidden" id="currCategoryId" value="0">
+	<div class="col-md-2 res-tree">
+		<ul class="ztree" id="reslist"></ul>
+	</div>
+</div>
+
+<!-- <div class="pic-box" style="width:400"></div> -->
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+
+<!-- plupload上传插件脚本 -->
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/plupload.full.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/i18n/zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.excheck-3.5.js"></script>
+
+<script type="text/javascript">
+$(function($){
+	
+	function onClickFunc(e, treeId, treeNode) {
+		getChildrenCategory(treeNode.id, true);
+		var zTree = $.fn.zTree.getZTreeObj("reslist");
+		zTree.expandNode(treeNode);
+	}
+	
+	var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			callback: {
+				onClick: onClickFunc
+			}
+		},
+		zNodes = {$programTree|default=0};
+	$.fn.zTree.init($("#reslist"), setting, zNodes);
+});
+</script>
+<include file="Public/footer" />

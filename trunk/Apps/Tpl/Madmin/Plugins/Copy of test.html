@@ -1,0 +1,219 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<ol class="breadcrumb">
+	<li><a href="">内容管理</a></li>
+	<li><a href="">主页场景</a></li>
+	<li class="active">新闻中心</li>
+</ol>
+
+<div id="pluginsInfo" class="row well">
+	<form class="form-inline" role="form">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="control-label" for="pluginsName">插件名称：</label>
+				<input type="text" class="form-control input-sm" id="pluginsName" value="{$plugins.name}" data-value="{$plugins.name}" style="width:242px;">
+				<button type="button" id="savePluginsName" class="btn btn-info btn-sm">保存</button>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="control-label" for="pluginsName">插件类型：</label>
+				<p class="form-control-static">图片幻灯框</p>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">图片列表<!-- （<span id="picDataCount">{$pluginsData.resData|count}</span>） -->：</h5>
+		<div class="fr">
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file" multiple="true">
+		</div>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th class="text-center">#ID</th>
+				<th class="text-center" width="80%">图片</th>
+				<th class="text-center">操作</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+<div class="row">
+	<div id="pluginsDataList" class="col-md-6">
+		<h5>已绑定到该插件的数据：</h5>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>#ID</th>
+					<th>数据名称</th>
+					<th>类型</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<volist name="pluginsData" id="vo">
+					<tr>
+						<td>{$vo.id}</td>
+						<td>{$vo.dataname}</td>
+						<td>{$vo.dataType}</td>
+						<td>
+							<a class="oper view" href="__URL__/editData/pid/{$vo.itemclassid}/did/{$vo.id}" title="查看管理"><i class="icon-edit"></i></a>
+							<!-- <a class="oper edit" href="__CONTROLLER__/editData/pid/{$vo.itemclassid}/did/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+							<a class="oper del" href="__CONTROLLER__/delData/pid/{$vo.itemclassid}/did/{$vo.id}" title="删除"><i class="icon-trash"></i></a> -->
+						</td>
+					</tr>
+				</volist>
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="pluginsDataResList"  class="col-md-5">
+		<h5>已绑定到该插件的数据：</h5>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>#ID</th>
+					<th>数据名称</th>
+					<th>类型</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<volist name="pluginsData" id="vo">
+					<tr>
+						<td>{$vo.id}</td>
+						<td>{$vo.dataname}</td>
+						<td>{$vo.dataType}</td>
+						<td>
+							<a class="oper view" href="__URL__/editData/pid/{$vo.itemclassid}/did/{$vo.id}" title="查看管理"><i class="icon-edit"></i></a>
+							<!-- <a class="oper edit" href="__CONTROLLER__/editData/pid/{$vo.itemclassid}/did/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+							<a class="oper del" href="__CONTROLLER__/delData/pid/{$vo.itemclassid}/did/{$vo.id}" title="删除"><i class="icon-trash"></i></a> -->
+						</td>
+					</tr>
+				</volist>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="my-cover" style="display:none;"></div>
+<button class="btn show-masker" type="button">Test</button>
+
+<div id="upArea"></div>
+<input id="file_upload" class="btn btn-default" name="file_upload" type="file" multiple="true">
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($){
+	/*$('#savePluginsName').click(function(){
+		var newPname = $.trim($('#pluginsName').val()),
+			pluginsID = {$plugins.id},
+			oldPname = $.trim($('#pluginsName').attr('data-value'));
+		
+		if (newPname == '') {
+			$.kw.alert('插件名称不能为空！');
+		} else if (newPname != oldPname) {
+			$.ajax({
+				url:'__URL__/modifyPluginsNameByAjax',
+				type:'post',
+				data:{pid:pluginsID,pname:newPname},
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1 > 0) {
+						// 同步更新左侧菜单的场景名称
+						$('#plugins-'+'{$plugins.id}', window.parent.frame_left_menu.document).find('a font').first().text(newPname);
+						window.location.reload();
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		}
+	});*/
+	
+	$('.show-masker').click(function(){ showFramesMasklayer(); });
+	
+	var succCount = failedCount = 0, errMsg = '';
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'fileObjName' : 'myUpfile',
+			'buttonText' : '<i class="icon-upload"></i>上传文件',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {
+				'dataType' : 'video', // image or folder
+				'folderName' : '' // if dataType is folder
+			},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'upArea',
+			'removeTimeout' : 10,
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess'],
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$('#' + file.id).find('.data').html(' - 上传成功');
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p></div>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+					//console.log(queuedFile.id);
+				}
+				/*
+				setTimeout(function(){
+					$('#upArea').hide();
+					hideFramesMasklayer();
+				}, 5000);
+				*/
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').hide();
+		hideFramesMasklayer();
+	});
+	
+});
+</script>
+<include file="Public/footer" />

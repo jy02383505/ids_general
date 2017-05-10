@@ -1,0 +1,223 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+<style>
+	.ztree *{font-family:"Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+	.ztree li span.button.root_open{background-position:-107px -63px;}
+	.ztree li span.button.root_close{background-position:-128px -63px;}
+	.ztree li span.button{background:url(__PUBLIC__/images/metro04.png) no-repeat;}
+	.ztree li span.button.chk{width:16px;height:16px;position:relative;top:-1px;}
+	.ztree li span.button.chk.checkbox_false_full{background-position:-3px -3px;}
+	.ztree li span.button.chk.checkbox_false_full_focus{background-position:-3px -24px;}
+	.ztree li span.button.chk.checkbox_true_full{background-position:-25px -3px;}
+	.ztree li span.button.chk.checkbox_true_full_focus{background-position:-25px -24px;}
+	.ztree li span.button.chk.checkbox_true_part{background-position:-25px -46px;}
+	.ztree li span.button.chk.checkbox_true_part_focus{background-position:-25px -66px;}
+	/* .ztree{padding:0}
+	.ztree li a{color:#fff;}
+	.ztree li{background:#34495E;line-height:40px;margin-top:1px;position:relative;}
+	.ztree li a{height:40px;display:block;border-bottom:1px solid #4A5967;}
+	.ztree li a:hover{text-decoration:none;background:#263747;}
+	.ztree li a.curSelectedNode{height:40px;background:#11949A url(__PUBLIC__/images/leftmenu-active.png) no-repeat right center;color:#fff;}
+	.ztree li a.curSelectedNode{height:40px;background:#263747;color:#fff;}
+	.ztree li span.button{background-image:url(__PUBLIC__/images/mini.png);width:32px;height:32px;}
+	.ztree li span.button.ico_open, .ztree li span.button.ico_close{background-position:-206px -40px;vertical-align:middle;}
+	.ztree li span.button.ico_docu{background-position:-238px -36px;}
+	.ztree li span.button.switch{display:block;}
+	.ztree li span.button.root_open, .ztree li span.button.root_close{display:none;}
+	.ztree li span.button.center_open, .ztree li span.button.center_close, .ztree li span.button.center_open, .ztree li span.button.bottom_open, .ztree li span.button.bottom_close, .ztree li span.button.center_docu, .ztree li span.button.bottom_docu{background-image:url(__PUBLIC__/images/metro.png);width:11px;height:40px;float:left;background-position:-94px -12px;}
+	.ztree li span.button.root_ico_open, .ztree li span.button.root_ico_close{background-position:-95px -41px;margin-left:5px;}
+	.ztree .item-tools{position:absolute;top:0;right:10px;background:#34495E;}
+	.ztree .item-tools .icon-edit{font-family:FontAwesome;font-size:16px;color:#95A5A6;}
+	.ztree li ul.line{background-position:-10px 0;} */
+</style>
+<ol class="breadcrumb">
+	<li><a href="">管理组</a></li>
+	<li><a href="">管理组列表</a></li>
+	<li class="active">分配权限</li>
+</ol>
+
+<div class="row well" style="padding: 10px 0;">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-6">
+				<b>组名称</b>：{$role.name}
+			</div>
+			<div class="col-md-6">
+				<b>状态</b>：<eq name="role.status" value="1">正常<else/>禁用</eq>
+			</div>
+		</div> 
+		<div class="row" style="margin-top:8px;border-top:1px solid #e3e3e3;padding-top:8px;">
+			<div class="col-md-12">
+				<b>说明</b>：{$role.remark}
+			</div>
+		</div> 
+	</div>
+</div>
+
+<div  class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">组权限分配：</h5>
+		<div class="fr">&nbsp;</div>
+	</div>
+	<form id="accForm" method="post" action="__URL__/assignPerms">
+	<input type="hidden" name="sids" id="sids" value="">
+	<input type="hidden" name="pids" id="pids" value="">
+	<div class="acc-list clearfix">
+	<volist name="nodes" id="vo">
+		<eq name="vo.node_id" value="$contentModuleID">
+		<dl class="node-perms scences-items well fl" style="background:#fcfcfc;padding:10px;width:28%;margin-left:10px;">
+		<else/>
+		<dl class="node-perms well fr" style="background:#fcfcfc;padding:10px;width:68%;margin-right:10px;">
+		</eq>
+			<dt>
+				<in name="vo.node_id" value="$roleAccess">
+					<eq name="vo.node_id" value="$contentModuleID">
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}" checked onclick="return false" disabled> {$vo.title}</label>
+					<input type="hidden" name="perms[]" id="cmPerm" value="{$contentModuleID}">
+					<else />
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}" checked> {$vo.title}</label>
+					</eq>
+				<else/>
+					<eq name="vo.node_id" value="$contentModuleID">
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}" onclick="return false" disabled> {$vo.title}</label>
+					<else />
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}"> {$vo.title}</label>
+					</eq>
+				</in>
+			</dt>
+			<notempty name="vo['children']">
+			<dd>
+				<volist name="vo['children']" id="svo">
+					<in name="svo.node_id" value="$roleAccess">
+						<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.node_id}" checked> {$svo.title}</label>
+					<else/>
+						<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.node_id}"> {$svo.title}</label>
+					</in>
+				</volist>
+			</dd>
+			</notempty>
+			<eq name="vo.node_id" value="$contentModuleID">
+				<ul class="ztree" id="scences"></ul>
+			</eq>
+		</dl>
+	</volist>
+	</div>
+	<div class="text-center" style="background-color:#f5f5f5;border-top:1px solid #e3e3e3;padding:18px 0 32px;">
+		<input type="hidden" name="role_id" value="{$role.id}">
+		<input class="btn btn-info btn-sm" type="submit" value="确认保存">&nbsp;&nbsp;
+		<input class="btn btn-default btn-sm" type="reset" value="取消">
+	</div>
+	</form>
+</div>
+
+<!-- 加载插件模板 -->
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript">
+function onCheck(e, treeId, treeNode) {
+	var treeObj = $.fn.zTree.getZTreeObj("scences");
+	var nodes = treeObj.getCheckedNodes(true);
+	var conNodeId = '{$contentModuleID|default=""}';
+	if (nodes.length > 0) {
+		$('.scences-items dt :checkbox').first().prop({'checked' : true});
+		$('.scences-items dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		$('#accForm').append('<input type="hidden" name="perms[]" id="cmPerm" value="' + conNodeId + '">');
+	} else {
+		$('.scences-items dt :checkbox').first().prop({'checked' : false});
+		$('.scences-items dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		$('#cmPerm').remove();
+	}
+}
+$(function($){
+
+	var setting = {
+			check: {
+				enable: true
+			},
+			callback: {
+				onCheck: onCheck
+			}
+		},
+		zNodes = {$sTree|default=0};
+	$.fn.zTree.init($("#scences"), setting, zNodes);
+	
+	var flHeight = 0;
+	$.each($('.acc-list .fr'), function(i, o){
+		flHeight += $(o).outerHeight();
+	});
+	$('.scences-items').first().css('min-height', flHeight + 60);
+	
+	$('input[type="reset"]').click(function(){
+		window.location.href = '__URL__/rolesList';
+	});
+	
+	$('dt input').siblings('ins').click(function() {
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked');
+		$(this).parents('dt').first().siblings('dd').first().find('input').prop({'checked' : isChecked});
+		if (isChecked) {
+			$(this).parent('div').addClass('checked');
+			$(this).parents('dt').first().siblings('dd').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			$(this).parent('div').removeClass('checked');
+			$(this).parents('dt').first().siblings('dd').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dt label.checkbox-inline').click(function() {
+		var isChecked = $(this).find(':checkbox').first().prop('checked');
+		$(this).parents('dt').first().siblings('dd').first().find(':checkbox').prop({'checked' : isChecked});
+		if (isChecked) {
+			$(this).parents('dt').first().siblings('dd').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			$(this).parents('dt').first().siblings('dd').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dd label.checkbox-inline').click(function() {
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		//console.log('lbl -- ' + checkedItems);
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dd input').siblings('ins').click(function() {
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		//console.log('ins -- ' + checkedItems);
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('#accForm').submit(function(){
+		var sids = [], pids = [];
+		var treeObj = $.fn.zTree.getZTreeObj("scences");
+		var nodes = treeObj.getCheckedNodes(true);
+		if (nodes.length > 0) {
+			$.each(nodes, function(i, o) {
+				if(o._dataType == 'scence') {
+					sids.push(o.id); 
+				} else {
+					pids.push(o.id); 
+				}
+			});
+			$('#sids').val(sids.join('-'));
+			$('#pids').val(pids.join('-'));
+		}
+		return true;
+	});
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,153 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="">节目管理</a></li>
+	<li class="active">节目列表</li>
+</ol>
+
+<div id="pluginsInfo" class="row well">
+	<div class="col-md-6">
+		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td class="text-right" width="90"><b>节目名称：</b></td>
+						<td>
+							<input type="text" class="form-control input-sm" name="progname" value="{$Think.get.progname}" style="width:182px;">
+							<button type="submit" class="btn btn-info btn-sm">搜索</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-6 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<a href="__URL__/add" type="button" class="btn btn-info btn-sm" id="addNewProgram">新建节目</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<!-- <th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th> -->
+				<th>#ID</th>
+				<th>节目名称</th>
+                <th>默认节目</th>
+				<th>描述</th>
+				<th>模板</th>
+				<!-- <th width="60%">描述</th> -->
+				<th>修改时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="programs" id="vo">
+			<tr>
+				<!-- <td><input type="checkbox"></td> -->
+				<td>{$vo.id}</td>
+				<td><a href="__URL__/groups/id/{$vo.program_classid}" title="管理栏目组">{$vo.program_name}</a></td>
+                <td><eq name="vo.is_default" value="1">
+                	<span class="glyphicon glyphicon-ok" style="color:#0c686c;"></span>
+                    <else/>
+                    <span class="glyphicon glyphicon-ok" style="color:#e4e4e4;"></span>
+                    </eq>
+                </td>
+				<td>{$vo.program_note}</td>
+				<td>
+					<volist name="vo.tpls" id="tpl" key="k">
+						<if condition="$k eq 1">
+							{$tpl}
+						<else/>
+							<b>，</b>{$tpl}
+						</if>
+					</volist>
+				</td>
+				<td>{$vo.modifytime}</td>
+				<td>
+					<php>	if (checkAccess('Users', 'editUser')) {	</php>
+					<a class="oper edit" href="__URL__/edit/id/{$vo.program_classid}" title="编辑"><i class="icon-pencil"></i></a>
+					<php>	}	</php>
+					<a class="oper edit" href="__URL__/groups/id/{$vo.program_classid}" title="管理栏目组"><i class="icon-sitemap"></i></a>
+					<php>	if (checkAccess('Users', 'delUser')) {	</php>
+					<a class="oper del" href="javascript:void(0);" data-id="{$vo.program_classid}" data-url="__URL__/recycle/id/{$vo.program_classid}" title="删除"><i class="icon-trash"></i></a>
+					<php>	}	</php>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	window.parent.programTree.expandAll(false);
+	//$('#programs', window.parent.frame_left_menu.document).find('a').removeClass('curSelectedNode');
+	
+	/* $('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要将该节目放入回收站吗？', function() {
+			window.location.href = targetUrl;
+		});
+	}); */
+	
+	$('.del').click(function() {
+		var clazzid = $.trim($(this).attr('data-id'));
+		
+		if (clazzid == '') {
+			$.kw.alert('页面数据错误，请刷新页面重试……');
+			return false;
+		}
+		
+		$.kw.confirm('确认要将该节目放入回收站吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__URL__/recycle',
+				data:{'id' : clazzid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						var programTrees = window.parent.programTree;
+						var nodeObj = programTrees.getNodeByParam("unid", clazzid, null);
+							
+						programTrees.removeNode(nodeObj);
+						
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请重试……');
+				}
+			});
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

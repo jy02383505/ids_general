@@ -1,0 +1,617 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<!-- plupload上传插件样式 -->
+<!-- <link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.plupload.queue/css/jquery.plupload.queue.css" type="text/css" media="screen" /> -->
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<style>
+.ui-icon, .ui-widget-content .ui-icon-circle-check{background-image: url("__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/images/ui-icons_0073ea_256x240.png")}
+</style>
+
+<style type="text/css">
+	.ui-widget, .plupload_wrapper, .plupload_header_title, .plupload_header_text{font-family: "Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+	.plupload_logo{background-position:-40px 0;}
+	.plupload_header_title{line-height:22px;}
+	.ui-widget-header{font-weight:normal;}
+	.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{font-weight:normal;}
+	.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{color:#333;}
+	.plupload_message strong{line-height:18px;}
+	.plupload_message i{line-height:22px;margin-left:18px;}
+	.ui-widget-header .ui-state-error{border:1px solid #a94442;}
+	.ui-state-error, .ui-widget-content .ui-state-error{border-bottom:1px solid #a94442;}
+	.ui-progressbar-value{background:#dff0d8;}
+	.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus{border:1px solid #1abc9c;background:#1abc9c;color:#fff;}
+</style>
+
+<eq name="dataType" value="music-hide">
+	<link href="__PUBLIC__/script/jPlayer/dist/skin/blue.monday/css/jplayer.blue.monday.min.css" rel="stylesheet" type="text/css" />
+	<style>
+		.jp-audio{border-color:#11949A;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;padding:2px;}
+	</style>
+</eq>
+
+<ol class="breadcrumb">
+	<li>内容管理</li>
+	<volist name="crumb" id="vo">
+		<li><a href="__GROUP__/Scences/index/sid/{$vo.id}">{$vo.scencename}</a></li>
+	</volist>
+	<li><a href="__URL__/index/pid/{$plugins.id}">{$plugins.name}</a></li>
+	<li class="active">{$pluginsData.dataname}</li>
+</ol>
+
+<div id="pluginsDataInfo" class="row well">
+	<form class="form-inline edit-form" role="form" onSubmit="return false;">
+		<input type="hidden" id="pluginsDataID" value="{$pluginsData.id}">
+
+		<table class="table">
+			<tbody>
+				<tr>
+					<td class="text-right" width="90"><b class="control-label">数据名称：</b></td>
+					<td width="30%">
+						<input type="text" class="form-control input-sm" id="pluginsName" value="{$pluginsData.dataname}" data-value="{$pluginsData.dataname}" style="width:280px;">
+						<button type="button" id="submitBtn" class="btn btn-info btn-sm">保存</button>
+					</td>
+					<td class="text-right" width="10%"><b>数据类型：</b></td>
+					<td><p class="form-control-static">{$pluginsData.dataType}</p></td>
+					<td class="text-right"><a type="button" href="__URL__/index/pid/{$plugins.id}" class="btn btn-info btn-sm">返回</a>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="has-error" style="position:relative;top:-12px;margin-left:100px;display:none;"></div>
+	</form>
+</div>
+
+<!-- 加载插件模板 -->
+<include file="$dataModelName" />
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/myplugins/jq.origiImgView.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+
+<!-- plupload上传插件脚本 -->
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/plupload.full.min.js"></script>
+<!-- <script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.plupload.queue/jquery.plupload.queue.js"></script> -->
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/i18n/zh_CN.js"></script>
+
+<eq name="dataType" value="music-hide">
+	<script type="text/javascript" src="__PUBLIC__/script/jPlayer/dist/jplayer/jquery.jplayer.min.js"></script>
+</eq>
+<script type="text/javascript">
+$(function($){
+	var dataDBModel = '{$dataModelName|default=""}',
+		dataID = {$pluginsData.id|default=0};
+	
+	//加载图片查看器 
+	$('.table .img-show-td > img').origiImgView();
+	
+	/* $( document ).keydown ( function( event ) {
+		if ( event.keyCode == 13 ){
+			$( "#submitBtn" ).click(); 
+		}
+	});  */
+	
+	$('#pluginsName').focus().val($('#pluginsName').val());
+	$('#pluginsName').keyup(function(event) {
+		var dataName = $.trim($(this).val());
+		//if (event.which >= 33 && event.which <= 40) return;	
+		/* var dataName = $.trim($(this).val()).toLowerCase(),
+			re = /<|>|\\|\/|:|\?|\"|\*|\|/g;
+		dataName = dataName.replace(re, '');
+		$(this).val(dataName); */
+		
+		if (dataName == '') {
+			showValidateRsInfo2('#pluginsName', 0, '数据名称不能为空！');
+		} else {
+			showValidateRsInfo2('#pluginsName', 1);
+			postData = {type: 'data', dataModel : dataDBModel, inputName : dataName, ID : dataID}
+			checkUniNameByAJAX2('__GROUP__/Ajaxhandle/checkUniName', true, postData);
+		}
+	});
+	
+	//保存数据名称
+	$('#submitBtn').click(function() {
+		var newPname = $.trim($('#pluginsName').val()),
+			oldPname = $.trim($('#pluginsName').attr('data-value'));
+			
+		if (newPname == '') {
+			$.kw.alert('数据名称不能为空！');
+		} else if (newPname != oldPname) {
+			
+			var postData = {type: 'data', dataModel : dataDBModel, inputName : newPname, ID : dataID},
+				isSubmit = false;
+		
+			// 检查插件名称唯一性
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/checkUniName',
+				type:'post',
+				data:postData,
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1 > 0) {
+						showValidateRsInfo2('#pluginsName', 1);
+						$('#submitBtn').removeAttr('disabled');
+						isSubmit = true;
+					} else {
+						showValidateRsInfo2('#pluginsName', 0, re.msg);
+						$('#submitBtn').attr({disabled:true});
+					}
+				},
+				error:function() {
+					$('#submitBtn').attr({disabled:true});
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});			
+			
+			// 如果通过唯一性验证，则发送更新名称请求
+			if (isSubmit) {
+				$.ajax({
+					url:'__URL__/modifyPluginsDataNameByAjax',
+					type:'post',
+					data:{dataDBModel : dataDBModel, dataID : dataID, pname : newPname},
+					async:false,
+					dataType:'json',
+					success:function(re) {
+						if (re.stat*1 > 0) {
+							$.kw.alert('操作成功！', '', function() {
+								window.location.reload();
+							});
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function() {
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			}
+		} else {
+			return false;
+		}
+	});
+
+	$('.music-play').click(function(){
+		$('#embedPlay').show();
+		$('.curr-player').hide();
+		$(this).parents('tr').first().find('.curr-player').first().show();
+	});
+	
+	// Uploadify 批量上传
+	var succCount = failedCount = 0, errMsg = '', formData = null, fileTypeDesc = fileTypeExts = '',
+		isMulti = true,
+		dataType = '{$dataType|default=""}',
+		isFolder = '{$pluginsData.isfolder|default=""}',
+		mediaPath = '{$mediaPath|default=""}',
+		folderName = '{$pluginsData.resData.filepath|default=""}';
+		if (isFolder == 'True') {
+			formData = {'dataType' : dataType, 'folderName' : folderName};
+		} else {
+			if (dataType == 'imagevideo') {
+				formData = {'dataType' : dataType, 'folderName' : mediaPath, 'isDBWrite' : 1, 'dataDBModel' : dataDBModel, 'dataID' : dataID};
+			} else {
+				formData = {'dataType' : dataType, 'folderName' : '', 'isDBWrite' : 1, 'dataDBModel' : dataDBModel, 'dataID' : dataID};
+			}
+		}
+		// console.log(formData);
+		switch (dataType) {
+			case 'image' : fileTypeDesc = '图片'; fileTypeExts = '{$Think.config.image_type_exts|default=""}'; break;
+			case 'video' : fileTypeDesc = '视频'; fileTypeExts = '{$Think.config.video_type_exts|default=""}'; break;
+			case 'imagevideo' : fileTypeDesc = '图片视频'; fileTypeExts = '{$Think.config.image_type_exts|default=""}' + ';' + '{$Think.config.video_type_exts|default=""}'; break;
+			case 'music' : fileTypeDesc = '音乐'; fileTypeExts = '{$Think.config.music_type_exts|default=""}'; break;
+			case 'text' : fileTypeDesc = '文本'; fileTypeExts = '{$Think.config.text_type_exts|default=""}'; break;
+			default : fileTypeDesc = '所有文件'; fileTypeExts = '*.*';
+		}
+
+		//if ((dataType == 'all') || (dataType == 'imagevideo' && isFolder == 'False')) {
+		if (dataType == 'all') {
+			isMulti = false;
+		}
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi'	: isMulti,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : fileTypeDesc,
+			'fileTypeExts' : fileTypeExts,
+			'buttonText' : '<i class="icon-upload"></i>上传文件',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : formData,
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'upArea',
+			'removeTimeout' : 10,
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$('#' + file.id).find('.data').html(' - 上传成功');
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p></div>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+					//console.log(queuedFile.id);
+				}
+				/*
+				setTimeout(function(){
+					$('#upArea').hide();
+					hideFramesMasklayer();
+				}, 5000);
+				*/
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+
+	$('#PLUploader').delegate('#clsBtn', 'click', function(){
+		$('#PLUploader').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+
+	$('#hugeFileUp').click(function() {
+		$('#PLUploader').show();
+		showFramesMasklayer();
+	});
+
+	$('.help-tips').hover(
+		function() {
+			$(this).children('div').first().show();
+		},
+		function() {
+			$(this).children('div').first().hide();
+		}
+	);
+	
+	var mime_types_val = '',
+		image_mime_types = "{$hugeMimeTypes.image|default=''}",
+		video_mime_types = "{$hugeMimeTypes.video|default=''}",
+		text_mime_types = "{$hugeMimeTypes.text|default=''}";
+	if (dataType == 'video') {
+		mime_types_val = [{title : "视频", extensions : video_mime_types}];
+	} else if (dataType == 'imagevideo') {
+		mime_types_val = [
+			{title : "图片", extensions : image_mime_types},
+			{title : "视频", extensions : video_mime_types}
+		];
+	} else if (dataType == 'all') {
+		mime_types_val = [
+			{title : "图片", extensions : image_mime_types},
+			{title : "视频", extensions : video_mime_types},
+			{title : "文档", extensions : text_mime_types}
+		];
+		//var savename = '{:generateUniqueID()}';
+		//formData = {'dataType' : dataType, 'folderName' : '', 'isDBWrite' : 1, 'dataDBModel' : dataDBModel, 'dataID' : dataID, 'savename' : savename};
+	}
+	//$("#uploader").pluploadQueue({
+	$("#uploader").plupload({
+		runtimes : 'html5,silverlight,flash,html4',
+		url : '__GROUP__/Ajaxhandle/plupload',
+		chunk_size: '1mb',
+		rename : false,
+		dragdrop: false,
+		prevent_duplicates: true,
+		multipart_params : formData,
+		multi_selection : isMulti,
+		
+		filters : {
+			max_file_size : '0',
+			mime_types: mime_types_val
+		},
+
+		views: {
+			list: true,
+			thumbs: true, // Show thumbs
+			active: 'list'
+		},
+
+		flash_swf_url : '__PUBLIC__/script/plupload2/Moxie.swf',
+		silverlight_xap_url : '__PUBLIC__/script/plupload2/Moxie.xap',
+
+		init : {
+			BeforeUpload: function(up, file) {
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/checkFileParts',
+					type:'post',
+					data:{filename : file.name},
+					async:false,
+					success:function(re) {
+						if (re*1) {
+							var hasUpChunks = re * 1;							
+							file.loaded = hasUpChunks * 1024 * 1024;
+						}
+					}
+				});
+			},
+
+			QueueChanged : function(up) {
+				if (!isMulti) {
+					if (up.files.length > 0) {
+						$('.plupload_buttons .plupload_add').first().hide();
+					} else {
+						$('.plupload_buttons .plupload_add').first().show();
+					}
+				}
+			},
+
+			ChunkUploaded: function(up, file, info) {
+				//console.log(file);
+				var re = $.parseJSON(info.response);
+				if (re.error) {
+					file.loaded = 0;
+					file.destroy();
+				}
+			},
+
+			FileUploaded: function(up, file, info) {
+				//console.log('[ File ]' + info);
+				// Called when file has finished uploading
+				//console.log(file);
+				var fileEle = $('#' + file.id), actionClass, iconClass;
+
+				var re = $.parseJSON(info.response);
+
+				if (re.error) {
+					actionClass = 'ui-state-error plupload_failed';
+					iconClass = 'ui-icon-alert';
+					fileEle.find('.plupload_file_name').first().append('&nbsp;&nbsp;<i style="color:#a94442"><b>[Error]:</b>' + re.error.message + '</i>');
+					//show_errors('<strong>服务器错误</strong><br><i>' + re.error.message + '</i>');
+				} else {
+					actionClass = 'plupload_done';
+					iconClass = 'ui-icon-circle-check';
+				}
+
+				fileEle.removeClass('plupload_done ui-state-default').addClass(actionClass).find('.plupload_action_icon').first().removeClass('ui-icon-circle-check').addClass(iconClass);
+			},
+
+			UploadComplete: function(up, files) {
+				// Called when all files are either uploaded or failed
+				//console.log('--------------------------------');
+                //console.log(files);
+			},
+ 
+            Error: function(up, errors) {
+                // Called when error occurs
+                //console.log(errors);
+            }
+		}
+	});
+	
+	// 单一删除图片
+	$('.table').delegate('.del', 'click', function(){
+		
+		var dataResID = parseInt($(this).attr('data-did')), requestUrl = '', postData = null;
+		
+		if (dataType == 'imagevideo') {
+			requestUrl = '__GROUP__/Ajaxhandle/delMediaByID';
+			postData = {'ids' : dataResID};
+		} else {
+			requestUrl = '__URL__/delResData';
+			postData = {'dataDBModel' : dataDBModel, 'dataID' : dataID, 'dataResID' : dataResID};
+		}
+		
+		$.kw.confirm('确认要删除吗？', function() {
+			
+			$.ajax({
+				url:requestUrl,
+				type:'post',
+				async:false,
+				data:postData,
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						window.location.reload();
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+	});
+	
+	$('.table').delegate('.del-file', 'click', function(){
+		var dataFiles = $.trim($(this).attr('data-filepath'));
+		$.kw.confirm('确认要删除吗？', function() {
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/delFiles',
+				type:'post',
+				async:false,
+				data:{'dataFiles' : dataFiles},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						window.location.reload();
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+	});
+	
+	// 批量删除图片
+	$('.table').delegate('.multi-del', 'click', function(){
+		var dataResIDs = '', requestUrl = '', postData = null,
+			checkedItems = $('.list-tbl').first().find('tbody').first().find(':checkbox:checked');
+			
+		$.each(checkedItems, function(i, o){
+			dataResIDs += $(o).val() + '-';
+		});
+
+		if (dataType == 'imagevideo') {
+			requestUrl = '__GROUP__/Ajaxhandle/delMediaByID';
+			postData = {'ids' : dataResIDs};
+		} else {
+			requestUrl = '__URL__/delMultiResData';
+			postData = {'dataDBModel' : dataDBModel, 'dataID' : dataID, 'dataResIDs' : dataResIDs};
+		
+		}
+		if (checkedItems.size() > 0) {
+			
+			$.kw.confirm('确认要删除吗？', function() {
+				$.ajax({
+					url:requestUrl,
+					type:'post',
+					async:false,
+					data:postData,
+					dataType:'json',
+					success:function(re){
+						if (re.stat*1) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function(){
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少选择一条记录！');
+		}
+	});
+	
+	$('.table').delegate('.multi-del-files', 'click', function(){
+		var dataFiles = '',
+			checkedItems = $('.list-tbl').first().find('tbody').first().find(':checkbox:checked');
+			$.each(checkedItems, function(i, o){
+				dataFiles += $(o).val() + ';';
+			});
+		if (checkedItems.size() > 0) {
+
+			$.kw.confirm('确认要删除吗？', function() {
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/delFiles',
+					type:'post',
+					async:false,
+					data:{'dataFiles' : dataFiles},
+					dataType:'json',
+					success:function(re){
+						if (re.stat*1) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function(){
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少选择一条记录！');
+		}
+	});
+	
+	$('.editTd').delegate('span, a', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			val = $.trim(editTd.attr('data-fname')),
+			html = '';
+			html += '<input type="text" class="form-control input-sm" value="' + val + '" data-value="' + val + '">';
+			html += '&nbsp;<button type="button" class="btn btn-info btn-sm btn-save">保存</button>&nbsp;<button type="button" class="btn btn-default btn-sm btn-cancel">取消</button>';
+			$.each($('.editTd'), function(i, o) {
+				var tdVal = $(o).attr('data-value'), isEdit = $(o).attr('data-edit')*1;
+				if (isEdit) {
+					$(o).html('<span>' + tdVal + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+				}
+			});
+			editTd.attr({'data-edit' : '1'}).html(html);
+	});
+	
+	$('.editTd').delegate('button.btn-cancel', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			val = $.trim(editTd.attr('data-fname'));
+		editTd.html('<span>' + val + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+	});
+	
+	$('.editTd').delegate('button.btn-save', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			fpath = $.trim(editTd.attr('data-fpath')),
+			oldVal = $.trim(editTd.attr('data-fname')),
+			newVal = $.trim($(this).siblings('input[type="text"]').first().val());
+		
+			if (newVal != '' && oldVal != newVal && fpath != '') {
+				var formData = {fpath : fpath, oldname : oldVal, fname : newVal};
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/setFileName',
+					type:'post',
+					data:formData,
+					//async:false,
+					dataType:'json',
+					success:function(re) {
+						if (re.stat*1 > 0) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function() {
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			} else if (oldVal == newVal) {
+				editTd.html('<span>' + oldVal + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+			} else if (newVal == '') {
+				$.kw.alert('文件名称不能为空！');
+			} else {
+				$.kw.alert('数据错误，请刷新页面重试....');
+			}
+		
+	});
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,225 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="{:U('Plan/powerPlanIndex')}">开关机计划管理</a></li>
+    <li class="active">开关机日安排</li>
+</ol>
+
+<style type="text/css">
+	#write_check_message{display:none;border:0px #FF0000 solid;overflow:hidden;}/*附加消息输入框，默认隐藏*/
+</style>
+
+<div id="pluginsInfo" class="row well">
+	<div class="col-md-8">
+		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td class="text-right" width="90"><b>日安排名称：</b></td>
+						<td>
+							<input type="text" class="form-control input-sm" name="keyboard" value="{$Think.get.keyboard}" style="width:182px;">
+							<button type="submit" class="btn btn-info btn-sm">搜索</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-4 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<a href="__GROUP__/Plan/addPowerDayArrange" class="btn btn-info btn-sm" id="addNew" >新建开关机日安排</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<!--<th width="60">#ID</th>-->
+				<th>单日安排名称</th>
+                <th width="160">时间段</th>
+				<th width="160">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="datas" id="vo">
+			<tr>
+				<td><input type="checkbox" value="{$vo.id}"></td>
+				<!--<td>{$vo.id}</td>-->
+				<td><a class="oper edit" href='{:U("Plan/editPowerDayArrange", "id=$vo[id]")}' title="编辑">{$vo.Name}</a></td>
+                <td>
+                	<button class="btn btn-default btn-sm btn-show" type="button" data-timelist="{$vo.timeList}" data-name="{$vo.Name}" >查看 <span class="badge">{$vo.Count}</span></button>
+                </td>
+	
+				<td>
+					<a class="oper edit" href="__URL__/editPowerDayArrange/id/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-id="{$vo.id}" data-url="__URL__/delPowerDayArranges/id/{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button>
+
+                
+                
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<style>
+	#model-infor{font-size:20px;line-height:30px;word-spacing:8px; letter-spacing: 1px;}
+</style>
+
+<!-------时间段显示 模态对话框 modal-lg modal-sm---------->
+<div class="modal fade " id="infoModal" tabindex="-1">
+    <div class="modal-dialog ">
+    	<div class="modal-content">
+    		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">信息窗口</h4>
+			</div>
+			<div class="modal-body" >
+                <div class="form-group">
+                    <div class="col-md-12" id="model-infor">
+                    
+                    </div>
+                </div>
+                <div style="clear:both;width:100%;height:1px;"></div>
+			</div>
+			<div class="modal-footer">
+            	<label class="col-sm-5 control-label" for=""></label>
+                <div class="col-md-7">
+				<button type="button" class="btn btn-primary" data-dismiss="modal" >确定</button>
+                </div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-------时间段显示 模态对话框---------->
+
+
+
+<include file="Public/jsLoader" />
+<script>
+$(document).ready(function() {
+	//选择了类型后，跳转到添加界面
+	$('#btn_ok').click(function() {
+		var d = $("#planTypeWeek").prop("checked");
+		var e = $("#planTypeDate").prop("checked");
+		var url = '';
+		if (d){
+			//周计划
+			url = '__GROUP__/Plan/addPlayPlans/planType/week';
+		}
+		if (e){
+			//日计划
+			url = '__GROUP__/Plan/addPlayPlans/planType/date';
+		}
+		window.location = url;
+		if (!d && !e){
+			alert("必须指定计划类型");	
+		}
+	});
+	
+	$('.btn-show').click(function(){
+		/*
+		var arr1 = [ "aaa", "bbb", "ccc" ];     
+		$.each(arr1, function(i,val){        
+		  alert(i);     
+		  alert(val);  
+		}); */
+
+		
+		var dname = $(this).attr("data-name") + " " + "时间段";
+		var dtimelist = new String();
+		dtimelist = $(this).attr("data-timelist");
+		
+		/*
+		var str=new String();  
+		var arr=new Array();
+		str="ddd,dsd,3,dd,g,k"; 
+		arr=dtimelist.split(',');//注split可以用字符或字符串分割 
+		for(var i=0;i<arr.length;i++)  {
+			alert(arr[i]);  			
+		}*/
+		
+		var reg = new RegExp(",","g");//g,表示全部替换。
+		dtimelist = dtimelist.replace(reg,"<br>");
+		//dtimelist = dtimelist.replace(",","<br>")
+		
+		$(".modal-title").html(dname );
+		$("#model-infor").html(dtimelist);
+		$('#infoModal').modal('show');                // 初始化后立即调用 show 方法
+		
+	});	
+	
+	
+	//删除
+	$('.del').click(function() {
+		var nid = $(this).attr('data-id')*1;
+		delNews(nid);
+	});
+
+	$('.multi-del').click(function() {
+		var checkedItems = $('.list-tbl tbody').first().find(':checkbox:checked'),
+			nids = new Array();
+		if (checkedItems.size() <= 0) {
+			$.kw.alert('没有选择操作对象！');
+			return false;
+		} else {
+			$.each(checkedItems, function (i, o) {
+				nids.push($(o).val()*1);
+			});
+			delNews(nids.join(','));
+		}
+	});
+	
+	function delNews(nids) {
+		$.kw.confirm('确定要删除吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__URL__/multiDelPowerDayArrange',
+				data:{'nids' : nids},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请刷新页面后重试……');
+				}
+			});
+		});
+		
+	}	
+	
+	
+});
+</script>
+
+<include file="Public/footer" />

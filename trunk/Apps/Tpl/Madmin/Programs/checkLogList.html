@@ -1,0 +1,136 @@
+<!--zjh-->
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="{:U('Check/logList')}">审核管理</a></li>
+	<li class="active">审核日志</li>
+</ol>
+
+
+<div id="" class="row well">
+	<div class="col-md-9">
+		<form class="form-inline edit-form" role="form" method="get" action="">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td width="100">
+                            <select class="form-control input-sm" name="type" id="chgType">
+                                <option value="">全部类型</option>
+                                <volist name="types" id="vo">
+                                    <eq name="vo.en" value="$type">
+                                        <option value="{$vo.en}" selected>{$vo.cn}</option>
+                                    <else/>
+                                        <option value="{$vo.en}">{$vo.cn}</option>
+                                    </eq>
+                                </volist>
+                            </select>
+						</td>
+						<td width="100">
+                            <select class="form-control input-sm" name="checked" id="chgChecked">
+                                <option value="">全部状态</option>
+                                <option value="ys" <eq name="checked" value="ys">selected</eq>  >已审核通过</option>
+                                <option value="ds" <eq name="checked" value="ds">selected</eq>  >等待审核</option>
+                                <option value="bh" <eq name="checked" value="bh">selected</eq>  >被驳回</option>
+                            </select>
+						</td>
+                        <td><button type="submit" class="btn btn-info btn-sm">搜索</button>
+                        <a href="__URL__/clearCheckLog"><button type="button" class="btn btn-link btn-clear-checklog">清空日志</button></a>
+                        </td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-3 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th width="60" class="hide">#ID</th>
+				<th width="80" >状态</th>
+                <th width="100">类型</th>
+                <th width="100">审核者</th>
+                <th width="300">内容</th>
+                <th >附加消息</th>
+                <th width="160">操作时间</th>
+			</tr>
+		</thead>
+		<tbody>
+
+
+            
+        
+			<volist name="datas" id="vo">
+			<tr>
+				<td><input type="checkbox" value="{$vo.id}"></td>
+				<td class="hide">{$vo.id}</td>
+				<td>
+                    <switch name="vo.dotype">
+                        <case value="-1"><font style="color:#FF00FF">已驳回</font></case>
+                        <case value="1">已审核</case>
+                        <default /><font style="color:#FF0000">待审核</font>
+                    </switch>
+                </td>
+                <td>
+                    <switch name="vo.type" >
+                    <case value="programArticle" break="1">文章</case>
+                    <case value="program">节目</case>
+                    <case value="programDirGroup">栏目组</case>
+                    <case value="programDir">栏目</case>
+                    <case value="resourceWorldNews">资源：全球要闻</case>
+                    <case value="resourceHistoric">资源：历史上的今天</case>                   
+                    <case value="resourceFamousQuotes">资源：名人名言</case>                    
+                    <case value="resourceBaike">资源：百科</case>                    
+                    <case value="resourceHumorJoke">资源：笑话</case>                    
+                    
+                    
+                    <default />未知
+                    </switch>
+                
+                </td>
+				<td>{$vo.username}</td>
+                <td>{$vo.thename|mb_substr=###,0,20,'utf-8'}</td>
+                <td>{$vo.word|mb_substr=###,0,20,'utf-8'}</td>
+                <td>{$vo.checktime}</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除该记录吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

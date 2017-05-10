@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<!-- <link rel="stylesheet" href="__PUBLIC__/style/iconfont/iconfont.css"> -->
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+	</head>
+	<body class="left-menu-body">
+		<div class="menu-header hide">
+			<a href="" class="home-link">控制台</a>	
+		</div>
+		
+		<div class="menu-box">
+			<if condition="($Think.get.menuID eq 'homepage') OR ($Think.get.menuID eq '')">
+			<ul class="menu-list" id="homepage">
+			<else/>
+			<ul class="menu-list" id="homepage" style="display:none;">
+			</if>
+				<li>
+					<a href="__URL__/rightFrame" target="frame_right_main" class="active"><i class=""></i> 欢迎页</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  快捷操作</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Users/modifyLoginPass" target="frame_right_main"><i class="icon-caret-right"></i> 设置登录密码</a></li>
+						<li><a href="__GROUP__/Endpoints/index" target="frame_right_main"><i class="icon-caret-right"></i> 终端列表</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+			<if condition="$Think.get.menuID eq 'scences'">
+			<ul class="menu-list" id="scences">
+			<else/>
+			<ul class="menu-list" id="scences" style="display:none">
+			</if>
+				<volist name="scences" id="scence">
+					<li id="scence-{$scence.id}">
+						<notempty name="scence['sub_plugins']">
+							<a href="javascript:void(0);" title="{$scence.scencename}"><span class="folded"></span><i class=""></i> <font>{$scence.short_scencename}</font><div class="item-tools"><i class="icon-edit" data-sid="{$scence.id}"></i></div></a>
+							<ul data-folded="1">
+								<volist name="scence['sub_plugins']" id="plugins">
+									<li id="plugins-{$plugins.id}"><a href="__GROUP__/Plugins/index/pid/{$plugins.id}" target="frame_right_main"><i class="icon-caret-right"></i> <font>{$plugins.name}</font></a></li>
+								</volist>
+							</ul>
+						<else/>
+							<a href="__GROUP__/Scences/index/sid/{$scence.id}" target="frame_right_main" title="{$scence.scencename}"><span class="folded"></span><i class=""></i> <font>{$scence.short_scencename}</font><div class="item-tools"><i class="icon-edit" data-sid="{$scence.id}"></i></div></a>
+						</notempty>
+					</li>
+				</volist>
+			</ul>
+			
+			<if condition="$Think.get.menuID eq 'syscfg'">
+			<ul class="menu-list" id="syscfg">
+			<else/>
+			<ul class="menu-list" id="syscfg" style="display:none">
+			</if>
+				<li>
+					<a href="__GROUP__/Syscfg/basicCfg" target="frame_right_main"><i class=""></i> 基本设置</a>
+				</li>
+				<li>
+					<a href="__GROUP__/Syscfg/advancedCfg" target="frame_right_main"><i class=""></i> 高级设置</a>
+				</li>
+				<li>
+					<a href="__GROUP__/Syscfg/securityCfg" target="frame_right_main"><i class=""></i> 安全设置</a>
+				</li>
+			</ul>
+			
+			
+			<if condition="$Think.get.menuID eq 'endPoints'">
+			<ul class="menu-list" id="endPoints">
+			<else/>
+			<ul class="menu-list" id="endPoints" style="display:none">
+			</if>
+				<li>
+					<a href="__GROUP__/Endpoints/index" target="frame_right_main"><i class=""></i> 终端列表</a>
+				</li>
+			</ul>
+			
+			<if condition="$Think.get.menuID eq 'ucenter'">
+			<ul class="menu-list" id="ucenter">
+			<else/>
+			<ul class="menu-list" id="ucenter" style="display:none">
+			</if>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  管理员</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Users/index" target="frame_right_main"><i class="icon-caret-right"></i> 管理员列表</a></li>
+						<li><a href="__GROUP__/Users/addUser" target="frame_right_main"><i class="icon-caret-right"></i> 添加管理员</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  管理组</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Users/rolesList" target="frame_right_main"><i class="icon-caret-right"></i> 管理组列表</a></li>
+						<li><a href="__GROUP__/Users/addRole" target="frame_right_main"><i class="icon-caret-right"></i> 创建管理组</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  模块管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Users/nodesList" target="frame_right_main"><i class="icon-caret-right"></i> 模块列表</a></li>
+						<li><a href="__GROUP__/Users/addNode" target="frame_right_main"><i class="icon-caret-right"></i> 添加模块</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		
+		<div class="left-bottom-box">
+			<p class="text-center">{$Think.config.a_copyright}</p>
+			<p class="text-center">{$Think.config.a_aftersales}</p>
+		</div>
+		
+		<div class="my-cover" style="display:none;"></div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($) {
+			
+			var menuID = '{$Think.get.menuID|default="homepage"}',
+				def = '{$menuDef|default="__GROUP__/Index/rightFrame"}',
+				tl = 0;
+		
+			window.parent.frame_right_main.location.href = def;
+
+			$.each($('#' + menuID + ' > li > a'), function(i, o) {
+				if ($(o).attr('href') == def) {
+					$(o).addClass('active');
+					tl = 1;
+				}
+			});
+			
+			if (!tl) {
+				$.each($('#' + menuID + ' ul li > a'), function(i, o) {
+					if ($(o).attr('href') == def) {
+						$(o).addClass('active').parents('ul').first().show().siblings('a').first().addClass('active');
+						tl = 0;
+					}
+				});
+			}
+			
+			// 导航级联展示效果
+			$('.menu-list > li > a').click(function() {
+				var subMenu = $(this).siblings('ul').first();
+				
+				if (subMenu.length > 0) {
+					var isFolded = parseInt(subMenu.attr('data-folded'));
+				}
+				
+				$.each($('.menu-list').children('li'), function(i, o){
+					$(o).children('a').first().removeClass('hover').children('span').first().removeClass('un-folded').addClass('folded');
+					$(o).children('ul').first().attr('data-folded', 1).slideUp('fast');
+				});	
+				
+				if (subMenu.length > 0) {
+					if (isFolded) {
+						$(this).children('span').first().removeClass('folded').addClass('un-folded');
+						subMenu.attr('data-folded', 0).slideDown('fast');
+						$(this).addClass('hover');
+					} else {
+						$(this).children('span').first().removeClass('un-folded').addClass('folded');
+						subMenu.attr('data-folded', 1).slideUp('fast');
+						$(this).removeClass('hover');
+					}	
+				} else {
+					$('.menu-list > li > a').removeClass('active');
+					$(this).addClass('active');
+				}
+			});
+
+			$('#scences > li > a').mouseover(function(){
+				$(this).children('.item-tools').first().show();
+				$(this).children('span').first().hide();
+			}).mouseout(function(){
+				$(this).children('.item-tools').first().hide();
+				$(this).children('span').first().show();
+			});
+
+			$('#scences > li a .icon-edit').click(function(event){
+				var scenceID = $(this).attr('data-sid')*1;
+				if (scenceID) {
+					window.parent.frame_right_main.location.href = '__GROUP__/Scences/index/sid/'+scenceID;
+				}
+				$.each($('.menu-list').children('li'), function(i, o){
+					$(o).children('a').first().removeClass('hover').children('span').first().removeClass('un-folded').addClass('folded');
+					$(o).children('ul').first().attr('data-folded', 1).slideUp('fast');
+				});	
+				$('.menu-list > li > a, .menu-list li li a').removeClass('active');
+				$(this).parents('a').first().addClass('active');
+				event.stopPropagation();
+			});
+			
+			$('.menu-list li li a').click(function(){
+				$('.menu-list > li > a, .menu-list li li a').removeClass('active');
+				$(this).parents('ul').first().siblings('a').first().addClass('active');
+				$(this).addClass('active');
+			});
+		})
+		</script>
+	</body>
+</html>

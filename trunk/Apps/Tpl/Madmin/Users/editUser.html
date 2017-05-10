@@ -1,0 +1,164 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">用户管理</a></li>
+	<li class="active">添加管理员</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrGrp">所属管理组</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="role_id" id="usrGrp">
+				<option value="">请选择</option>
+				<volist name="roles" id="vo">
+					<eq name="vo.id" value="$user.role_id">
+						<option value="{$vo.id}" selected>{$vo.name}</option>
+					<else/>
+						<option value="{$vo.id}">{$vo.name}</option>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrName">用户名</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="account" id="usrName" value="{$user.account}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="newPass">密码</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="password" name="password" id="newPass" value="">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="cfmNewPass">确认密码</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="password" name="cfgpass" id="cfmNewPass" value="">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="cfmNewPass">状态</label>
+		<div class="col-sm-3">
+			<eq name="user.status" value="1">
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1" checked> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0"> 禁用</label>
+			<else/>
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1"> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0" checked> 禁用</label>
+			</eq>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrEmail">Email</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="email" id="usrEmail" value="{$user.email}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrMobile">电话</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="mobile" id="usrMobile" value="{$user.mobile}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrRemark">备注</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="usrRemark">{$user.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$user.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+
+<script type="text/javascript">
+$(function($) {
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/Index';
+	});
+});
+</script>
+
+<script type="text/javascript">
+$(function($) {
+	var uid = {$user.id|default=0}, rules = msgs = null;
+	if (uid) {
+		rules = {role_id:{required:true},account:{required:true,rangelength:[3,20]},cfgpass:{equalTo:'#newPass'},email:{email:'#usrEmail'}};
+		msgs = {role_id:{required:"所属管理组必填."},account:{required:"用户名必填." ,rangelength:"用户名允许长度3~20."},cfgpass:{equalTo:'两次输入新密码不一致'},email:{email:"邮箱格式不正确."}}
+	} else {
+		rules = {role_id:{required:true},account:{required:true,rangelength:[3,20]},password:{required:true},cfgpass:{required:true,equalTo:'#newPass'},email:{email:'#usrEmail'}};
+		msgs = {role_id:{required:"所属管理组必填."},account:{required:"用户名必填." ,rangelength:"用户名允许长度3~20."},password:{required:"新密码必填."},cfgpass:{required:"确认新密码必填.",equalTo:'两次输入新密码不一致'},email:{email:"邮箱格式不正确."}}
+	}
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : rules
+        /* {
+        	role_id : {  
+                required : true  
+            },  
+            account : {  
+                required : true,
+                rangelength : [6,20]
+            },
+            password : {  
+                required : true
+            },  
+            cfmpass : {  
+                required : true,
+                equalTo	: '#newPass'
+            },
+            email : {
+            	email : '#usrEmail'
+            }
+        } */,  
+        messages : msgs
+        /* {  
+        	role_id : {  
+                required : "所属管理组必填."  
+            },
+            account : {  
+                required : "用户名必填." ,
+                rangelength : "用户名允许长度6~20."
+            },  
+            password : {  
+                required : "新密码必填."
+            },  
+            cfmpass : {  
+                required : "确认新密码必填.",
+                equalTo : '两次输入新密码不一致'
+            },
+            email : {
+            	email : "邮箱格式不正确."
+            }
+        } */,  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+		<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+		<meta content="no-cache" http-equiv="pragma">
+		<meta content="0" http-equiv="expires">
+		<meta content="telephone=no, address=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes"> 
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/mobile.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			.usr-input-box{color:#f0f0f0;margin:168px 0 16px 328px;}
+			.usr-input-box label{font-size:20px;}
+			.msg-box{margin-top:36px;color:#cc0;font-size:16px;display:none;background:#B28180;width:482px;margin-left:142px;line-height:28px;border-radius:12px;  text-align:center;-webkit-border-radius:12px;}
+			.help-text{display:block;color:#f0f0f0;margin-top:14px;padding-left:142px;font-size:16px;}
+			.usr-info{padding:0 0 0 24px;margin-top:36px;color:#f0f0f0;line-height:28px;}
+			.book-cover{display:block;width:240px;text-align:center;height:272px;background-color:rgba(255, 255, 255, 0.1);margin-right:18px;}
+			.book-cover span{height:100%;display:inline-block;vertical-align:middle;}
+			.book-cover img{max-height:240px;max-width:240px;vertical-align:middle;}
+			.book-info{width:982px;}
+			.book-info p{float:left;width:312px;}
+			.usr-borrowing{padding:0 0 0 24px;margin-top:28px;color:#f0f0f0;line-height:28px;}
+			.usr-borrowing table{border-collapse:collapse;background-color:rgba(255, 255, 255, 0.1);width:100%;}
+			.usr-borrowing table th{border:1px solid rgba(0, 0, 0, 0.1);border-bottom-width:2px;}
+			.usr-borrowing table td{border:1px solid rgba(0, 0, 0, 0.1);padding:0 6px;}
+			.loading-box{display:none;}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="top-bar clearfix">
+				<span class="fl"><a href="__URL__/index" class="go-back">&lt;</a></span>
+				<span class="fl page-title">{$columnTitle}</span>
+				<span class="fr"><a href="__URL__/index" class="go-home">回到首页</a></span>
+			</div>
+			<div class="usr-input-box">
+				<label for="borrowNum">
+					输入证件号码：<input type="text" class="input-text" id="borrowNum" autocomplete="off">
+				</label>
+				<button class="my-button" id="searBtn">查询</button>
+				<a href="__URL__/iborrows" id="clearResults" style="color:rgb(116, 12, 32);display:none;">清除查询结果</a>
+				<p class="help-text">例如：科大文10000　201501093018</p>
+				<p class="msg-box"></p>
+			</div>
+			
+			<div class="loading-box">
+				<p style="text-align:center;margin-top:60px;color:#f0f0f0;font-size:18px;"><img src="__PUBLIC__/images/mobile/loading.gif" /></p>
+			</div>
+			<div class="usr-info"></div>
+			<div class="usr-borrowing"></div>
+		</div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			var api_unid = 'd819950b-82cf-9dd1-30d2-127967e2d7d6',
+				borrow_num = '';
+			
+			$('#searBtn').click(function(){
+				borrow_num = $.trim($('#borrowNum').val());
+				if (borrow_num != '') {
+					$('.loading-box').first().show();
+					$('.usr-info, .usr-borrowing').empty();
+					$('#searBtn').removeClass('my-button').addClass('my-dis-button').html('正在查询……').attr({'disabled' : true});
+					
+					$.ajax({
+						url : '__URL__/getApiData',
+						type : 'post',
+						data : {type : 'iborrow', apid : api_unid, borrowNum : borrow_num},
+						dataType : 'json',
+						timeout : 10000,
+						success: function(re) {
+							$('.loading-box').first().hide();
+							$('#searBtn').removeClass('my-dis-button').addClass('my-button').html('查询').removeAttr('disabled');
+							if (re.stat*1) {
+								var usr_html = list_html = '', reader = re.books.userInfo, borrows = re.books.borrowing;
+								usr_html += '<div class="books-item clearfix">';
+								usr_html += '<div class="fl book-cover"><span></span><img src="'+ reader.photo + '" /></div>';
+								usr_html += '<div class="fl book-info">';
+								usr_html += '<p><span>姓名：</span>' + reader.username + '</p>';
+								usr_html += '<p><span>身份证号：</span>' + reader.IDCardNum + '</p>';
+								usr_html += '<p><span>性别：</span>' + reader.sex + '</p><div class="clearfix10"></div>';
+								usr_html += '<p><span>年级：</span>' + reader.grade + '</p>';
+								usr_html += '<p><span>专业：</span>' + reader.major + '</p>';
+								usr_html += '<p><span>系别：</span>' + reader.department + '</p><div class="clearfix10"></div>';
+								usr_html += '<p><span>单位：</span>' + reader.company + '</p>';
+								usr_html += '<p><span>联系地址：</span>' + reader.address + '</p><div class="clearfix10"></div>';
+								usr_html += '<p><span>电话：</span>' + reader.phone + '</p>';
+								usr_html += '<p><span>手机：</span>' + reader.mobile + '</p>';
+								usr_html += '<p><span>Email：</span>' + reader.email + '</p><div class="clearfix10" style="border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:14px;"></div>';
+								usr_html += '<p><span>借书证号：</span>' + reader.borrowNum + '</p>';
+								usr_html += '<p><span>读者条码：</span>' + reader.readerBarCode + '</p><div class="clearfix10"></div>';
+								usr_html += '<p><span>发证日期：</span>' + reader.openingDate + '</p>';
+								usr_html += '<p><span>失效日期：</span>' + reader.expiryDate + '</p><div class="clearfix10"></div>';
+								usr_html += '<p><span>上次到馆时间：</span>' + reader.latestAccessTime + '</p>';
+								usr_html += '</div>';
+								usr_html += '</div>';
+								$('.usr-input-box').first().css({'margin-top' : '28px'});
+								$('.usr-info').first().html(usr_html);
+								
+								list_html += '<h1 style="color:#f0f0f0;padding:10px 2px 0px;border-bottom:1px solid rgba(255,255,255,0.5);">&nbsp;<font style="font-size:12px;">》</font>借阅情况</h1>';
+								list_html += '<table>';
+								list_html += '<tr>';
+								list_html += '<th>题名</th>';
+								list_html += '<th>条形码</th>';
+								list_html += '<th>登录号</th>';
+								list_html += '<th>馆藏地</th>';
+								list_html += '<th>外借时间</th>';
+								list_html += '<th>应归还时间</th>';
+								list_html += '</tr>';
+								$.each(borrows, function(i, item) {
+									list_html += '<tr>';
+									list_html += '<td>' + item.title + '</td>';
+									list_html += '<td>' + item.barCode + '</td>';
+									list_html += '<td>' + item.loginNo + '</td>';
+									list_html += '<td>' + item.Collection + '</td>';
+									list_html += '<td>' + item.lendoutTime + '</td>';
+									list_html += '<td>' + item.givebackTime + '</td>';
+									list_html += '</tr>';
+								});
+								list_html += '</table>';
+								$('.help-text').first().hide();
+								$('#clearResults').show();
+								$('.usr-borrowing').first().html(list_html);
+							} else {
+								$('.usr-input-box').first().css({'margin-top' : '168px'});
+								$('.help-text').first().show();
+								$('#clearResults').hide();
+								setMessage('操作提示：没有查询到结果信息!请检查输入的证件号码是否正确！');
+							}
+						},
+						error: function() {
+							$('.usr-input-box').first().css({'margin-top' : '168px'});
+							$('.loading-box').first().hide();
+							$('#searBtn').removeClass('my-dis-button').addClass('my-button').html('查询').removeAttr('disabled');
+							setMessage('操作提示：网络异常，请求失败！');
+						}
+					});
+					
+				} else {
+					setMessage('操作提示：请先输入证件号码！');
+				}
+			});
+			
+			function setMessage(contents) {
+				$('.msg-box').first().html(contents).fadeIn().delay(3000).fadeOut();
+			}
+		});
+		</script>
+	</body>
+</html>

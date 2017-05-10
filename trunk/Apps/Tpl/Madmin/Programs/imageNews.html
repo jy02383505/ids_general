@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>news showbox</title>
+
+<style>
+*{padding:0;margin:0;font-family:Microsoft Yahei,"Helvetica Neue",Helvetica,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif;}
+li{list-style:none;}
+img{border:none;}
+a{text-decoration:none;outline:none;hide-focus:expression(this.hideFocus=true);}
+body{background:#4F6467;}
+
+/* play */
+.play{width:700px;height:580px;overflow:hidden;position:relative;margin:0 auto;}
+.mask-layer{position:absolute;width:100%;height:100%;top:0px;right:0px;bottom:0px;left:0px;filter:alpha(opacity=0);background-color:#000;opacity:0;-moz-opacity:0;z-index:9999;}
+.play ul{position:absolute;top:36px;left:0;z-index:1;}
+.play ul li{width:700px;height:580px;float:left;position:relative;}
+.play ul li p{font-size:14px;color:#f0f0f0;line-height:20px;text-align:left;margin-top:10px;}
+.play ul li img{width:700px;height:420px;}
+#next,#prev{display:block;position:absolute;top:300px;width:40px;height:80px;text-align:center;background:url(__PUBLIC__/images/next-prev.png) no-repeat;z-index:999;}
+#prev{left:48px;background-position:0 -60px;}
+#next{right:48px;background-position:-40px -60px;}
+</style>
+
+</head>
+<body>
+<div style="width:100%;text-align:center;margin-top:80px;">
+	<a href="javascript:void(0);" id="next"></a>
+	<a href="javascript:void(0);" id="prev"></a>
+	<div class="play" id="play">
+		<h4 class="text-center" style="color:#fff;margin-bottom:36px;font-weight:normal;">{$article.article_name}<span style="font-size:12px;">（{$article.create_time}）</span></h4>
+		<ul>
+		<volist name="pictures" id="pic">
+			<li>
+				<img src="/{$Think.config.upload_root_path}{$pic.filepath}">
+				<p class="text"><span style="display:inline-block;width:30px;height:30px;text-align:center;line-height:30px;text-indent:0;color:#8dc18d;font-style:italic;position:relative;top:-3px;left:0px;font-size:18px;font-weight:bold;">{$i}</span> {$pic.news_note}</p>
+			</li>
+		</volist>
+		</ul>
+		<div class="mask-layer"></div>
+	</div>
+</div>
+
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	var oDiv = $("#play");  //外部盒子
+	var count = $("#play ul li").length;  //内部图片数量
+	var countwidth = $("#play ul li").width();  //图片边框宽度
+	var oUl = $("#play ul").css("width",count*countwidth);  //ul li总宽度
+	var now = 0;
+	var next = $("#next");
+	var prev = $("#prev");
+	//图片循环事件
+	function tab(index){
+		now = index;
+		oUl.stop(true,false).animate({"left":-countwidth * now},400);
+	}
+	
+	//下一张点击事件
+	next.click(function(){
+		//clearInterval(timer);
+		now++;
+		if(now==count){
+			now=0;
+		}
+		tab(now);
+		//timer=setInterval(autoRun, 2000);
+	});
+	//上一张点击事件
+	prev.click(function(){
+		//clearInterval(timer);
+		now--;
+		if(now==-1){
+			now=count-1;
+		}
+		tab(now);
+		//timer=setInterval(autoRun, 2000);
+	});
+	//自动轮播定义
+	function autoRun(){
+		now++;
+		if(now==count){
+			now=0;
+		}
+		tab(now);
+	};
+	//var timer=setInterval(autoRun, 3000);
+});
+</script>
+
+</body>
+</html>

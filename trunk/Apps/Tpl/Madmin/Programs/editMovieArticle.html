@@ -1,0 +1,528 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+<style type="text/css">
+.tpls-box {width:100%;height:420px;overflow-y:scroll;padding:10px;border:1px solid #ddd;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;margin-top:10px;}
+.tpls-box .file-list li{position:relative;height:42px;line-height:42px;border-bottom:1px solid #e1e1e1;padding:0 10px;}
+.tpls-box .file-list li:hover{background:#f5f5f5;}
+.tpl-item {position:relative;padding:8px 8px 8px 8px;background:#f1f1f1;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;margin:12px;}
+.tpl-item .tpl-shots {width:140px;height:140px;overflow:hidden;text-align:center;line-height:140px;}
+.tpl-item img {max-width:140px;max-height:140px;}
+a.tpl-sel {display:block;position:absolute;right:4px;bottom:4px;width:22px;height:22px;line-height:22px;text-align:center;background:url(__PUBLIC__/images/item-selected-s.png) no-repeat -184px -257px;color:#666;}
+.tpls-box .file-list a.tpl-sel{bottom:10px;}
+a.tpl-sel i{font-size:22px;}
+a.tpl-sel:hover {color:#a94442;}
+#resWindow a.tpl-sel:hover {color:green;}
+#resWindow .tpl-item{margin:6px;}
+#resWindow .tpl-item .add-success{position:absolute;width:100%;bottom:0;background:rgba(0,0,0,0.7);margin:0;left:0;padding:0;text-align:center;color:#6a6;line-height:22px;border-bottom-left-radius:4px;border-bottom-right-radius:4px;}
+.file-list .add-success{background:rgba(0,0,0,0.7);padding:0px 6px;text-align:center;color:#6a6;line-height:22px;border-radius:4px;margin-top:8px;}
+
+.ztree li span.button.root_open{background-position:-105px -63px;}
+.ztree li span.button.root_close{background-position:-126px -63px;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+	<li><a href="__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}">栏目管理</a></li>
+	<li><a href="__URL__/articles/gid/{$group.dirgroup_classid}/id/{$column.classid}">文章管理</a></li>
+	<li class="active"><empty name="article.article_classid">添加文章<else />编辑文章</empty></li>
+</ol>
+<form id="progForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属节目</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$program.program_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属栏目组</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$group.dirgroup_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属栏目</label>
+		<div class="col-sm-3">
+		<php> if (in_array($column['dir_type'], $spColumns)) { </php>
+			<p class="form-control-static">{$column.dir_name}</p>
+			<input type="hidden" name="program_dir_classid" value="{$column.classid}">
+		<php> } else { </php>
+			<select class="form-control input-sm" name="program_dir_classid">
+				<option value="">顶级栏目</option>
+				<volist name="columns" id="col">
+					<eq name="col.classid" value="$column.classid">
+						<option value="{$col.classid}" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+					<else />
+						<eq name="col.dir_type" value="$column.dir_type">
+							<option value="{$col.classid}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+						<else />
+							<option value="{$col.classid}" disabled>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+						</eq>
+					</eq>
+				</volist>
+			</select>
+		<php> } </php>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">文章类型</label>
+		<div class="col-sm-6" style="position:relative;">
+			<p class="form-control-static">图片 + 视频 + 网页文本</p>
+			<input type="hidden" name="article_content_type" value="html">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="artiName">文章名称</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="article_name" id="artiName" value="{$article.article_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">文章图标</label>
+		<div class="col-sm-3">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"></span>
+				<div id="uploadfyQueueList"></div> 
+				<div class="showimg clearfix">
+					<notempty name="article.article_ico">
+						<span><img src="/{$Think.config.upload_root_path}{$article.article_ico_path}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="article_ico" class="gcovers" value="{$article.article_ico}">
+			</div>
+		</div>
+	</div>
+		
+	<div class="form-group content-box content-image">
+		<label class="col-sm-2 control-label" for="articleContent">图片</label>
+		<div class="col-sm-9">
+			<button class="btn btn-info btn-sm open-reslib" data-type="pictures" type="button">选择图片</button>
+			<div class="tpls-box clearfix">
+			<volist name="movieMedias.image" id="res">
+				<div class="tpl-item fl">
+					<div class="tpl-shots">
+						<img src="/{$Think.config.upload_root_path}{$res.filepath}">
+					</div>
+					<a href="javascript:void(0);" data-id="{$res.id}" class="tpl-sel" style="background:none" title="移除"><i class="icon-minus-sign"></i></a>
+				</div>
+			</volist>
+			</div>
+		</div>
+	</div>
+		
+	<div class="form-group content-box content-files">
+		<label class="col-sm-2 control-label" for="articleContent">视频</label>
+		<div class="col-sm-9">
+			<button class="btn btn-info btn-sm open-reslib" data-type="videos" type="button">选择视频</button>
+			<div class="tpls-box clearfix">
+				<ul class="file-list">
+				<volist name="movieMedias.video" id="res">
+					<li class="clearfix">
+						<span class="fname fl">{$res.filename}</span>
+						<a href="javascript:void(0);" data-id="{$res.id}" class="tpl-sel fr" style="background:none" title="移除"><i class="icon-minus-sign"></i></a>
+					</li>
+				</volist>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div class="form-group content-box content-html">
+		<label class="col-sm-2 control-label" for="articleContent">内容</label>
+		<div class="col-sm-9">
+			<script id="articleHtmlContent" name="article_html_content" type="text/plain" style="height:400px;">{$article.article_html_content}</script>
+		</div>
+	</div>
+		
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="article_classid" value="{$article.article_classid}">
+			<input type="hidden" name="dirgroup_classid" value="{$group.dirgroup_classid}">
+			<input type="hidden" name="column_classid" value="{$column.classid}">
+			<input type="hidden" name="temp_article_classid" value="{$tempClassId}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<!-- about pdf author:lym -->
+			<div class="pdf_box" style="display:inline;">
+				<label style="color:maroon;">
+					<input type="checkbox" name="pdf_meantime">&nbsp;&nbsp;同时保存pdf&nbsp;&nbsp;
+				</label>
+				<a type="button" class="pdf_preview btn btn-sm btn-success" target="_blank" href='javascript:;'>pdf预览</a>&nbsp;&nbsp;
+			</div>
+			<!-- pdfsome end -->
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<div class="my-cover" style="display:none;"></div> <!-- 遮罩层 -->
+<div id="resWindow" class="modal-dialog" style="display:none;/* min-width:360px; */top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title">素材资源选择器</h4>
+		</div>
+		<div class="modal-body clearfix">
+			<div id="cateTree" class="fl" style="width:20%;">
+				<ul class="ztree" id="reslist"></ul>
+			</div>
+			<div class="tpls-box fl clearfix" style="width:78%">
+				<!-- <div class="loading-box" style="text-align:center;">
+					<p style="font-size:48px;margin-top:160px;"><i class="icon-spinner icon-spin"></i></p>
+					<p style="">正在加载数据，请稍等……</p>
+				</div> -->
+				<!-- <div class="tpl-item fl">
+					<div class="tpl-shots">
+						<img src="__PUBLIC__/images/demo.jpg">
+					</div>
+					<a href="javascript:void(0);" data-id="{$vo.tplclassid}" class="tpl-sel" style="background:none" title="添加"><i class="icon-plus-sign"></i></a>
+				</div>
+				<ul class="file-list">
+					<li class="clearfix">
+						<span class="fname fl">测试文芳的额房东.avi</span>
+						<a href="javascript:void(0);" data-id="{$vo.tplclassid}" class="tpl-sel fr" style="background:none" title="添加"><i class="icon-plus-sign"></i></a>
+					</li>
+				</ul> -->
+			</div>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.all.js"> </script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var program_classid = '{$program.program_classid|default=""}';
+	var temp_classid = '{$tempClassId|default=""}';
+	var article_type = '{$article.article_content_type|default="txt"}';
+	
+	// pdfsome
+	$('input[name=pdf_meantime]').iCheck('check');
+	$('.pdf_preview').click(function(){
+		var myEditor = UE.getEditor('articleHtmlContent');
+		var article_content = myEditor.getContent();
+		var article_name = $('#artiName').val();
+		console.log('-----------article_content-----------');
+		console.log(article_content);
+		$.post('{:U('ajax_pdf_preview')}', {article_name: article_name, htmlStr: article_content}, function(data){
+			if(data){
+				window.open('{:U("pdf_preview")}');
+			}else{
+				alert('服务器买药去了，请稍后再试。');
+			}
+		})
+	})
+
+	function onClickFunc(e, treeId, treeNode) {
+		var zTree = $.fn.zTree.getZTreeObj("reslist");
+		zTree.expandNode(treeNode);
+		var type = $('#resWindow').attr('data-restype');
+		getRes(type, treeNode.classid);
+		
+		$('#reslist').find('a.curSelectedNode').removeClass('curSelectedNode');
+		$('#' + treeNode.tId + '_a').addClass('curSelectedNode');
+	}
+	
+	var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			callback: {
+				onClick: onClickFunc
+			}
+		},
+		zNodes = {$treeData|default=0};
+	var resTypeZTree = $.fn.zTree.init($("#reslist"), setting, zNodes);
+	
+	$('.tpls-box').delegate('.tpl-item', 'mouseover', function() {
+		$(this).css({background : '#e1e1e1'});
+	}).delegate('.tpl-item', 'mouseout', function() {
+		$(this).css({background : '#f1f1f1'});
+	});
+	
+	$('#resWindow').delegate('.tpl-sel', 'click', function() {
+		/* $('.tpl-sel').css({'background-position' : '-184px -257px'});
+		$(this).css({'background-position' : '-50px -257px'}); */
+		var res_id = $(this).attr('data-id'), that=this;
+		$.ajax({
+			url:'__GROUP__/Ajaxhandle/selectResToTemptbl',
+			type:'post',
+			data:{type : 'add', res_id : res_id, porg_id : program_classid, temp_id : temp_classid},
+			async:false,
+			dataType:'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+					var listHtmlStr = '';
+					if (re.data.filetype == 'image' || re.data.filetype == 'gif') {
+						listHtmlStr += '<div class="tpl-item fl">';
+						listHtmlStr += '<div class="tpl-shots">';
+						listHtmlStr += '<img src="' + re.data.url + '">';
+						listHtmlStr += '</div>';
+						listHtmlStr += '<a href="javascript:void(0);" data-id="' + re.data.res_id + '" class="tpl-sel" style="background:none" title="移除"><i class="icon-minus-sign"></i></a>';
+						listHtmlStr += '</div>';
+						$('.content-image .tpls-box').first().append(listHtmlStr);
+					} else {
+						listHtmlStr += '<li class="clearfix">';
+						listHtmlStr += '<span class="fname fl">' + re.data.filename + '</span>';
+						listHtmlStr += '<p class="add-success fr" style="display:none;">已添加</p>';
+						listHtmlStr += '<a href="javascript:void(0);" data-id="' + re.data.res_id + '" class="tpl-sel fr" style="background:none" title="添加"><i class="icon-minus-sign"></i></a>';
+						listHtmlStr += '</li>';
+						$('.content-files .file-list').first().append(listHtmlStr);
+					}
+					$(that).hide().siblings('.add-success').first().show();
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+	});
+	
+	$('.content-box').delegate('.tpl-sel', 'click', function() {
+		/* $('.tpl-sel').css({'background-position' : '-184px -257px'});
+		$(this).css({'background-position' : '-50px -257px'}); */
+		var res_id = $(this).attr('data-id'), that=this;
+		//console.log(res_id);return false;
+		$.ajax({
+			url:'__GROUP__/Ajaxhandle/removeResToTemptbl',
+			type:'post',
+			data:{type : 'del', res_id : res_id, temp_id : temp_classid},
+			async:false,
+			dataType:'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+					$(that).parents('.tpl-item').first().remove();
+					$(that).parents('li').first().remove();
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+	});
+	
+	var toolbars_for_html = [['fullscreen', 'source', '|', 'undo', 'redo', '|','bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|','rowspacingtop', 'rowspacingbottom', 'lineheight', '|','customstyle', 'paragraph', 'fontfamily', 'fontsize', '|','directionalityltr', 'directionalityrtl', 'indent', '|','justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|','simpleupload', 'insertimage', 'pagebreak', 'template', 'background', '|','horizontal', 'date', 'time', 'spechars', '|','inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|', 'preview', 'searchreplace',]];
+	
+	var ueHtml = UE.getEditor('articleHtmlContent', {
+		serverUrl : '__GROUP__/Ajaxhandle/UEUploadImage',
+		toolbars : toolbars_for_html,
+        elementPathEnabled : false,
+        wordCount : false
+	});
+	
+	ueHtml.ready(function() {
+		ueHtml.execCommand('serverparam', {
+			'artiClassID': temp_classid,
+			'progClassID': program_classid
+		});
+	});
+		
+	$(':reset').click(function() {
+		$.kw.confirm('确定离开不保存吗？', function() {
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/cancelSaveArticle',
+				type:'post',
+				data:{temp_id : temp_classid},
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1 > 0) {
+						window.location.href = '__URL__/articles/gid/{$group.dirgroup_classid}/id/{$column.classid}';
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面后检查数据....');
+				}
+			});
+		});
+	});
+	
+	$('.open-reslib').click(function() {
+		var type = $(this).attr('data-type');
+		getRes(type, '');
+		
+		resTypeZTree.expandAll(false);
+		var rootNode = resTypeZTree.getNodeByParam("id", 0, null);
+		$('#reslist').find('a').removeClass('curSelectedNode');
+		$("#" + rootNode.tId + "_a").addClass('curSelectedNode');
+		resTypeZTree.expandNode(rootNode, true, false, true);
+	});
+	
+	function getRes(type, classid) {
+		var res_type = '';
+		switch (type) {
+			case 'pictures' : res_type = 'image'; break;
+			case 'gif' : res_type = 'gif'; break;
+			case 'videos' :	res_type = 'video'; break;
+			case 'videos' :	res_type = 'video'; break;
+			case 'music'  :	res_type = 'music'; break;
+			case 'falsh'  :	res_type = 'flash'; break;
+			case 'office'  : res_type = 'office'; break;
+			default : res_type = 'file';
+		}
+		
+		showFramesMasklayer();
+		$('#resWindow').width($(window).width() - 160).attr({'data-restype' : type});
+		var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+			loadingHtml += '<p style="font-size:48px;margin-top:160px;"><i class="icon-spinner icon-spin"></i></p>';
+			loadingHtml += '<p style="">正在加载数据，请稍等……</p>';
+			loadingHtml += '</div>';
+		$('#resWindow .tpls-box').first().html(loadingHtml);
+		setDivCenter('#resWindow');
+			
+		$.ajax({
+			url:'__GROUP__/Ajaxhandle/getResManagerByType',
+			type:'post',
+			data:{type : res_type, classid : classid},
+			async:false,
+			dataType:'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+				
+					var listHtmlStr = '';
+					if (res_type != 'image' && res_type != 'gif') {
+						listHtmlStr += '<ul class="file-list">';
+					}
+					$.each(re.data, function(i, res) {
+						if (res_type == 'image' || res_type == 'gif') {
+							listHtmlStr += '<div class="tpl-item fl">';
+							listHtmlStr += '<div class="tpl-shots">';
+							listHtmlStr += '<img src="/Uploads/thumb/' + res.filepath + '">';
+							listHtmlStr += '</div>';
+							listHtmlStr += '<p class="add-success" style="display:none;">已添加</p>';
+							listHtmlStr += '<a href="javascript:void(0);" data-id="' + res.id + '" class="tpl-sel" style="background:none" title="添加"><i class="icon-plus-sign"></i></a>';
+							listHtmlStr += '<span class="fname" style="position:absolute;top:0;left:0;width:156px;display:block;word-break:break-all;word-wrap:break-word;color:#16a085;border-top-right-radius:4px;border-top-left-radius:4px;background:rgba(0,0,0,0.72);">' + res.filename + '</span>';
+							listHtmlStr += '</div>';
+						} else {
+							listHtmlStr += '<li class="clearfix">';
+							listHtmlStr += '<span class="fname fl">' + res.filename + '</span>';
+							listHtmlStr += '<p class="add-success fr" style="display:none;">已添加</p>';
+							listHtmlStr += '<a href="javascript:void(0);" data-id="' + res.id + '" class="tpl-sel fr" style="background:none" title="添加"><i class="icon-plus-sign"></i></a>';
+							listHtmlStr += '</li>';
+						}
+					});
+					if (res_type != 'image' && res_type != 'gif') {
+						listHtmlStr += '</ul>';
+					}
+					$('#resWindow .tpls-box').first().html(listHtmlStr);
+				} else {
+					$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign');
+					//$('#resWindow .loading-box').first().find('p:eq(1)').text(re.msg);
+					$('#resWindow .loading-box').first().find('p').empty();
+					//$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign');
+				$('#resWindow .loading-box').first().find('p:eq(1)').text('由于网络异常导致操作失败，请刷新页面重试....');
+				//$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+	}
+	
+	$('button.close, button.close2').click(function(){
+		$('#resWindow').hide();
+		hideFramesMasklayer();
+	});
+	
+	$('#progForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules :
+        {
+        	article_name : {  
+                required : true  
+            }, 
+        },  
+        messages :
+        {  
+        	article_name : {  
+                required : "文章名称必填."  
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'article', 'progClassID' : program_classid, 'artiClassID' : temp_classid, type : 'ico'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                //var old_ico_classid = $.trim($(".gcovers").first().val());
+	                $(".gcovers").first().val(re.resourceid);
+	                /* if (old_ico_classid != '') {
+	                	$.post('__GROUP__/Ajaxhandle/delResFromMedialib', {'resid' : old_ico_classid});
+	                } */
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+});
+</script>
+<include file="Public/footer" />

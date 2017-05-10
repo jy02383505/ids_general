@@ -1,0 +1,89 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="">节目管理</a></li>
+	<li><a href="">安卓广告机</a></li>
+	<li class="active">节目列表</li>
+</ol>
+
+<div id="pluginsInfo" class="row well">
+	<div class="col-md-6">
+		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td class="text-right" width="90"><b>节目表名称：</b></td>
+						<td>
+							<input type="text" class="form-control input-sm" name="tplname" value="{$Think.get.tplname}" style="width:182px;">
+							<button type="submit" class="btn btn-info btn-sm">搜索</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-6 text-right hide">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<a href="javascript:void(0);" type="button" class="btn btn-info btn-sm" id="addNewProgram">创建节目</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<!-- <th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th> -->
+				<th>唯一标识（ID）</th>
+				<th>节目名称</th>
+				<th>分辨率</th>
+				<th>状态</th>
+				<!-- <th>操作</th> -->
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="programs" id="vo">
+			<tr>
+				<!-- <td><input type="checkbox"></td> -->
+				<td><span class="label label-primary">{$vo.tplclassid}</span></td>
+				<td>{$vo.tplname}</td>
+				<td>{$vo.tplpx_width} x {$vo.tplpx_height}</td>
+				<td>
+					<eq name="vo.bevalid" value="1">
+						<i class="icon-ok" style="color:#3c763d;"></i>
+					<else/>
+						<i class="icon-remove" style="color:#a94442;"></i>
+					</eq>
+				</td>
+				<!-- <td>
+					<a class="oper edit" href="__URL__/edit/id/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/del/id/{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+				</td> -->
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+});
+</script>
+<include file="Public/footer" />

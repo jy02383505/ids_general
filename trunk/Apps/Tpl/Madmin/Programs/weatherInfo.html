@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<style>body{font-family:Microsoft Yahei,"Helvetica Neue",Helvetica,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif;color:#555;font-size:12px;background:#00673A}img{vertical-align:middle;}</style>
+</head>
+<body>
+<div style="position:fixed;width:100%;height:100%;top:0px;right:0px;bottom:0px;left:0px;filter:alpha(opacity=0);background-color:#000;opacity:0;-moz-opacity:0;"></div>
+<div id="jl-content" style="padding:0px;">
+	<div style="width:auto;height:48px;overflow:hidden;line-height:48px;">
+		
+		<volist name="weatherInfo" id="wea">
+			<div style="float:left;width:279px;height:48px;overflow:hidden;background:#45A1A1;margin-right:7px;color:#fff">
+				<div style="float:left;width:36px;margin-left:16px;/* color:#268DEC; */color:#fff;text-align:right;">{$wea.day_title}</div>
+				<div style="float:left;width:140px;text-align:center;">
+					<img src="__PUBLIC__/images/weather/icon/day/{$wea.dayPictureUrl}" width="32">&nbsp;&nbsp;{$wea.weather}
+				</div>
+				<div style="float:right;width:60px;margin-right:16px;/* color:#FF6A00; */color:#fff;">{$wea.temperature}</div>
+			</div>
+		</volist>
+		
+		<div style="width:100%;height:0;overflow:hidden;clear:both;"></div>
+	</div>
+</div>
+</body>
+</html>

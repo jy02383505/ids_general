@@ -1,0 +1,331 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<ol class="breadcrumb">
+	<li><a href="">广告管理</a></li>
+	<li class="active">编辑广告</li>
+</ol>
+
+<div class="row well">
+	<form class="form-inline" role="form">
+		<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label">终端组：</label>
+				<p class="form-control-static">{$epgroup.groupname}</p>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="control-label" for="adsdelay">广告延迟时间（秒）：</label>
+				<eq name="isWrite" value="1">
+					<input type="text" class="form-control input-sm" id="adsdelay" value="{$ads.adsdelay}" data-value="{$ads.adsdelay}" style="width:80px;margin-right:10px;text-align:center;">
+					<button type="button" id="upAdsDelayTime" class="btn btn-info btn-sm">保存</button>
+				<else/>
+					<p class="form-control-static">{$ads.adsdelay}</p>
+				</eq>
+			</div>
+		</div>
+		<div class="col-md-1" style="text-align:right;">
+			<div class="form-group">
+				<a type="button" href="__URL__/index" class="btn btn-info btn-sm">返回</a>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">广告图片列表<span style="font-weight:normal;font-size:12px;">（文件夹路径：/{$Think.config.upload_root_path}{$ads.filepath}/）</span></h5>
+		<div class="fr">
+		<eq name="isWrite" value="1">
+			<div id="upArea"></div>
+			<div class="my-cover" style="display:none;"></div>
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file" multiple="true">
+		<else/>
+			&nbsp;
+		</eq>
+		</div>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th class="text-center" width="40%">图片</th>
+				<th class="text-center">文件名称&nbsp;
+					<eq name="Think.get.ord" value="1">
+						<a href="__URL__/{$actname}/gid/{$epgroup.groupclassid}/ord/0"><i class="icon-caret-down order-desc"></i></a>
+					<else/>
+						<a href="__URL__/{$actname}/gid/{$epgroup.groupclassid}/ord/1"><i class="icon-caret-up order-asc"></i></a>
+					</eq>
+				</th>
+				<eq name="isWrite" value="1">
+				<th class="text-center">操作</th>
+				</eq>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="adsFiles">
+				<volist name="adsFiles" id="vo">
+					<tr>
+						<td><input type="checkbox" value="{$Think.config.upload_root_path}{$ads.filepath}/{$vo}"></td>
+						<td class="img-show-td"><img src="/{$Think.config.upload_root_path}{$ads.filepath}/{$vo}" /></td>
+						<eq name="isWrite" value="1">
+						<td class="editTd" data-fname="{$vo}" data-fpath="{$Think.config.upload_root_path}{$ads.filepath}/" data-edit="0">
+							<span>{$vo}</span>
+							<a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>
+						</td>
+						<else/>
+						<td>{$vo}</td>
+						</eq>
+						<eq name="isWrite" value="1">
+						<td style="text-align:center;">
+							<a class="oper del-file" href="javascript:void(0);" data-filepath="{$Think.config.upload_root_path}{$ads.filepath}/{$vo}" title="删除"><i class="icon-trash"></i></a>
+						</td>
+						</eq>
+					</tr>
+				</volist>
+			</notempty>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<eq name="isWrite" value="1">
+				<input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del-files" style="margin-left:30px;">批量删除</button>
+				<else/>
+				&nbsp;
+				</eq>
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/myplugins/jq.origiImgView.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($){
+	
+	//加载图片查看器 
+	$('.table .img-show-td > img').origiImgView();
+
+	$('#upAdsDelayTime').click(function() {
+		var aId = {$ads.id|default=0},
+			oldVal = parseInt($('#adsdelay').attr('data-value')),
+			newVal = parseInt($('#adsdelay').val());
+			
+			if (isNaN(newVal)) {
+				$.kw.alert('广告延迟时间必须是大于0的整数！');
+				return false;
+			}
+
+			if (newVal > 0 && oldVal != newVal) {
+				var formData = {model : 'Ads', id : aId, field : 'adsdelay', value : newVal};
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/setFieldValue',
+					type:'post',
+					data:formData,
+					//async:false,
+					dataType:'json',
+					success:function(re) {
+						if (re.stat*1 > 0) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function() {
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			} else if (newVal <= 0) {
+				$.kw.alert('广告延迟时间必须是大于0的整数！');
+			} else {
+				$.kw.alert('数据错误，请刷新页面重试....');
+			}
+		
+	});
+	
+	// Uploadify 批量上传
+	var succCount = failedCount = 0, errMsg = '', formData = null, fileTypeDesc = fileTypeExts = '',
+		dataType = 'image',
+		folderName = '{$ads.filepath|default=""}';
+		formData = {'dataType' : dataType, 'folderName' : folderName};
+		fileTypeDesc = '图片';
+		fileTypeExts = '{$Think.config.image_type_exts|default=""}'; 
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : fileTypeDesc,
+			'fileTypeExts' : fileTypeExts,
+			'buttonText' : '<i class="icon-upload"></i>上传文件',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : formData,
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'upArea',
+			'removeTimeout' : 10,
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess'],
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$('#' + file.id).find('.data').html(' - 上传成功');
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p></div>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+				}
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+	
+	$('.table').delegate('.del-file', 'click', function(){
+		var dataFiles = $.trim($(this).attr('data-filepath'));
+		$.kw.confirm('确认要删除吗？', function() {
+			$.ajax({
+				url:'__GROUP__/Ajaxhandle/delFiles',
+				type:'post',
+				async:false,
+				data:{'dataFiles' : dataFiles},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						window.location.reload();
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+	});
+
+	$('.table').delegate('.multi-del-files', 'click', function(){
+		var dataFiles = '',
+			checkedItems = $('.list-tbl').first().find('tbody').first().find(':checkbox:checked');
+			$.each(checkedItems, function(i, o){
+				dataFiles += $(o).val() + ';';
+			});
+		if (checkedItems.size() > 0) {
+
+			$.kw.confirm('确认要删除吗？', function() {
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/delFiles',
+					type:'post',
+					async:false,
+					data:{'dataFiles' : dataFiles},
+					dataType:'json',
+					success:function(re){
+						if (re.stat*1) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function(){
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少选择一条记录！');
+		}
+	});
+
+	$('.editTd').delegate('span, a', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			val = $.trim(editTd.attr('data-fname')),
+			html = '';
+			html += '<input type="text" class="form-control input-sm" value="' + val + '" data-value="' + val + '">';
+			html += '&nbsp;<button type="button" class="btn btn-info btn-sm btn-save">保存</button>&nbsp;<button type="button" class="btn btn-default btn-sm btn-cancel">取消</button>';
+			$.each($('.editTd'), function(i, o) {
+				var tdVal = $(o).attr('data-value'), isEdit = $(o).attr('data-edit')*1;
+				if (isEdit) {
+					$(o).html('<span>' + tdVal + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+				}
+			});
+			editTd.attr({'data-edit' : '1'}).html(html);
+	});
+	
+	$('.editTd').delegate('button.btn-cancel', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			val = $.trim(editTd.attr('data-fname'));
+		editTd.html('<span>' + val + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+	});
+	
+	$('.editTd').delegate('button.btn-save', 'click', function() {
+		var editTd = $(this).parents('.editTd').first(),
+			fpath = $.trim(editTd.attr('data-fpath')),
+			oldVal = $.trim(editTd.attr('data-fname')),
+			newVal = $.trim($(this).siblings('input[type="text"]').first().val());
+		
+			if (newVal != '' && oldVal != newVal && fpath != '') {
+				var formData = {fpath : fpath, oldname : oldVal, fname : newVal};
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/setFileName',
+					type:'post',
+					data:formData,
+					//async:false,
+					dataType:'json',
+					success:function(re) {
+						if (re.stat*1 > 0) {
+							window.location.reload();
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function() {
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			} else if (oldVal == newVal) {
+				editTd.html('<span>' + oldVal + '</span><a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>').attr({'data-edit' : 0});
+			} else if (newVal == '') {
+				$.kw.alert('文件名称不能为空！');
+			} else {
+				$.kw.alert('数据错误，请刷新页面重试....');
+			}
+		
+	});
+});
+</script>
+<include file="Public/footer" />

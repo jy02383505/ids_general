@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+		.ztree *{font-family:"Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+		.ztree{padding:0}
+		.ztree li a{color:#fff;}
+		.ztree li{background:#34495E;line-height:40px;margin-top:1px;position:relative;}
+		.ztree li a{height:40px;display:block;border-bottom:1px solid #4A5967;}
+		.ztree li a:hover{text-decoration:none;background:#263747;}
+		.ztree li a.curSelectedNode{height:40px;background:#11949A url(__PUBLIC__/images/leftmenu-active.png) no-repeat right center;color:#fff;}
+		/*.ztree li a.curSelectedNode{height:40px;background:#263747;color:#fff;}*/
+		.scence-menu-ico{background-image:url(__PUBLIC__/images/mini.png);display:inline-block;width:32px;height:32px;background-position: -166px -88px;vertical-align:middle;}
+		
+		.ztree li span.button{background-image:url(__PUBLIC__/images/mini.png);width:32px;height:32px;}
+		.ztree li span.button.ico_open, .ztree li span.button.ico_close{background-position:-166px -88px;vertical-align:middle;}
+		#scences li span.button.ico_docu{background-position:-238px -81px;}
+		.ztree li span.button.switch{display:block;}
+		.ztree li span.button.root_open, .ztree li span.button.root_close{display:none;}
+		.ztree li span.button.roots_open, .ztree li span.button.roots_docu, .ztree li span.button.root_docu, .ztree li span.button.roots_close, .ztree li span.button.center_open, .ztree li span.button.center_close, .ztree li span.button.center_open, .ztree li span.button.bottom_open, .ztree li span.button.bottom_close, .ztree li span.button.center_docu, .ztree li span.button.bottom_docu{background-image:url(__PUBLIC__/images/metro.png);width:11px;height:40px;float:left;background-position:-94px -12px;}
+		#scences li span.button.root_ico_open, .ztree li span.button.root_ico_close{background-position:-95px -41px;margin-left:5px;}
+		.ztree .item-tools{position:absolute;top:0;right:10px;background:#34495E;}
+		.ztree .item-tools .icon-edit{font-family:FontAwesome;font-size:16px;color:#95A5A6;}
+		.ztree li ul.line{background-position:-10px 0;}
+		.ztree li a.scences{position:relative;}
+		.ztree li a.scences span.button{position:absolute;top:5px;right:10px;background:url(__PUBLIC__/images/my-icons.png) no-repeat}
+		.ztree li a.scences span.button.ico_open{background-position:-12px -213px}
+		.ztree li a.scences span.button.ico_close{background-position:-12px -116px}
+		#programs li a.scences span.button.ico_docu{background-position:-12px -116px}
+		#endPoints li a.scences span.button.ico_docu{background-position:-12px -116px}
+		#programs .trashArticle span.button.ico_docu{background-position:-92px -182px;vertical-align:middle;}
+		#programs li span.button.ico_docu{background-position:-166px -88px;vertical-align:middle;}
+		#endPoints li span.button.ico_docu{background-position:-166px -88px;vertical-align:middle;}
+		#programs li a.column span.button.ico_docu{background-position:-240px -86px;vertical-align:middle;}
+		#endPoints li a.column span.button.ico_docu{background-position:-240px -86px;vertical-align:middle;}
+		#programs .scence-menu-ico{background-position:-310px -41px;}
+		#endPoints .scence-menu-ico{background-position:-310px -41px;}
+		#programs .dirgroup .scence-menu-ico{background-position:-201px -86px;}
+		#endPoints .dirgroup .scence-menu-ico{background-position:-201px -86px;}
+		#programs .column .scence-menu-ico{background-position:-240px -86px;}
+		#endPoints .column .scence-menu-ico{background-position:-240px -86px;}
+		.ztree li{margin-top:0px;}
+		.gen-latest-data{height:32px;line-height:32px !important;background:transparent;margin-left:2px;position:relative;top:2px;}
+/* 		.gen-latest-data{display:inline-block;width:32px;height:32px;background:transparent url(__PUBLIC__/images/update.png) no-repeat center center;position:absolute;top:4px;right:8px;border-radius:4px;-webkit-border-radius:4px;-moz-border-radius:4px;} */
+		.myBadge{
+            background: #2C3E50;
+        }
+        .notifyPoint{
+            background-image: url('__PUBLIC__/images/lym_icon.png');
+            background-position: -23px -196px;
+            width: 10px;
+            height: 10px;
+        }
+        </style>
+	</head>
+	<body class="left-menu-body">
+		<eq name="menuID" value="scences">
+		<div class="menu-header" style="background:#34495E;width:90%;padding:6px;text-align:center;margin:10px auto;border-radius:16px;-moz-border-radius:16px;-webkit-border-radius:16px;">
+			<a href="__GROUP__/Index/leftFrame/menuID/scences" style="display:block;"><i class="icon-refresh"></i>&nbsp;&nbsp;更新内容</a>	
+		</div>
+		</eq>
+		
+		<div class="menu-box">
+			<eq name="menuID" value="homepage">
+			<ul class="menu-list" id="homepage">
+			<else/>
+			<ul class="menu-list" id="homepage" style="display:none;">
+			</eq>
+				<li>
+					<a href="__URL__/rightFrame" target="frame_right_main" class="active"><i class=""></i> 欢迎页</a>
+				</li>
+				<php>	if (checkAccess('Syscfg', 'modifyLoginPass')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  快捷操作</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('Syscfg', 'modifyLoginPass')) {	</php>
+						<li><a href="__GROUP__/Syscfg/modifyLoginPass" target="frame_right_main"><i class="icon-caret-right"></i> 设置登录密码</a></li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}	</php>
+                
+ 				<php>	if (checkAccess('ResLib', 'multiCheckWorldNews,multiCheckHistoric,multiCheckFamousQuotes,multiCheckBaike,multiCheckHumorJokes')||checkAccess('Programs', 'ProgramsCheckIndex,multiCheckPrograms,multiCheckGroup,multiCheckDir,multiCheckArticles')||checkAccess('Programs', 'checkLogList')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  内容审核</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('Programs', 'ProgramsCheckIndex,multiCheckPrograms,multiCheckGroup,multiCheckDir,multiCheckArticles')) {	</php>
+						<li><a href="__GROUP__/Programs/ProgramsCheckIndex" target="frame_right_main"><i class="icon-caret-right"></i> 节目审核</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'resCheckIndex,multiCheckWorldNews,multiCheckHistoric,multiCheckFamousQuotes,multiCheckBaike,multiCheckHumorJokes')) {	</php>
+						<li><a href="__GROUP__/ResLib/ResCheckIndex" target="frame_right_main"><i class="icon-caret-right"></i> 资源审核</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('Programs', 'checkLogList')) {	</php>
+						<li><a href="__GROUP__/Programs/checkLogList" target="frame_right_main"><i class="icon-caret-right"></i> 审核日志</a></li>
+						<php>	}	</php>
+                        
+					</ul>
+				</li>
+				<php>	}	</php> 
+                
+			</ul>
+			
+			<eq name="menuID" value="scences">
+				<ul class="ztree" id="scences"></ul>
+			<else/>
+				<ul class="ztree" id="scences" style="display:none"></ul>
+			</eq>
+			
+			<eq name="menuID" value="programs">
+				<eq name="etype" value="azt">
+					<ul class="menu-list" id="programs">
+				<else />
+					<ul class="ztree" id="programs">
+				</eq>
+			<else/>
+				<ul class="ztree" id="programs" style="display:none">
+			</eq>
+				<if condition="$etype eq 'azt'">
+					<li>
+						<a href="__GROUP__/Playlists/programs" target="frame_right_main"><i class=""></i> 节目列表</a>
+					</li>
+					<li>
+						<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  节目播放管理</a>
+						<ul data-folded="1">
+							<li><a href="__GROUP__/Playlists/index" target="frame_right_main"><i class="icon-caret-right"></i> 浏览节目播放表</a></li>
+							<li><a href="__GROUP__/Playlists/add" target="frame_right_main"><i class="icon-caret-right"></i> 创建节目播放表</a></li>
+						</ul>
+					</li>
+				</if>
+			</ul>
+			
+			<eq name="menuID" value="syscfg">
+			<ul class="menu-list" id="syscfg">
+			<else/>
+			<ul class="menu-list" id="syscfg" style="display:none">
+			</eq>
+				<php>	if (checkAccess('Syscfg', 'basicCfg')) {	</php>
+				<li>
+					<a href="__GROUP__/Syscfg/basicCfg" target="frame_right_main"><i class=""></i> 基本设置</a>
+				</li>
+				<php>	}	</php>
+				
+				<php>	if (checkAccess('Syscfg', 'modifyLoginPass') || checkAccess('Syscfg', 'securityCfg')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  安全配置</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('Syscfg', 'modifyLoginPass')) {	</php>
+						<li><a href="__GROUP__/Syscfg/modifyLoginPass" target="frame_right_main"><i class="icon-caret-right"></i> 修改登录密码</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('Syscfg', 'securityCfg')) {	</php>
+						<li><a href="__GROUP__/Syscfg/securityCfg" target="frame_right_main"><i class="icon-caret-right"></i> 安全设置</a></li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}	</php>
+
+				<!-- li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  广告管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Syscfg/ads" target="frame_right_main"><i class="icon-caret-right"></i> x86 广告资源</a></li>
+					</ul>
+				</li -->
+				
+				<eq name="Think.config.is_dev" value="1">
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  模块管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Syscfg/nodesList" target="frame_right_main"><i class="icon-caret-right"></i> 模块列表</a></li>
+						<li><a href="__GROUP__/Syscfg/addNode" target="frame_right_main"><i class="icon-caret-right"></i> 添加模块</a></li>
+					</ul>
+				</li>
+
+
+				
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  开发者选项</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Syscfg/advancedCfg" target="frame_right_main"><i class="icon-caret-right"></i> 系统配置</a></li>
+						<li><a href="__GROUP__/Syscfg/dataAPIs" target="frame_right_main"><i class="icon-caret-right"></i> 数据接口配置</a></li>
+					</ul>
+				</li>
+				</eq>
+				
+				<php>	if (checkAccess('Syscfg', 'logList')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  系统日志</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Syscfg/logList" target="frame_right_main"><i class="icon-caret-right"></i> 管理日志</a></li>
+					</ul>
+				</li>
+				<php>	}	</php>				
+				
+			</ul>
+
+
+			
+			<eq name="menuID" value="endPoints">
+			<!-- 添加状态变更通知标志小红点 -->
+                <div class="noticeBox" style="display:none;">
+                    <span class="badge myBadge" data-toggle="popover" data-content="播放计划已更改"><div class="notifyPoint"></div></span>
+                </div>
+				<ul class="ztree" id="endPoints"></ul>
+                <ul><li></li></ul><!--所有终端-->
+			<else/>
+				<ul class="ztree" id="endPoints" style="display:none">
+                
+                </ul>
+			</eq> 
+            
+            
+            
+			<!-- <eq name="menuID" value="endPoints">
+			<ul class="menu-list" id="endPoints">
+			<else/>
+			<ul class="menu-list" id="endPoints" style="display:none">
+			</eq>
+				<php>	if (checkAccess('Endpoints', 'index')) {	</php>
+				<li>
+					<a href="__GROUP__/Endpoints/index" target="frame_right_main"><i class=""></i> 终端列表</a>
+				</li>
+				<php>	}	</php>
+				<php>	if (checkAccess('EndpointsGroups', 'index') || checkAccess('EndpointsGroups', 'add')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  终端组</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('EndpointsGroups', 'index')) {	</php>
+						<li><a href="__GROUP__/EndpointsGroups/index" target="frame_right_main"><i class="icon-caret-right"></i> 组列表</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('EndpointsGroups', 'add')) {	</php>
+						<li><a href="__GROUP__/EndpointsGroups/add" target="frame_right_main"><i class="icon-caret-right"></i> 添加组</a></li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}	</php>
+			</ul> -->
+		
+			<eq name="menuID" value="ucenter">
+			<ul class="menu-list" id="ucenter">
+			<else/>
+			<ul class="menu-list" id="ucenter" style="display:none">
+			</eq>
+				<php>	if (checkAccess('Users', 'index') || checkAccess('Users', 'addUser')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  管理员</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('Users', 'index')) {	</php>
+						<li><a href="__GROUP__/Users/index" target="frame_right_main"><i class="icon-caret-right"></i> 管理员列表</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('Users', 'addUser')) {	</php>
+						<li><a href="__GROUP__/Users/addUser" target="frame_right_main"><i class="icon-caret-right"></i> 添加管理员</a></li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}	</php>
+				
+				<php>	if (checkAccess('Users', 'rolesList') || checkAccess('Users', 'addRole')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  管理组</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('Users', 'rolesList')) {	</php>
+						<li><a href="__GROUP__/Users/rolesList" target="frame_right_main"><i class="icon-caret-right"></i> 管理组列表</a></li>
+						<php>	}	</php>
+						<php>	if (checkAccess('Users', 'addRole')) {	</php>
+						<li><a href="__GROUP__/Users/addRole" target="frame_right_main"><i class="icon-caret-right"></i> 创建管理组</a></li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}	</php>
+				
+			</ul>
+			
+   			<eq name="menuID" value="plan">
+                <ul class="menu-list" id="plan">
+                <php>if (checkAccess('plan', 'PowerPlanIndex,AddPowerPlan,EditPowerPlan,SavePowerPlan,delPowerPlan,multiDelPowerPlan,delPowerPlanDetail,addPowerPlanDetails,playPlans,addPlayPlans,editPlayPlans,delPlayPlan,multiDelPlayPlan,savePlayPlans,updatePlayPlanWeekData,addPlayPlanDateRecord,delDayPlayPlan,dayArranges,addDayArranges,editDayArranges,saveDayArranges,delDayArranges,multiDelDayArranges,addDayArrangeDetails,delDayArrangeDetails,updatePlayPlanWeekData')) {	</php>
+                <li>
+                   <a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  开关机计划</a>
+                    <ul data-folded="1">
+                        <li><a href="__GROUP__/Plan/powerPlanIndex" target="frame_right_main"><i class="icon-caret-right"></i> 开关机计划列表</a></li>
+                        <li><a href="__GROUP__/Plan/powerDayArranges" target="frame_right_main"><i class="icon-caret-right"></i> 开关机单日安排</a></li>
+                    </ul>
+                </li>
+                            
+				<li>
+					<a href="__GROUP__/Plan/playPlans" target="frame_right_main"><span class="folded"></span><i class=""></i>  播放计划管理</a>
+                    <ul data-folded="1">
+                        <li><a href="__GROUP__/Plan/playPlans" target="frame_right_main"><i class="icon-caret-right"></i> 播放计划列表</a></li>
+                        <li><a href="__GROUP__/Plan/dayArranges" target="frame_right_main"><i class="icon-caret-right"></i> 日安排列表</a></li>
+                        <li><a href="__GROUP__/Plan/addPlayPlans/planType/week" target="frame_right_main"><i class="icon-caret-right"></i> 添加周播放计划</a></li>
+                        <li><a href="__GROUP__/Plan/addPlayPlans/planType/date" target="frame_right_main"><i class="icon-caret-right"></i> 添加日播放计划</a></li>
+                    </ul>
+				</li>                
+				<php>	}	</php>
+                </ul>
+            
+            
+			<if condition="$Think.config.app_type eq 'store'">
+			<eq name="menuID" value="mall">
+			<ul class="menu-list" id="mall">
+			<else/>
+			<ul class="menu-list" id="mall" style="display:none">
+			</eq>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  商铺管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Mall/stores/sc/1" target="frame_right_main"><i class="icon-caret-right"></i>  商铺列表</a></li>
+						<li><a href="__GROUP__/Mall/addStore/spottype/shop" target="frame_right_main"><i class="icon-caret-right"></i>  添加商铺</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  公共设施点位管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Mall/stores/sc/0" target="frame_right_main"><i class="icon-caret-right"></i>  点位列表</a></li>
+						<li><a href="__GROUP__/Mall/addStore/spottype/service" target="frame_right_main"><i class="icon-caret-right"></i>  添加公共设施点位</a></li>
+						<li><a href="__GROUP__/Mall/addStore/spottype/tep" target="frame_right_main"><i class="icon-caret-right"></i>  添加信息终端点位</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  分类管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Mall/storeTypes" target="frame_right_main"><i class="icon-caret-right"></i>  分类列表</a></li>
+						<li><a href="__GROUP__/Mall/addStoreType" target="frame_right_main"><i class="icon-caret-right"></i>  创建分类</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  商场活动管理</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Mall/activities" target="frame_right_main"><i class="icon-caret-right"></i>  活动管理</a></li>
+						<li><a href="__GROUP__/Mall/addActivities" target="frame_right_main"><i class="icon-caret-right"></i>  发布活动</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  商场设置</a>
+					<ul data-folded="1">
+						<li><a href="__GROUP__/Mall/mallSyscfg" target="frame_right_main"><i class="icon-caret-right"></i>  设置基本信息</a></li>
+					</ul>
+				</li>
+			</ul>
+			</if>
+				
+			<eq name="menuID" value="resLib">
+			<ul class="menu-list" id="resLib">
+			<else/>
+			<ul class="menu-list" id="resLib" style="display:none">
+			</eq>
+				<php>	if (checkAccess('ResLib', 'index')) {	</php>
+				<li>
+					<a href="__GROUP__/ResLib/index" target="frame_right_main"><i class=""></i>  素材管理</a>
+				</li>
+				<php>	}	</php>
+				
+				<php> if (C('EN_RES_PACKET')) { </php>
+				<php>	if (checkAccess('ResLib', 'worldNews') || checkAccess('ResLib', 'historic') || checkAccess('ResLib', 'famousQuotes') || checkAccess('ResLib', 'baike') || checkAccess('ResLib', 'humorJokes') || checkAccess('ResLib', 'englishWords') || checkAccess('ResLib', 'weather')) {	</php>
+				<li>
+					<a href="javascript:void(0);"><span class="folded"></span><i class=""></i>  资源包管理</a>
+					<ul data-folded="1">
+						<php>	if (checkAccess('ResLib', 'worldNews')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/worldNews" target="frame_right_main"><i class="icon-caret-right"></i>  全球要闻</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'weather')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/weather" target="frame_right_main"><i class="icon-caret-right"></i>  天气预报</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'historic')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/historic" target="frame_right_main"><i class="icon-caret-right"></i>  历史上的今天</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'famousQuotes')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/famousQuotes" target="frame_right_main"><i class="icon-caret-right"></i>  名人名言</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'baike')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/baike" target="frame_right_main"><i class="icon-caret-right"></i>  百科知识</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'humorJokes')) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/humorJokes" target="frame_right_main"><i class="icon-caret-right"></i>  幽默笑话</a>
+						</li>
+						<php>	}	</php>
+						<php>	if (checkAccess('ResLib', 'englishWords') && false) {	</php>
+						<li>
+							<a href="__GROUP__/ResLib/englishWords" target="frame_right_main"><i class="icon-caret-right"></i>  英语词条</a>
+						</li>
+						<php>	}	</php>
+					</ul>
+				</li>
+				<php>	}}	</php>
+			</ul>
+
+		
+            <eq name="menuID" value="template">
+				<ul class="menu-list" id="template">
+            <else/>
+				<ul class="menu-list" id="template" style="display:none;">
+            </eq>
+            <php>	if (checkAccess('TemplateManage', 'template_index,showEach,scene_index,getSerialize,setExigent,ajax_setPlayorder,ajax_changePlayorder,ajax_setPlaytime,index_azad,scene_list')) {	</php>
+
+                <li>
+                <a href="javascript:void(0);" target="frame_right_main" class="active"><span class="folded"></span><i class=""></i>  模板管理</a>
+                
+					<ul data-folded="1">
+						<li><a href="__GROUP__/TemplateManage/showEach/tType/x86" target="frame_right_main"><i class="icon-caret-right"></i>  x86触摸机</a></li>
+						<li><a href="__GROUP__/TemplateManage/showEach/tType/azt" target="frame_right_main"><i class="icon-caret-right"></i>  安卓触摸机</a></li>
+						<li><a href="__GROUP__/TemplateManage/showEach/tType/azad" target="frame_right_main"><i class="icon-caret-right"></i>  安卓广告机</a></li>
+                    </ul>
+                </li>
+             <php>	}	</php>
+            </ul>   
+        
+        </div>
+		<div class="left-bottom-box hide">
+			<p class="text-center">{$Think.config.a_copyright}</p>
+			<p class="text-center">{$Think.config.a_aftersales}</p>
+		</div>
+		
+		<div id="pageData" style="display:none;">
+			<textarea rows="0" cols="0" id="enodes"></textarea>
+			<textarea rows="0" cols="0" id="pnodes"></textarea>
+		</div>
+		
+		<div class="my-cover" style="display:none;"></div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/common.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+		<script type="text/javascript">
+		$(function($) {
+			
+			var menuID = "{$menuID|default=''}",
+				menuDef = "{$menuDef|default=''}",
+				etype = "{$etype|default='x86'}",
+				noDef = {$Think.get.noDef|default=0},
+				endPointsTree = null;
+				
+				//ztree节点单击事件
+			function onClickFunc(e, treeId, treeNode) {
+				pagePreLoader();
+				if (menuID == 'scences') {
+					if (treeNode.iconSkin != 'root') {
+						var zTree = $.fn.zTree.getZTreeObj("scences");
+						zTree.expandNode(treeNode);
+						$('.ztree').find('a').first().removeClass('curSelectedNode');
+					}
+				
+					if (treeNode._dataType == 'scence') {
+						window.parent.frame_right_main.location.href = '__GROUP__/Scences/index/sid/' + treeNode.id + '/treeId/' + treeNode.tId;
+					} else {
+						window.parent.frame_right_main.location.href = '__GROUP__/Plugins/index/pid/' + treeNode.id + '/treeId/' + treeNode.tId;
+					}
+					$('.left-bottom-box').css('position', $('#scences').outerHeight() > 580 ? 'static' : 'fixed');
+					
+				} else if (menuID == 'endPoints') {
+					
+					var zTree = $.fn.zTree.getZTreeObj("endPoints");
+					//zTree.expandNode(treeNode);
+					$('#endPoints').find('a').removeClass('curSelectedNode');
+					$('#' + treeNode.tId + '_a').addClass('curSelectedNode');
+					if (treeNode.id) {
+						window.parent.frame_right_main.location.href = '__GROUP__/Endpoints/index/et/' + treeNode.endtype + '/epgId/' + treeNode.id;
+					} else {
+						window.parent.frame_right_main.location.href = '__GROUP__/Endpoints/index/et/' + treeNode.endtype;
+					}
+					
+					
+				} else {
+					var zTree = $.fn.zTree.getZTreeObj("programs");
+					if (etype == 'x86') {
+						
+						if (treeNode.level == 0) {
+							zTree.expandAll(false);
+						}
+						zTree.expandNode(treeNode);
+						if (treeNode.node_type == 'program') {
+							window.parent.frame_right_main.location.href = '__GROUP__/Programs/groups/id/' + treeNode.unid + '/treeId/' + treeNode.tId;
+						} else if (treeNode.node_type == 'dirgroup') {
+							window.parent.frame_right_main.location.href = '__GROUP__/Programs/columns/pid/' + treeNode.program_id + '/id/' + treeNode.unid + '/treeId/' + treeNode.tId;
+						} else if (treeNode.node_type == 'column') {
+							
+							if ($.isEmptyObject(treeNode.children)) {
+								window.parent.frame_right_main.location.href = '__GROUP__/Programs/articles/gid/' + treeNode.dirgroup_classid + '/id/' + treeNode.unid + '/treeId/' + treeNode.tId;
+							} else {
+								window.parent.frame_right_main.location.href = '__GROUP__/Programs/columns/pid/' + treeNode.program_id + '/id/' + treeNode.dirgroup_classid + '/cid/' + treeNode.unid + '/treeId/' + treeNode.tId;
+							}
+						} else if (treeNode.node_type == 'trashArticle') {
+							window.parent.frame_right_main.location.href = '{:U("Programs/trashArticle")}';
+						} else {
+							window.parent.frame_right_main.location.href = '__GROUP__/Programs/index';
+						}
+						
+					} else if (etype == 'azt') {
+					} else if (etype == 'azad') {
+					}
+					
+					$('.left-bottom-box').css('position', $('#programs').outerHeight() > 580 ? 'static' : 'fixed');	
+				}
+				
+			}
+			
+			/*
+			function onExpand(e, treeId, treeNode) {   // 由于目前插件还不支持onExpand事件，故无法运行事件执行代码
+				//console.log(treeNode);
+				//console.log($(window).height());
+				//console.log($('.menu-header').outerHeight());
+				//console.log($('.ztree').height());
+				//console.log($('.left-bottom-box').outerHeight());
+				var contentHeight = $('.menu-header').outerHeight() + $('.ztree').outerHeight() + $('.left-bottom-box').outerHeight(),
+					winHeight = $(window).height();
+				//console.log(contentHeight + ' : ' + winHeight);
+				$('.left-bottom-box').css('position', contentHeight >= winHeight ? 'static' : 'fixed');				
+			}*/
+			
+			function addDiyDomFunc(treeId, treeNode) {
+				var aObj = $("#" + treeNode.tId + "_a");
+				if (menuID == 'scences') {
+					
+					if (treeNode._dataType == 'scence' && treeNode.iconSkin != 'root') {
+						
+						if ($("#diyIco_" + treeNode.id).length>0) return;
+						
+						var htmlStr = "<span class='scence-menu-ico' id='diyIco_" + treeNode.id + "'></span>";
+						aObj.addClass('scences').prepend(htmlStr);
+					} else {
+						aObj.addClass('items');
+					}
+					
+				} else if (menuID == 'endPoints') {
+					
+					if (!treeNode.id) {
+						aObj.addClass('curSelectedNode');
+					}
+					
+					if (!$.isEmptyObject(treeNode.children)) {
+						
+						if ($("#diyIco_" + treeNode.unid).length>0) return;
+						
+						
+						var htmlStr = "<span class='scence-menu-ico' id='diyIco_" + treeNode.unid + "'></span>";
+						aObj.addClass('scences').prepend(htmlStr);
+					} else {
+						aObj.addClass('items');
+						if (treeNode.endtype == 'x86'&& treeNode.id*1 > 0 && $.trim(treeNode.tplclassid) != '') {
+							aObj.append('<span class="gen-latest-data" title="该组已添加终端，可更新数据"><i class="icon-sitemap text-danger" style="font-family:FontAwesome;font-size:14px;"></i></span>');
+						}
+					}
+					
+					aObj.addClass(treeNode.node_type);
+
+					// 当isChanged字段为1时，显示变更通知标志：小红点
+					if(treeNode.isChanged){
+					    $("#" + treeNode.tId + '_span').append($('.noticeBox'));
+					    $('.noticeBox').css('display', 'inline');
+					}
+				} else {
+					
+					if (treeNode.node_type == 'program' || treeNode.node_type == 'dirgroup' || (treeNode.node_type == 'column' && !$.isEmptyObject(treeNode.children))) {
+						
+						if ($("#diyIco_" + treeNode.unid).length>0) return;
+						
+						var htmlStr = "<span class='scence-menu-ico' id='diyIco_" + treeNode.unid + "'></span>";
+						aObj.addClass('scences').prepend(htmlStr);
+					} else if (treeNode.node_type == 'all') {
+						aObj.addClass('curSelectedNode');
+					} else {
+						aObj.addClass('items');
+					}
+					
+					aObj.addClass(treeNode.node_type);
+					
+				}
+			}
+				
+			var IDMark_Switch = "_switch",
+			IDMark_Icon = "_ico",
+			IDMark_Span = "_span",
+			IDMark_Input = "_input",
+			IDMark_Check = "_check",
+			IDMark_Edit = "_edit",
+			IDMark_Remove = "_remove",
+			IDMark_Ul = "_ul",
+			IDMark_A = "_a";
+			
+			if (menuID == 'scences') {
+	
+				var setting = {
+					view: {
+						dblClickExpand: false,
+						showLine: true,
+						showIcon: true,
+						addDiyDom: addDiyDomFunc
+					},
+					callback: {
+						onClick: onClickFunc,
+					}
+				},
+				zNodes = {$sTree|default=0};
+		
+				$.fn.zTree.init($("#scences"), setting, zNodes);
+			}
+				
+			if (menuID == 'programs' && etype == 'x86') {
+	
+				var setting2 = {
+					view: {
+						dblClickExpand: false,
+						showLine: true,
+						showIcon: true,
+						addDiyDom: addDiyDomFunc
+					},
+					callback: {
+						onClick: onClickFunc,
+					}
+				},
+				zNodes2 = {$programTree|default=0};
+				
+				var programZTree = $.fn.zTree.init($("#programs"), setting2, zNodes2);
+				window.parent.programTree = programZTree;
+				var allProNodes = programZTree.transformToArray(programZTree.getNodes());
+				var pnodes = '[';
+				$.each(allProNodes,function(i, node) {
+					pnodes += ((i+1 == 1) ? '' : ',') + '{"unid":"' + node.unid + '", "tId":"' + node.tId + '"}';
+				})
+				pnodes += ']';
+				//console.log(pnodes);
+				//console.log(jQuery.parseJSON(pnodes));
+				$('#pnodes').text(pnodes);
+			}
+			
+			if (menuID == 'endPoints') {
+	
+				var setting3 = {
+					view: {
+						dblClickExpand: false,
+						showLine: true,
+						showIcon: true,
+						addDiyDom: addDiyDomFunc
+					},
+					callback: {
+						onClick: onClickFunc,
+					}
+				},
+				zNodes3 = {$groupsTree|default=0};
+				
+				endPointsTree = $.fn.zTree.init($("#endPoints"), setting3, zNodes3);
+				var allEndNodes = endPointsTree.transformToArray(endPointsTree.getNodes());
+				var enodes = '[';
+				$.each(allEndNodes,function(i, node) {
+					enodes += ((i+1 == 1) ? '' : ',') + '{"id":' + node.id + ', "tId":"' + node.tId + '"}';
+				})
+				enodes += ']';
+				//console.log(enodes);
+				//console.log(jQuery.parseJSON(enodes));
+				$('#enodes').text(enodes);
+			}
+			
+			// 控制submenu子菜单的开关
+			if (menuID != 'programs' && menuID != 'endPoints') {
+				menuDef = $('#' + menuID).find('a[href!="javascript:void(0);"]').first().attr('href');//默认菜单为第一个链接的href值（跳过href="javascript:void(0);"的菜单）
+				//其它执行这里
+			} else {
+				$('li[data-etype="' + menuID + '"] a[data-etype="' + etype + '"]', window.parent.frame_top.document).addClass('active');
+				//终端管理和节目管理执行这里
+			}
+			
+			setMenuDef(menuID, menuDef);
+
+			$('.left-bottom-box').css('position', $('.ztree').outerHeight() > 580 ? 'static' : 'fixed');
+			
+			$('#scences li').delegate('a', 'click', function() {
+				if($.trim($(this).attr('href')) != 'javascript:void(0);') {
+					pagePreLoader();
+				}
+			});
+			
+			/* $('#endPoints').delegate('.gen-latest-data', 'click', function(e) {
+				//var node = endPointsTree.getNodeByTId($(this).closest('li').attr('id'));
+				//console.log(node);
+				//if ($.trim(node.tplclassid) == '') {
+				//}
+				stopPropagation(e);
+			}).delegate('.gen-latest-data', 'mouseover', function(e) {
+				$(this).css({'background-color' : $(this).closest('a').hasClass('curSelectedNode') ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)'}); 
+			}).delegate('.gen-latest-data', 'mouseout', function(e) {
+				$(this).css({'background-color' : 'transparent'});
+			}); */
+			
+			// 导航级联展示效果（普通一级左菜单单击）
+			$('.menu-box').delegate('.menu-list > li > a', 'click', function() {
+				var subMenu = $(this).siblings('ul').first();
+				
+				if (subMenu.length > 0) {
+					var isFolded = parseInt(subMenu.attr('data-folded'));
+				}
+				
+				$.each($('.menu-list').children('li'), function(i, o){
+					$(o).children('a').first().removeClass('hover').children('span').first().removeClass('un-folded').addClass('folded');
+					$(o).children('ul').first().attr('data-folded', 1).slideUp('fast');
+				});	
+				
+				if (subMenu.length > 0) {
+					if (isFolded) {
+						$(this).children('span').first().removeClass('folded').addClass('un-folded');
+						subMenu.attr('data-folded', 0).slideDown('fast');
+						$(this).addClass('hover');
+					} else {
+						$(this).children('span').first().removeClass('un-folded').addClass('folded');
+						subMenu.attr('data-folded', 1).slideUp('fast');
+						$(this).removeClass('hover');
+					}	
+				} else {
+					$('.menu-list > li > a').removeClass('active');
+					$(this).addClass('active');
+				}
+			});
+			
+			//普通二级左菜单单击事件
+			$('.menu-box').delegate('.menu-list li li a', 'click', function(){
+				$('.menu-list > li > a, .menu-list li li a').removeClass('active');
+				$(this).parents('ul').first().siblings('a').first().addClass('active');
+				$(this).addClass('active');
+			});
+		});
+		
+		function stopPropagation(e) {
+			if (e.stopPropagation)
+				e.stopPropagation();
+			else
+				e.cancelBubble = true;
+		}
+		
+		//设置默认（设置右框架打开的地址及左侧菜单高亮显示，特殊处理menuID==scences）
+		function setMenuDef(menuID, menuDef) {
+			var tl = 0;
+
+			window.parent.frame_right_main.location.href = menuDef;//右框架打开此默认地址
+			
+			if (menuID != 'scences') {
+				
+				$.each($('#' + menuID + ' > li > a', window.parent.frame_left_menu.document), function(i, o) {
+					//如果当前href==默认网址
+					if ($(o).attr('href') == menuDef) {
+						$(o).addClass('active');
+						tl = 1;//设置一个标识，表示是活动的
+						
+						//只有第一个一级菜单的href不是javascript:void(0)，才执行到此，即后台首页，系统设置执行此处
+						//资源管理，系统设置，后台首页，可执行到此
+					}
+				});
+				
+				//不是活动的
+				if (!tl) {
+					$.each($('#' + menuID + ' ul li > a', window.parent.frame_left_menu.document), function(i, o) {
+						if ($(o).attr('href') == menuDef) {
+							$(o).addClass('active').parents('ul').first().show().siblings('a').first().addClass('active');
+							tl = 0;
+							
+							//模板管理，计划管理，用户管理执行到此
+							//动态加载的，如节目管理，终端管理，不执行此处
+						}
+					});
+				}
+				
+				//不是活动的
+				if (!tl) {
+					$.each($('#' + menuID + ' .icon-edit', window.parent.frame_left_menu.document), function(i, o) {
+						if ('__GROUP__/Scences/index/sid/' + $(o).attr('data-sid') == menuDef) {
+							$(o).parents('a').first().addClass('active');
+							tl = 0;
+							//alert(4466);//一直执行不到此，至少现在是
+						}
+					});
+				}
+				
+			} else {
+				$('#scences').find('a').first().addClass('curSelectedNode');
+			}
+		}
+		</script>
+	</body>
+</html>

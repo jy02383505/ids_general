@@ -1,0 +1,123 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+	<li class="active"><empty name="group.dirgroup_classid">新建栏目组<else />修改栏目组信息</empty></li>
+</ol>
+<form id="progForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属节目</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$program.program_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="dirgroupName">栏目组名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="dirgroup_name" id="dirgroupName" value="{$group.dirgroup_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="dirgroupNote">描述</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="dirgroup_note" id="dirgroupNote">{$group.dirgroup_note}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="program_classid" id="programClassid" value="{$program.program_classid}">
+			<input type="hidden" name="dirgroup_classid" id="dirgroupClassid" value="{$group.dirgroup_classid}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	$(':reset').click(function() {
+		window.location.href = '__URL__/groups/id/{$program.program_classid}';
+	});
+	
+	$('#progForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules :
+        {
+        	dirgroup_name : {  
+                required : true  
+            }, 
+        },  
+        messages :
+        {  
+        	dirgroup_name : {  
+                required : "栏目组名称必填."  
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			//form.submit();
+			return false;
+		}
+	});
+	
+	$('#progForm').submit(function() {
+		var dirgroupName = $.trim($('#dirgroupName').val()),
+			dirgroupNote = $.trim($('#dirgroupNote').val()),
+			programClassid = $.trim($('#programClassid').val()),
+			dirgroupClassid = $.trim($('#dirgroupClassid').val());
+		
+		$.ajax({
+			type:'POST',
+			url:'__URL__/saveGroupData',
+			data:{'dirgroup_name' : dirgroupName, 'dirgroup_note' : dirgroupNote, 'program_classid' : programClassid, 'dirgroup_classid' : dirgroupClassid},
+			async:false,
+			dataType:'json',
+			beforeSend:function() {
+				
+			},
+			success:function(re) {
+				if (re.stat*1) {
+					var programTrees = window.parent.programTree;
+					var node_data = re.data,
+						newNode = {name:node_data.dirgroup_name, unid:node_data.dirgroup_classid, program_id:programClassid, node_type:'dirgroup'},
+						pnodeObj = programTrees.getNodeByParam("unid", node_data.program_id, null);
+					if (dirgroupClassid == '') {
+						programTrees.addNodes(pnodeObj, newNode);
+					} else {
+						var nodeObj = programTrees.getNodeByParam("unid", dirgroupClassid, pnodeObj);
+						nodeObj.name = dirgroupName;
+						programTrees.updateNode(nodeObj);
+					}
+					
+					$.kw.alert('操作成功！', '', function() {
+						window.location.href = '__URL__/groups/id/' + programClassid;
+					});
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('操作失败！请重试……');
+			}
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

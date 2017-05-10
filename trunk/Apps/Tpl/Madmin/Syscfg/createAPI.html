@@ -1,0 +1,327 @@
+<include file="Public/header" />
+<style>
+.list-group{min-width:720px;}
+.list-group span{display:inline-block;width:200px;text-align:center;}
+.add-option{position:absolute;top:8px;right:10px;z-index:999;}
+.rm-option{position:absolute;top:8px;left:14px;z-index:999;color:#333;font-size:16px;}
+.rm-param{position:relative;top:-5px;left:22px;z-index:999;color:#333;font-size:18px;}
+a.rm-param:hover, a.rm-option:hover{color:#e74c3c;}
+.list-tr{padding:4px 15px;}
+.list-tr input[type="text"]{width:120px;display:inline-block;text-align:center;}
+.col-sm-6{width:720px;}
+.col-sm-6 .input-group{width:32%;margin-right:10px;}
+.input-group-addon{font-size:12px;}
+.form-horizontal .radio-inline{padding-top:6px;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">创建数据接口</li>
+</ol>
+<form id="editForm" class="form-horizontal edit-form" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="apiTitle">接口名称</label>
+		<div class="col-sm-4">
+			<input type="text" class="form-control input-sm" id="apiTitle" name="api_title" value="{$apiInfo.api_title}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="">唯一标识（ID）</label>
+		<div class="col-sm-4">
+			 <p class="form-control-static">{$apiUnicode} <span class="text-warning">（系统自动生成，无法修改.）</span></p>
+			 <input type="hidden" name="api_unicode" value="{$apiUnicode}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-3">状态</label>
+		<div class="col-sm-3">
+			<php> if ($apiInfo['api_status'] == "1") { </php>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_yes" value="1" checked> 可用
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_no" value="0"> 禁用
+				</label>
+			<php>	} else if ($apiInfo['api_status'] == "0") {	</php>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_yes" value="1"> 可用
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_no" value="0" checked> 禁用
+				</label>
+			<php>	} else {	</php>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_yes" value="1" checked> 可用
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="api_status" id="apiStatus_no" value="0"> 禁用
+				</label>
+			<php>	}	</php>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="apiDesc">接口说明</label>
+		<div class="col-sm-6">
+			<textarea class="form-control" name="api_desc" id="apiDesc" rows="4">{$apiInfo.api_desc}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="requestURL">请求地址</label>
+		<div class="col-sm-6">
+			<div class="input-group" style="width:80%;margin-bottom:8px;">
+				<span class="input-group-addon">http://</span>
+				<input type="text" class="form-control input-sm" id="requestURL" name="requestURL" value="{$requestURL}">
+			</div>
+		  	<a href="javascript:void(0);" class="add-param"><i class="icon-plus"></i> 添加查询条件</a>
+		</div>
+	</div>
+	<volist name="params" id="pa">
+		<div class="form-group param-item">
+			<label class="control-label col-sm-3" for=""><a href="javascript:void(0);" class="rm-param" title="移除"><i class="icon-remove"></i></a></label>
+			<div class="col-sm-6 clearfix">
+				<div class="input-group fl">
+					<span class="input-group-addon">参数说明</span>
+					<input type="text" class="form-control input-sm param-label" id="" name="paramLabels[]" value="{$pa.paramLabel}">
+				</div>
+				<div class="input-group fl">
+					<span class="input-group-addon">参数名</span>
+					<input type="text" class="form-control input-sm param-name" id="" name="paramNames[]" value="{$pa.paramName}">
+				</div>
+				<div class="input-group fl">
+					<span class="input-group-addon">参数值类型</span>
+					<select class="form-control input-sm param-type" name="paramTypes[]">
+						<eq name="pa.paramType" value="select">
+							<option value="select" selected>下拉列表</option>
+						<else />
+							<option value="select">下拉列表</option>
+						</eq>
+						<eq name="pa.paramType" value="text">
+							<option value="text" selected>输入框</option>
+						<else />
+							<option value="text">输入框</option>
+						</eq>
+						<eq name="pa.paramType" value="radio">
+							<option value="radio" selected>单选按钮</option>
+						<else />
+							<option value="radio">单选按钮</option>
+						</eq>
+					</select>
+				</div>
+				<neq name="pa.paramType" value="text">
+					<div class="my-clearfix10"></div>
+					<ul class="list-group">
+				<else />
+					<div class="my-clearfix10" style="display:none;"></div>
+					<ul class="list-group" style="display:none;">
+				</neq>
+					<li class="list-group-item list-th">
+						<span>键名</span><span>键值</span><span>设为默认</span>
+						<a href="javascript:void(0);" class="btn btn-info btn-xs add-option">添加选项</a>
+					</li>
+					<empty name="pa.options">
+						<li class="list-group-item list-tr">
+							<a href="javascript:void(0);" class="rm-option" title="移除"><i class="icon-remove"></i></a>
+							<span><input type="text" class="form-control input-sm input-key" id="" name="{$pa.paramName}Keys[]" value=""></span>
+							<span><input type="text" class="form-control input-sm input-value" id="" name="{$pa.paramName}Values[]" value=""></span>
+							<span><i class="jl-check un-checked" data-checked="0"></i><input type="hidden" class="input-def" id="" name="{$pa.paramName}Def[]" value="0"></span>
+						</li>
+					<else />
+						<volist name="pa.options" id="op">
+							<li class="list-group-item list-tr">
+								<a href="javascript:void(0);" class="rm-option" title="移除"><i class="icon-remove"></i></a>
+								<span><input type="text" class="form-control input-sm input-key" id="" name="{$pa.paramName}Keys[]" value="{$op.optionKey}"></span>
+								<span><input type="text" class="form-control input-sm input-value" id="" name="{$pa.paramName}Values[]" value="{$op.optionValue}"></span>
+								<span>
+									<eq name="op.isDef" value="1">
+										<i class="jl-check checked" data-checked="1"></i>
+									<else />
+										<i class="jl-check un-checked" data-checked="0"></i>
+									</eq>
+									<input type="hidden" class="input-def" id="" name="{$pa.paramName}Def[]" value="{$op.isDef}">
+								</span>
+							</li>
+						</volist>
+					</empty>						
+				</ul>
+			</div>
+		</div>
+	</volist>
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$apiInfo.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<form id="editCloneForm" class="form-horizontal edit-form hide" role="form" method="post" action="">
+	<div class="form-group param-item">
+		<label class="control-label col-sm-3" for=""><a href="javascript:void(0);" class="rm-param" title="移除"><i class="icon-remove"></i></a></label>
+		<div class="col-sm-6 clearfix">
+			<div class="input-group fl">
+				<span class="input-group-addon">参数说明</span>
+				<input type="text" class="form-control input-sm param-label" id="" name="paramLabels[]" value="">
+			</div>
+			<div class="input-group fl">
+				<span class="input-group-addon">参数名</span>
+				<input type="text" class="form-control input-sm param-name" id="" name="paramNames[]" value="">
+			</div>
+			<div class="input-group fl">
+				<span class="input-group-addon">参数值类型</span>
+				<select class="form-control input-sm param-type" name="paramTypes[]">
+					<option value="select">下拉列表</option>
+					<option value="text">输入框</option>
+					<option value="radio">单选按钮</option>
+				</select>
+			</div>
+			<div class="my-clearfix10"></div>
+			<ul class="list-group">
+			  <li class="list-group-item list-th">
+			  	<span>键名</span><span>键值</span><span>设为默认</span>
+			  	<a href="javascript:void(0);" class="btn btn-info btn-xs add-option">添加选项</a>
+			  </li>
+			  <li class="list-group-item list-tr">
+			  	<a href="javascript:void(0);" class="rm-option" title="移除"><i class="icon-remove"></i></a>
+			  	<span><input type="text" class="form-control input-sm input-key" id="" name="" value=""></span>
+			  	<span><input type="text" class="form-control input-sm input-value" id="" name="" value=""></span>
+			  	<span><i class="jl-check un-checked" data-checked="0"></i><input type="hidden" class="input-def" id="" name="" value="0"></span>
+			  </li>
+			</ul>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($) {
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/dataAPIs';
+	});
+	
+	$('.add-param').click(function() {
+		if ($('#editForm').children('.param-item').size() >= 5) {
+			$.kw.alert('最多允许添加5个查询条件！');
+		} else {
+			var param = $('#editCloneForm').children('.form-group').first().clone();
+			$('#editForm').children('.form-group:last').before(param);
+		}
+	});
+	
+	$('#editForm').delegate('.jl-check', 'click', function() {
+		var isChecked = $(this).attr('data-checked')*1;
+		$(this).closest('.list-group').find('.jl-check').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+		$(this).closest('.list-group').find('input.input-def').val(0);
+		$(this).removeClass('un-checked checked').addClass('checked').attr('data-checked', 1);
+		$(this).siblings('input.input-def').val(1);
+	});
+	
+	$('#editForm').delegate('.add-option', 'click', function() {
+		
+		var param_obj = $(this).closest('.col-sm-6'),
+			param_label = $.trim(param_obj.find('.param-label').val()),
+			param_name = $.trim(param_obj.find('.param-name').val()),
+			pl_obj = param_obj.find('.param-label');
+	
+		if (param_label == '' || param_name == '') {
+			$.kw.alert('请先填写参数说明和参数名！', '', function() {
+				$(pl_obj).focus();
+			});
+			return false;
+		} else {
+			var option = $(this).closest('.list-group').children('.list-tr').first();
+			option.find('.input-key').attr('name', param_name + 'Keys[]');
+			option.find('.input-value').attr('name', param_name + 'Values[]');
+			option.find('.input-def').attr('name', param_name + 'Def[]');
+			var clone_option = option.clone();
+			clone_option.find('input[type="text"]').val('');
+			clone_option.find('input.input-def').val(0);
+			clone_option.find('.jl-check').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+			$(this).closest('.list-group').append(clone_option);
+		}
+		
+	});
+	
+	$('#editForm').delegate('.rm-param', 'click', function() {
+		$(this).closest('.param-item').remove();
+	});
+	
+	$('#editForm').delegate('.param-name', 'keyup', function(e) {
+		if (e.keyCode == 13) { 
+			return false;
+		}
+		var param_name = $.trim($(this).val()), curr_obj = this;
+		if (param_name == '') {
+			$.kw.alert('参数名必填，不能为空！', '', function() {
+				$(curr_obj).focus();
+			});
+			
+		} else {
+			var param_obj = $(this).closest('.col-sm-6');
+			param_obj.find('.input-key').attr('name', param_name + 'Keys[]');
+			param_obj.find('.input-value').attr('name', param_name + 'Values[]');
+			param_obj.find('.input-def').attr('name', param_name + 'Def[]');
+		}
+	});
+	
+	$('#editForm').delegate('.list-tr :text', 'focus', function() {
+		var param_obj = $(this).closest('.col-sm-6'),
+			param_label = $.trim(param_obj.find('.param-label').val()),
+			param_name = $.trim(param_obj.find('.param-name').val()),
+			pl_obj = param_obj.find('.param-label');
+		
+		if (param_label == '' || param_name == '') {
+			$(this).blur();
+			$.kw.alert('请先填写参数说明和参数名！', '', function() {
+				$(pl_obj).focus();
+			});
+			return false;
+		} else {
+			param_obj.find('.list-tr .input-key').attr('name', param_name + 'Keys[]');
+			param_obj.find('.list-tr .input-value').attr('name', param_name + 'Values[]');
+			param_obj.find('.list-tr .input-def').attr('name', param_name + 'Def[]');
+		}
+	});
+	
+	function checkParam(curr_obj) {
+		var param_label = $.trim($(curr_obj).closest('.col-sm-6').find('.param-label').val()),
+			param_name = $.trim($(curr_obj).closest('.col-sm-6').find('.param-name').val()),
+			pl_obj = $(curr_obj).closest('.col-sm-6').find('.param-label');
+		
+		if (param_label == '' || param_name == '') {
+			$.kw.alert('请先填写参数说明和参数名！', '', function() {
+				$(pl_obj).focus();
+			});
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	$('#editForm').delegate('.param-type', 'change', function() {
+		if ($(this).val() != 'text') {
+			$(this).closest('.col-sm-6').children('.my-clearfix10').first().show();
+			$(this).closest('.col-sm-6').children('.list-group').first().show();
+		} else {
+			$(this).closest('.col-sm-6').children('.my-clearfix10').first().hide();
+			$(this).closest('.col-sm-6').children('.list-group').first().hide();
+			var option = $(this).closest('.col-sm-6').children('.list-group').first().find('.list-tr').first();
+			option.find('input[type="text"]').val('');
+			option.find('input.input-def').val(0);
+			option.find('.jl-check').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+			$(this).closest('.col-sm-6').children('.list-group').first().find('.list-tr:gt(0)').remove();
+		}
+	});
+	
+	$('#editForm').delegate('.rm-option', 'click', function() {
+		
+		if ($(this).closest('.list-group').find('.list-tr').size() <= 1) {
+			$.kw.alert('至少要有一个选项！');			
+		} else {
+			$(this).closest('.list-tr').remove();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

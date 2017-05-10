@@ -1,0 +1,121 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li>内容管理</li>
+	<li class="active">{$scence.scencename}</li>
+</ol>
+<form id="scenceForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<input type="hidden" name="sid" value="{$scence.classid}">
+	<input type="hidden" name="sbgid" value="{$scence.bgInfo.id}">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="scenceName">场景名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="scencename" id="scenceName" value="{$scence.scencename}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label">背景图片</label>
+		<div class="col-sm-8">
+			<div class="up-image-box">
+				<div class="myup-btn"> 
+					<span><i class="icon-upload"></i> 上传图片</span>
+					<input class="fileupload" type="file" name="gcover">
+					<input type="hidden" class="isMulti" value="0"> <!-- 是否支持多图上传  0-否， 1-是  -->
+				</div> 
+				<div class="progress"> 
+  					<span class="bar"></span><span class="percent">0%</span > 
+				</div> 
+				<div class="showimg clearfix">
+					<notempty name="scence['bgInfo']">
+						<span><img src="/{$Think.config.upload_root_path}{$scence.bgInfo.filepath}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="cover_image" class="gcovers" value="{$scence.bgInfo.filepath}">
+				<input type="hidden" class="savename" value="{$uniName}">
+			</div>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="scenceName">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/plugins/jquery.form.js"></script>
+<script type="text/javascript">
+$(function($) {
+	// 同步更新左侧菜单的场景名称
+	$('#scence-'+'{$scence.id}', window.parent.frame_left_menu.document).find('a font').first().text('{$scence.short_scencename}');
+	
+	$('#scenceForm').submit(function() {
+		if ($.trim($('#scenceName').val()) == '') {
+			$.kw.alert('场景名称不能为空！');
+			return false;
+		}
+	});
+	
+	// 异步单图上传
+	$(".fileupload").wrap("<form class='myupload' action='__GROUP__/Ajaxhandle/uploadImage' method='post' enctype='multipart/form-data'></form>");
+	$(".fileupload").change(function() {
+		var upContainer = $(this).parents('.up-image-box').first(),
+	   		btn = upContainer.find('.myup-btn span').first(),
+	   		bar = upContainer.find('.bar').first(),
+	   		percent = upContainer.find('.percent').first(),
+	   		showimg = upContainer.find('.showimg').first(),
+	   		progress = upContainer.find('.progress').first(),
+	   		gcovers = upContainer.find('.gcovers').first(),
+	   		isMulti = upContainer.find('.isMulti').first().val()*1,
+	   		saveName = isMulti ? '' : upContainer.find('.savename').first().val();
+		
+		upContainer.find(".myupload").first().ajaxSubmit({
+	   		data: {'savename' : saveName},
+	       	dataType: 'json',
+	           //数据格式为json
+	           beforeSend: function() { //开始上传
+	           	// showimg.empty();
+	               progress.show(); //显示进度条
+	               var percentVal = '0%'; //开始进度为0%
+	               bar.width(percentVal); //进度条的宽度
+	               percent.html(percentVal); //显示进度为0%
+	               btn.html("上传中..."); //上传按钮显示上传中
+	           },
+	           uploadProgress: function(event, position, total, percentComplete) {
+	               var percentVal = percentComplete + '%'; //获得进度
+	               bar.width(percentVal); //上传进度条宽度变宽
+	               percent.html(percentVal); //显示上传进度百分比
+	           },
+	           success: function(data) { //成功
+	               //获得后台返回的json数据，显示文件名，大小，以及删除按钮
+	               //files.html("<b>" + data.name + "(" + data.size + "k)</b><span class='delimg' rel='" + data.pic + "'>删除</span>");
+	           	if(data.stat) {
+	                //显示上传后的图片
+	                if(isMulti) {
+		                showimg.append('<span><img src="' + data.url + '" /><i class="bui-ext-mask hide"></i><i class="x-icon x-icon-error del-img hide" data-target="' + data.savePath + '" title="删除">x</i></span>');
+		                var gList = $.trim(gcovers.val());
+		                gcovers.val(gList + ',' + data.savePath);
+	                } else {
+		                showimg.html('<span><img src="' + data.url + '?' + Math.random() + '" /></span>');
+		                gcovers.val(data.savePath);
+	                }
+	           	} else {
+	                bar.width('0');
+	                percent.html('0%');
+	           		$.kw.alert(data.msg);
+	           	}
+	               btn.html('<i class="icon-upload"></i> 上传图片'); //上传按钮还原
+	           },
+	           error: function(xhr) { //上传失败
+	               btn.html("上传失败");
+	               bar.width('0');
+	               //files.html(xhr.responseText); //返回失败信息
+	           }
+	    });
+	});
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,190 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+	<li><a href="__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}">栏目管理</a></li>
+	<li><a href="__URL__/articles/gid/{$group.dirgroup_classid}/id/{$column.classid}">文章管理</a></li>
+	<li class="active"><empty name="article.article_classid">添加文章<else />编辑文章</empty></li>
+</ol>
+<form id="progForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属节目</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$program.program_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属栏目组</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$group.dirgroup_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属栏目</label>
+		<div class="col-sm-3">
+		<php> if (in_array($column['dir_type'], $spColumns)) { </php>
+			<p class="form-control-static">{$column.dir_name}</p>
+			<input type="hidden" name="program_dir_classid" value="{$column.classid}">
+		<php> } else { </php>
+			<select class="form-control input-sm" name="program_dir_classid">
+				<option value="">顶级栏目</option>
+				<volist name="columns" id="col">
+					<eq name="col.classid" value="$column.classid">
+						<option value="{$col.classid}" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+					<else />
+						<eq name="col.dir_type" value="$column.dir_type">
+							<option value="{$col.classid}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+						<else />
+							<option value="{$col.classid}" disabled>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+						</eq>
+					</eq>
+				</volist>
+			</select>
+		<php> } </php>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">图标</label>
+		<div class="col-sm-3">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"></span>
+				<div id="uploadfyQueueList"></div> 
+				<div class="showimg clearfix">
+					<notempty name="article.article_ico">
+						<span><img src="/{$Think.config.upload_root_path}{$article.article_ico_path}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="article_ico" class="gcovers" value="{$article.article_ico}">
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="artiName">问题</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="article_name" id="artiName" value="{$article.article_name}">
+		</div>
+	</div>
+		
+	<div class="form-group content-box content-image">
+		<label class="col-sm-2 control-label" for="articleContent">回答</label>
+		<div class="col-sm-9">
+			<textarea class="form-control" rows="3" name="article_content">{$article.article_content}</textarea>
+		</div>
+	</div>
+		
+		
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="article_content_type" value="txt">
+			<input type="hidden" name="article_classid" value="{$article.article_classid}">
+			<input type="hidden" name="dirgroup_classid" value="{$group.dirgroup_classid}">
+			<input type="hidden" name="column_classid" value="{$column.classid}">
+			<input type="hidden" name="temp_article_classid" value="{$tempClassId}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var program_classid = '{$program.program_classid|default=""}';
+	var temp_classid = '{$tempClassId|default=""}';
+	var article_type = '{$article.article_content_type|default="txt"}';
+		
+	$(':reset').click(function() {
+		window.location.href = '__URL__/articles/gid/{$group.dirgroup_classid}/id/{$column.classid}';
+	});
+	
+	$('#progForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules :
+        {
+        	article_name : {  
+                required : true  
+            }, 
+        },  
+        messages :
+        {  
+        	article_name : {  
+                required : "文章名称必填."  
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'article', 'progClassID' : program_classid, 'artiClassID' : temp_classid, type : 'ico'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                //var old_ico_classid = $.trim($(".gcovers").first().val());
+	                $(".gcovers").first().val(re.resourceid);
+	                /* if (old_ico_classid != '') {
+	                	$.post('__GROUP__/Ajaxhandle/delResFromMedialib', {'resid' : old_ico_classid});
+	                } */
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+});
+</script>
+<include file="Public/footer" />

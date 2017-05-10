@@ -1,0 +1,894 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+<!-- <link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/zTreeStyle/zTreeStyle.css"> -->
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="__PUBLIC__/script/plupload2/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<style>
+/* .ztree *{font-family:"Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+.ztree li span.button.root_open{background-position:-107px -63px;}
+.ztree li span.button.root_close{background-position:-128px -63px;}
+.ztree li span.button{background:url(__PUBLIC__/images/metro04.png) no-repeat;}
+.ztree li span.button.chk{width:16px;height:16px;position:relative;top:-1px;}
+.ztree li span.button.chk.checkbox_false_full{background-position:-3px -3px;}
+.ztree li span.button.chk.checkbox_false_full_focus{background-position:-3px -24px;}
+.ztree li span.button.chk.checkbox_true_full{background-position:-25px -3px;}
+.ztree li span.button.chk.checkbox_true_full_focus{background-position:-25px -24px;}
+.ztree li span.button.chk.checkbox_true_part{background-position:-25px -46px;}
+.ztree li span.button.chk.checkbox_true_part_focus{background-position:-25px -66px;} */
+
+.ui-icon, .ui-widget-content .ui-icon-circle-check{background-image: url("__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/images/ui-icons_0073ea_256x240.png")}
+</style>
+
+<style type="text/css">
+	.uploadify{display:inline-block;line-height:30px;}
+	.ui-widget, .plupload_wrapper, .plupload_header_title, .plupload_header_text{font-family: "Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+	.plupload_logo{background-position:-40px 0;}
+	.plupload_header_title{line-height:22px;}
+	.ui-widget-header{font-weight:normal;}
+	.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{font-weight:normal;}
+	.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{color:#333;}
+	.plupload_message strong{line-height:18px;}
+	.plupload_message i{line-height:22px;margin-left:18px;}
+	.ui-widget-header .ui-state-error{border:1px solid #a94442;}
+	.ui-state-error, .ui-widget-content .ui-state-error{border-bottom:1px solid #a94442;}
+	.ui-progressbar-value{background:#dff0d8;}
+	.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus{border:1px solid #1abc9c;background:#1abc9c;color:#fff;}
+	
+	.res-box .col-md-3, .res-box .col-md-9{padding:0;}
+	.res-box .res-tree{border-right:1px solid #ddd;}
+	.res-box .res-window .tool-bar{height:60px;line-height:60px;background:#f5f5f5;border-bottom:1px solid #ddd;/* overflow:hidden; */}
+	.res-box .res-window .tool-bar .breadcrumb{margin:0;background:none;padding:0 4px;}
+	.res-box .res-window .tool-bar .breadcrumb .sel:before{content:none;}
+	.res-box .res-window .tool-bar .btn-sm{padding:4px 10px 3px;font-size:14px;font-weight:500;}
+	.res-box .res-window .tool-bar .btn-default:hover{background-color:#fff;border-color:#ccc;}
+	.res-list{position:relative;}
+	.res-list li{height:auto;line-height:48px;border-bottom:1px solid #ddd;padding:0 10px;position:relative;}
+	.res-list li span.ftype-icon{display:inline-block;width:32px;}
+	.res-list li span.resname{padding:6px 0;}
+	.res-list li .res-image-box{position:absolute;top:1px;left:100%;margin-left:10px;width:480px;height:300px;line-height:300px;text-align:center;background:rgba(0, 0, 0, 0.5);border-radius:4px;z-index:99;}
+	.res-list li .res-image-box img{max-width:460px;height:280px;}
+	.res-list li span.resname input{display:inline-block;width:180px;}
+	.res-list li:hover{background:#f5f5f5;}
+	.res-list li i{font-size:14px;color:#333}
+	/* .res-list li i.icon-folder-close{font-size:22px;color:#aabb00;position:relative;top:3px;} */
+	.res-list li i.icon-folder-close{font-size:18px;color:#333;position:relative;top:3px;}
+	.res-list li .opers {height:48px;}
+	.res-list li .opers a{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;color:#aaa;}
+	.res-list li .opers a i{font-size:16px;color:#a1a1a1;}
+	.res-list li .opers a:hover i{color:#16a085;}
+	.cbx-block{display:inline-block;width:28px;margin:0 5px 0 10px;position:relative;}
+	.resinfo{display:inline-block;cursor:pointer;position:relative;}
+	.resinfo.mouseover{color:#16a085}
+	.resinfo.mouseover i{color:#16a085}
+	.my-check{position:absolute;top:15px;left:-2px;width:16px;height:16px;background:#fff url(__PUBLIC__/images/icheck.png) -2px -3px;cursor:pointer;z-index:99;}
+	.jl-tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid;top:25px;left:-5px;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:rgba(0, 0, 0, 0.5);}
+	.smy-checked{background-position:-23px -3px;}
+	.addResDescBox a.jl-btn-cancel{display:block;position:absolute;bottom:6px;right:6px;width:20px;height:20px;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;text-align:center;line-height:20px;}
+	.addResDescBox a.jl-btn-cancel i{font-size:16px;}
+	.addResDescBox a.jl-btn-cancel:hover{background:rgba(51, 51, 51, 0.3)}
+	.addResDescBox a.jl-btn-cancel:hover i{color:#16a085}
+</style>
+<div class="row res-box">
+	<input type="hidden" id="currCategoryId" value="0">
+	<div class="col-md-2 res-tree">
+		<ul class="ztree" id="reslist"></ul>
+	</div>
+	<div class="col-md-10 res-window">
+		<div class="row tool-bar">
+			<div class="col-md-5" style="line-height:59px;">
+				<ol class="breadcrumb">
+					<li>
+						<div style="display:inline-block;width:28px;margin:0;position:relative;top:-1px;">
+							<input type="checkbox" class="select-all" title="全选/全不选">
+							<span class="my-check" style="top:20px;"></span>
+						</div>
+					</li>
+					<li class="sel">资源库</li>
+					<li class="active">素材管理</li>
+				</ol>
+			</div>
+			<div class="col-md-7 text-right">
+				<form class="form-inline" action="" method="post" enctype="multipart/form-data">
+					<button type="button" class="btn btn-default btn-sm" id="addResType"><i class="icon-plus-sign"></i>&nbsp;创建分类</button>
+					<button type="button" class="btn btn-default btn-sm moveto hide" id="addResType"><i class="icon-external-link"></i>&nbsp;移动到</button>
+					<button type="button" class="btn btn-default btn-sm del" id="addResType"><i class="icon-trash" style="font-weight:bold;"></i>&nbsp;批量删除</button>
+					<input id="file_upload" class="btn btn-info" name="file_upload" type="file">
+					<button id="hugeFileUp" class="btn btn-default" type="button" style="display:inline-block;height:30px;line-height:16px;"><i class="icon-upload-alt"></i>&nbsp;大文件上传</button>
+					<div class="help-tips" style="position:relative;display:inline-block;font-size:18px;height:30px;line-height:30px;margin-left:8px;top:4px;">
+						<i class="icon-question-sign"></i>
+						<div class="text-left" style="position:absolute;top:36px;right:-10px;width:225px;font-size:12px;line-height:18px;background:#f0f0f0;border:1px solid #e0e0e0;padding:8px;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;display:none;z-index:99;">
+							<ul style="margin:0;list-style-type:disc;list-style-position:inside;">
+								<li>批量上传：上传50MB以内的文件.</li>
+								<li>大文件上传：允许上传50MB以上的文件.</li>
+							</ul>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	
+		<ul class="res-list">
+			<!-- 分类列表 -->
+			<volist name="categories" id="cat">
+				<li class="clearfix">
+					<div class="cbx-block">
+						<input type="checkbox" class="" value="{$cat.id}">
+						<span class="my-check"></span>
+					</div>
+					<div class="resinfo" data-id="{$cat.id}" data-type="dir">
+						<span class="ftype-icon"><i class="icon-folder-close"></i></span>
+						<span class="resname">{$cat.dir_name}</span>
+					</div>
+					<div class="opers fr">
+						<a href="javascript:void(0);" class="download hide" data-id="{$cat.id}" title="下载"><i class="icon-download-alt"></i></a>
+						<a href="javascript:void(0);" class="moveto hide" data-id="{$cat.id}" title="移动"><i class="icon-external-link"></i></a>
+						<!-- <a href="javascript:void(0);" class="rename" data-id="{$cat.id}" title="添加说明文字"><i class="icon-edit"></i></a> -->
+						<!-- <eq name="cat.has_sub" value="0"> -->
+						<!-- </eq> -->
+						<a href="javascript:void(0);" class="del" data-id="{$cat.id}" title="删除"><i class="icon-trash"></i></a>
+					</div>
+				</li>
+			</volist>
+			<!-- 文件列表 -->
+			<volist name="files" id="file">
+				<li class="clearfix res-file-{$file.filetype}">
+					<div class="cbx-block">
+						<input type="checkbox" class="" value="{$file.id}">
+						<span class="my-check"></span>
+					</div>
+					<div class="resinfo" data-id="{$file.id}" data-type="file">
+						<span class="ftype-icon">
+							<switch name="file.filetype">
+								<case value="image"><i class="icon-picture" data-url="/{$Think.config.upload_thumb_path}{$file.filepath}"></i></case>
+								<case value="video"><i class="icon-film"></i></case>
+								<case value="music"><i class="icon-music"></i></case>
+								<default /><i class="icon-file"></i>
+							</switch>
+						</span>
+						<span class="resname">{$file.filename}</span>
+					</div>
+					<div class="opers fr">
+						<a href="javascript:void(0);" class="download hide" data-id="{$file.id}" title="下载"><i class="icon-download-alt"></i></a>
+						<a href="javascript:void(0);" class="moveto hide" data-id="{$file.id}" title="移动"><i class="icon-external-link"></i></a>
+						<a href="javascript:void(0);" class="rename" data-id="{$file.id}" title="添加说明文字"><i class="icon-edit"></i></a>
+						<a href="javascript:void(0);" class="del" data-id="{$file.id}" title="删除"><i class="icon-trash"></i></a>
+					</div>
+				</li>
+			</volist>
+		</ul>
+	</div>
+</div>
+
+<div id="upArea"></div>
+<div class="my-cover" style="display:none;"></div>
+
+<div id="PLUploader">
+	<span id="clsBtn" style="font-size:26px;position:absolute;top:-4px;right:2px;cursor:pointer;z-index:1005;" title="关闭"><i class="icon-remove-sign"></i></span>
+	<div id="uploader">
+		<p>Your browser doesn't have Flash, Silverlight or HTML5 support.</p>
+	</div>
+</div>
+
+<div id="addResDescBox" style="position:relative;margin-left:45px;background-color:#f0f0f0;padding:10px;margin-bottom:10px;line-height:24px;display:none;" class="row border-radius4">
+	<div class="col-md-1 text-right" style="width: 56px;"><span>说明</span></div>
+	<div class="col-md-9" style=""><textarea class="form-control" rows="3"></textarea></div>
+	<div class="col-md-2" style="">
+		<button type="button" class="btn btn-info btn-xs jl-btn-save">保存</button>
+		<button type="button" class="btn btn-default btn-xs jl-btn-cancel">取消</button>
+		<p class="bg-danger border-radius4 jl-help-text" style="display:none;margin-top:8px;padding-left:10px;">没有输入任何内容，无法保存！</p>
+	</div>
+	<a href="javascript:void(0);" class="jl-btn-cancel" title="收起"><i class="icon-angle-up"></i></a>
+</div>
+
+<!-- <div class="pic-box" style="width:400"></div> -->
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+
+<!-- plupload上传插件脚本 -->
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/plupload.full.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/jquery-ui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/plupload2/i18n/zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.excheck-3.5.js"></script>
+
+<script type="text/javascript">
+$(function($){
+	dynamicCalcHeight();
+	function dynamicCalcHeight () {
+		// 动态加载目录树容器的高度
+		var window_height = $(window).height() - 32,
+			res_window_height = $('.res-window').first().height();
+			
+		if (res_window_height > window_height) {
+			$('.res-tree').first().height(res_window_height);
+		} else {
+			$('.res-tree').first().height(window_height);
+		}
+	}
+	
+	function onClickFunc(e, treeId, treeNode) {
+		getChildrenCategory(treeNode.id, true);
+		var zTree = $.fn.zTree.getZTreeObj("reslist");
+		zTree.expandNode(treeNode);
+		$('#reslist').find('a.curSelectedNode').removeClass('curSelectedNode');
+		$('#' + treeNode.tId + '_a').addClass('curSelectedNode');
+	}
+	
+	var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			callback: {
+				onClick: onClickFunc
+			}
+		},
+		zNodes = {$treeData|default=0};
+	$.fn.zTree.init($("#reslist"), setting, zNodes);
+	
+	$('input').iCheck('destroy');
+	/*$(':checkbox').prop({'disabled' : true});*/
+	
+	$('.res-list').delegate('.ftype-icon i.icon-picture', 'click', function() {
+		var img_src = $(this).attr('data-url');
+		/* $('.my-cover').show(); */
+	});
+	
+	$('.select-all').siblings('.my-check').click(function(){
+		
+		$(this).siblings('.select-all').first().click();
+		
+		var isChecked = $(this).siblings('.select-all').first().prop('checked');
+		$('.res-list').find(':checkbox').prop({'checked' : isChecked});
+		
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').removeClass('smy-checked');
+		}
+	});
+	
+	$('.res-list').first().delegate('li > .cbx-block > .my-check', 'click', function(){
+		
+		$(this).siblings(':checkbox').first().click();
+		
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked');
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+		}
+		
+		var allItems = $('.res-list').find(':checkbox').size(),
+			checkedItems = $('.res-list').find(':checkbox:checked').size();
+			$('.select-all').prop({'checked' : (allItems == checkedItems)});
+			
+			if (allItems == checkedItems) {
+				$('.select-all').siblings('.my-check').addClass('smy-checked');
+			} else {
+				$('.select-all').siblings('.my-check').removeClass('smy-checked');
+			}
+	});
+	
+	// 创建新分类
+	$('#addResType').click(function() {
+		var new_type_html = '<li class="clearfix new-add">';
+		new_type_html += '<div class="cbx-block"><input type="checkbox" class="" value=""><span class="my-check"></span></div>';
+		new_type_html += '<div class="resinfo">';
+		new_type_html += '<span class="ftype-icon"><i class="icon-folder-close"></i></span>';
+		new_type_html += '<span class="resname">';
+		new_type_html += '<input type="text" class="form-control input-sm" value="">';
+		new_type_html += '</span></div>';
+		new_type_html += '</li>';
+		
+		$('.res-list').first().prepend(new_type_html);
+		dynamicCalcHeight();
+		$('.new-add').first().find(':text').first().focus();
+	});
+	
+	$('.res-list').delegate('.new-add :text', 'blur', function() {
+		var new_resname = $.trim($(this).val()), that = this;
+		if (new_resname == '') {
+			$('.new-add').remove();
+		} else {
+			// 通过ajax异步请求添加分类
+			var pid = $('#currCategoryId').val();
+			$.ajax({
+				type:'POST',
+				url:'__URL__/addCategory',
+				data:{catename : new_resname, pid : pid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					$('#addResType').attr('disabled', true);
+				},
+				success:function(data) {
+					if (data.stat*1) {
+						var res_opers_html = '<div class="opers fr">';
+						res_opers_html += '<a href="javascript:void(0);" class="download hide" data-id="' + data.catId + '" title="下载"><i class="icon-download-alt"></i></a> ';
+						res_opers_html += '<a href="javascript:void(0);" class="moveto hide" data-id="' + data.catId + '" title="移动"><i class="icon-external-link"></i></a> ';
+						//res_opers_html += '<a href="javascript:void(0);" class="rename" data-id="' + data.catId + '" title="添加说明文字"><i class="icon-edit"></i></a> ';
+						res_opers_html += '<a href="javascript:void(0);" class="del" data-id="' + data.catId + '" title="删除"><i class="icon-trash"></i></a> ';
+						res_opers_html += '</div>';
+						
+						$(that).closest('.resinfo').attr({'data-id' : data.catId, 'data-type' : 'dir'});
+						$(that).closest('li').find(':checkbox').first().val(data.catId);
+						$('.new-add .resname').empty().html(new_resname);
+						$('.new-add').append(res_opers_html).removeClass('new-add');
+						dynamicCalcHeight();
+						$('#addResType').removeAttr('disabled');
+						
+						var treeObj = $.fn.zTree.getZTreeObj("reslist");
+						var pnode = treeObj.getNodeByParam("id", pid, null);
+						var newNode = {name:data.catInfo.dir_name, id:data.catInfo.id, classid:data.catInfo.classid, dir_name:data.catInfo.dir_name, parent_classid:data.catInfo.parent_classid};
+						newNode = treeObj.addNodes(pnode, newNode);
+					} else {
+						$.kw.alert(data.msg, '', function() {
+							$('.new-add').remove();
+							dynamicCalcHeight();
+							$('#addResType').removeAttr('disabled');
+						});
+					}
+				},
+				error:function() {
+						$.kw.alert('操作失败！请重试……');
+				}
+			});
+		}
+	});
+	
+	$('.res-list').delegate('.resinfo[data-type="dir"]', 'click', function() {
+		var catId = $(this).attr('data-id')*1;
+		if (catId) {
+			getChildrenCategory(catId, false, false);
+		} else {
+			$.kw.alert('页面数据错误！请刷新页面重试……');
+		}
+	});
+	
+	$('.breadcrumb').delegate('a[data-id]', 'click', function() {
+		var catId = $(this).attr('data-id')*1;
+		getChildrenCategory(catId, false, true);
+	});
+	
+	function getChildrenCategory(catId, byTree, byToolbar) {
+		// 根据分类ID获取分类及其下属信息
+		$.ajax({
+			type:'POST',
+			url:'__URL__/getCategory',
+			data:{catId : catId},
+			async:false,
+			dataType:'json',
+			beforeSend:function() {
+				
+			},
+			success:function(re) {
+				if (re.stat*1) {
+					
+					if (!byTree) {
+						var treeObj = $.fn.zTree.getZTreeObj("reslist");
+						var node = treeObj.getNodeByParam("id", catId, null);
+						if (byToolbar) {
+							var sub_nodes = treeObj.getNodesByParam("isParent", true, node);
+							$.each(sub_nodes, function(i, snode) {
+								treeObj.expandNode(snode, false, true, true);
+							});
+						} else {
+							treeObj.expandNode(node, true, false, true);
+						}
+						$('a[treenode_a]').removeClass('curSelectedNode');
+						if (catId) {
+							$("#" + node.tId + "_a").addClass('curSelectedNode');
+						}
+					}
+					
+					$('.select-all').prop({'checked' : false}).siblings('.my-check').removeClass('smy-checked');
+					
+					$('#currCategoryId').val($.isEmptyObject(re.data.cateinfo) ? 0 : re.data.cateinfo.id);
+					
+					if (!$.isEmptyObject(re.data.cateinfo) && re.data.cateinfo.dir_level >= 3) {
+						$('#addResType').hide();
+					} else {
+						$('#addResType').show();
+					}
+					
+					$('.res-list').empty();
+					
+					var bc_li_html = '';
+					if ($.isEmptyObject(re.data.cateinfo) && $.isEmptyObject(re.data.breadcrumb)) {
+						bc_li_html = '<li class="active">素材管理</li>';
+					} else {
+						bc_li_html += '<li><a href="javascript:void(0);" data-id="0">素材管理</a></li>';
+						$.each(re.data.breadcrumb, function(i, o) {
+							bc_li_html += '<li><a href="javascript:void(0);" data-id="' + i + '">' + o + '</a></li>';
+						});
+						bc_li_html += '<li class="active">'+re.data.cateinfo.dir_name+'</li>';
+					}
+					$('.breadcrumb').find('li:gt(1)').remove();
+					$('.breadcrumb').append(bc_li_html);
+					
+					var new_type_html = '';
+					if (!$.isEmptyObject(re.data.childrenCats)) {
+						$.each(re.data.childrenCats, function(i, o) {
+							new_type_html += '<li class="clearfix">';
+							new_type_html += '<div class="cbx-block"><input type="checkbox" class="" value="' + o.id + '"><span class="my-check"></span></div>';
+							new_type_html += '<div class="resinfo" data-id="' + o.id + '" data-type="dir">';
+							new_type_html += '<span class="ftype-icon"><i class="icon-folder-close"></i></span>';
+							new_type_html += '<span class="resname">' + o.dir_name + '</span></div>';
+							new_type_html += '<div class="opers fr">';
+							new_type_html += '<a href="javascript:void(0);" class="download hide" data-id="' + o.id + '" title="下载"><i class="icon-download-alt"></i></a> ';
+							new_type_html += '<a href="javascript:void(0);" class="moveto hide" data-id="' + o.id + '" title="移动"><i class="icon-external-link"></i></a> ';
+							//new_type_html += '<a href="javascript:void(0);" class="rename" data-id="' + o.id + '" title="添加说明文字"><i class="icon-edit"></i></a> ';
+							//if (o.has_sub <= 0) {}
+							new_type_html += '<a href="javascript:void(0);" class="del" data-id="' + o.id + '" title="删除"><i class="icon-trash"></i></a> ';
+							new_type_html += '</div>';
+							new_type_html += '</li>';
+						});
+					}
+					
+					if (!$.isEmptyObject(re.data.childrenFiles)) {
+						$.each(re.data.childrenFiles, function(i, o) {
+							new_type_html += '<li class="clearfix res-file-' + o.filetype + '">';
+							new_type_html += '<div class="cbx-block"><input type="checkbox" class="" value="' + o.id + '"><span class="my-check"></span></div>';
+							new_type_html += '<div class="resinfo" data-id="' + o.id + '" data-type="file">';
+							new_type_html += '<span class="ftype-icon">';
+							switch (o.filetype) {
+							case 'image' : new_type_html += '<i class="icon-picture" data-url="/{$Think.config.upload_thumb_path}' + o.filepath + '"></i>'; break;
+							case 'video' : new_type_html += '<i class="icon-film"></i>'; break;
+							case 'music' : new_type_html += '<i class="icon-music"></i>'; break;
+							default : new_type_html += '<i class="icon-file"></i>';
+						}
+							new_type_html += '</span>';
+							new_type_html += '<span class="resname">' + o.filename + '</span></div>';
+							new_type_html += '<div class="opers fr">';
+							new_type_html += '<a href="javascript:void(0);" class="download hide" data-id="' + o.id + '" title="下载"><i class="icon-download-alt"></i></a> ';
+							new_type_html += '<a href="javascript:void(0);" class="moveto hide" data-id="' + o.id + '" title="移动"><i class="icon-external-link"></i></a> ';
+							new_type_html += '<a href="javascript:void(0);" class="rename" data-id="' + o.id + '" title="重命名"><i class="icon-edit"></i></a> ';
+							new_type_html += '<a href="javascript:void(0);" class="del" data-id="' + o.id + '" title="删除"><i class="icon-trash"></i></a> ';
+							new_type_html += '</div>';
+							new_type_html += '</li>';
+						});
+					}
+					
+					
+					$('.res-list').html(new_type_html);
+					dynamicCalcHeight();
+				} else {
+					$.kw.alert(re.msg, '', function() {
+					});
+				}
+			},
+			error:function() {
+					$.kw.alert('操作失败！请重试……');
+			}
+		});
+	}
+	
+	$('.tool-bar').find('.del').click(function() {
+		var checkedItems = $('.res-list').find(':checkbox:checked'),
+			checkedItemCounts = checkedItems.size();
+		if (checkedItemCounts > 0) {
+			
+			$.kw.confirm('确认要删除吗？', function() {
+				var dirIds = new Array(),
+					fileIds = new Array(),
+					dirCounts = fileCounts = 0,
+					postData = null;
+				
+				$.each(checkedItems, function(i, obj) {
+					var res_type = $.trim($(obj).closest('li').find('div.resinfo').first().attr('data-type')),
+						res_id = $(obj).val()*1;
+					if (res_type == 'dir') {
+						dirCounts = dirIds.push(res_id);
+					} else {
+						fileCounts = fileIds.push(res_id);
+					}
+				});
+				
+				if (dirCounts > 0 && fileCounts > 0) {
+					postData = {dids : dirIds.join('-'), fids : fileIds.join('-')};
+				} else if (dirCounts == 0 && fileCounts > 0) {
+					postData = {fids : fileIds.join('-')};
+				} else if (dirCounts > 0 && fileCounts == 0) {
+					postData = {dids : dirIds.join('-')};
+				}
+				
+				$.ajax({
+					type:'POST',
+					url:'__URL__/delCategories',
+					data:postData,
+					async:false,
+					dataType:'json',
+					beforeSend:function() {
+						
+					},
+					success:function(re) {
+						if (re.stat*1) {
+							$.kw.alert('操作成功！', '', function() {
+								if (dirCounts > 0) {
+									var treeObj = $.fn.zTree.getZTreeObj("reslist");
+									for (did in dirIds) {
+										var node = treeObj.getNodeByParam("id", dirIds[did], null);
+										treeObj.removeNode(node);
+									}
+									dynamicCalcHeight();
+								}
+								checkedItems.parents('li').remove();
+								dynamicCalcHeight();
+								
+								$('.select-all').prop({'checked' : false});
+								$('.select-all').siblings('.my-check').removeClass('smy-checked');
+							});
+						} else {
+							$.kw.alert('操作失败！请重试……');
+						}
+					},
+					error:function() {
+						$.kw.alert('操作失败！请重试……');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少要选择一个操作对象！');
+		}
+	});
+	
+	$('.res-list').delegate('.del', 'click', function() {
+		var resId = $(this).attr('data-id')*1, that = this,
+			resType = $(this).closest('li').find('.resinfo').first().attr('data-type'),
+			postData = null;
+		
+		
+		if (resId > 0) {
+			
+			$.kw.confirm('确认要删除吗？', function() {
+				
+				if (resType == 'dir') {
+					postData = {dids : resId};
+				} else {
+					postData = {fids : resId};
+				}
+				
+				$.ajax({
+					type:'POST',
+					url:'__URL__/delCategories',
+					data:postData,
+					async:false,
+					dataType:'json',
+					beforeSend:function() {
+						
+					},
+					success:function(re) {
+						if (re.stat*1) {
+							$.kw.alert('操作成功！', '', function() {
+								$(that).parents('li').remove();
+								
+								if (resType == 'dir') {
+									var treeObj = $.fn.zTree.getZTreeObj("reslist");
+									var node = treeObj.getNodeByParam("id", resId, null);
+									treeObj.removeNode(node);
+									dynamicCalcHeight();
+								}
+							});
+						} else {
+							$.kw.alert('操作失败！请重试……');
+						}
+					},
+					error:function() {
+						$.kw.alert('操作失败！请重试……');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('页面数据错误！请刷新重试……');
+		}
+	});
+	
+	$('.res-list').delegate('.rename', 'click', function() {
+		var catId = $(this).attr('data-id')*1,
+			catItem = $(this).closest('li'),
+			cloneObj = $('#addResDescBox').clone();
+		cloneObj.removeAttr('id').addClass('addResDescBox');
+		$('.res-list').find('.addResDescBox').remove();
+		catItem.append(cloneObj);
+		catItem.find('.addResDescBox').show();
+		$.post('__GROUP__/Ajaxhandle/resDescText', {id:catId}, function(data) {
+			if(data.stat*1) {
+				catItem.find('textarea').first().val(data.msg);
+			}
+		}, 'json');
+	});
+	
+	$('.res-list').delegate('.jl-btn-save', 'click', function() {
+		var file_id = $(this).closest('.addResDescBox').siblings('.resinfo').first().attr('data-id'),
+			desc_text = $.trim($(this).closest('.addResDescBox').find('textarea').first().val()),
+			tipsObj = $(this).siblings('.jl-help-text');
+		
+		/* if (desc_text == '') {
+			$(this).siblings('.jl-help-text').fadeIn().delay(2000).fadeOut();
+			return false;
+		} */
+		$.post('__GROUP__/Ajaxhandle/resDescText', {id:file_id,action:'w',file_desc:desc_text}, function(data) {
+			if (data.stat*1) {
+				tipsObj.removeClass('bg-danger text-danger').addClass('bg-success text-success').text('操作成功！').fadeIn().delay(2000).fadeOut();
+			} else {
+				tipsObj.removeClass('bg-success text-success').addClass('bg-danger text-danger').text('操作失败！').fadeIn().delay(2000).fadeOut();
+			}
+		}, 'json');
+			 
+	});
+	
+	$('.res-list').delegate('.jl-btn-cancel', 'click', function() {
+		$(this).closest('.addResDescBox').remove();
+	});
+	
+	
+	/* $('.res-list').delegate('.rename', 'click', function() {
+		//return false;
+		var catId = $(this).attr('data-id')*1,
+			catItem = $(this).closest('li').find('.resname'),
+			oldCatName = catItem.text();
+		catItem.closest('.resinfo').removeAttr('data-type');
+		catItem.html('<input type="text" class="form-control input-sm" value="' + oldCatName + '" data-oname="' + oldCatName + '">');
+		catItem.find(':text').first().focus();
+	}); */
+	
+	// Uploadify 批量上传
+	var succCount = failedCount = 0, errMsg = '';
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'fileObjName' : 'myUpfile',
+			'buttonText' : '<i class="icon-upload"></i>上传文件',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'uploader' : '__GROUP__/Ajaxhandle/commonUploadify',
+			'queueID'  : 'upArea',
+			'removeTimeout' : 10,
+			'fileSizeLimit' : '0',
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess', 'onSelectError'],
+			'onUploadStart' : function() {
+				$('#file_upload').uploadify('settings', 'formData', {catID : $('#currCategoryId').val()});
+				$('#upArea .up-result').empty();
+			},
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$('#' + file.id).find('.data').html(' - 上传成功');
+					
+					var new_type_html = '';
+						new_type_html += '<li class="clearfix res-file-' + re.type + '">';
+						new_type_html += '<div class="cbx-block"><input type="checkbox" class="" value="' + re.id + '"><span class="my-check"></span></div>';
+						new_type_html += '<div class="resinfo" data-id="' + re.id + '" data-onlyRead="1">';
+						new_type_html += '<span class="ftype-icon">';
+						switch (re.type) {
+							case 'image' : new_type_html += '<i class="icon-picture" data-url="' + re.url + '"></i>'; break;
+							case 'video' : new_type_html += '<i class="icon-film"></i>'; break;
+							case 'music' : new_type_html += '<i class="icon-music"></i>'; break;
+							default : new_type_html += '<i class="icon-file"></i>';
+						}
+						new_type_html += '</span>';
+						new_type_html += '<span class="resname">' + re.pic + '</span></div>';
+						new_type_html += '<div class="opers fr">';
+						new_type_html += '<a href="javascript:void(0);" class="download hide" data-id="' + re.id + '" title="下载"><i class="icon-download-alt"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="moveto hide" data-id="' + re.id + '" title="移动"><i class="icon-external-link"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="rename" data-id="' + re.id + '" title="添加说明文字"><i class="icon-edit"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="del" data-id="' + re.id + '" title="删除"><i class="icon-trash"></i></a> ';
+						new_type_html += '</div>';
+						new_type_html += '</li>';
+					
+					$('.res-list').append(new_type_html);
+					dynamicCalcHeight();
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div class="up-result" style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+				}
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').hide();
+		hideFramesMasklayer();
+		//window.location.reload();
+	});
+
+	$("#uploader").plupload({
+		runtimes : 'html5,silverlight,flash,html4',
+		url : '__GROUP__/Ajaxhandle/commonPlupload',
+		chunk_size: '1mb',
+		rename : false,
+		dragdrop: false,
+		prevent_duplicates: true,
+		multipart_params : {catID : $('#currCategoryId').val()},
+		
+		filters : {
+			max_file_size : '0',
+		},
+
+		views: {
+			list: true,
+			thumbs: true, // Show thumbs
+			active: 'list'
+		},
+
+		flash_swf_url : '__PUBLIC__/script/plupload2/Moxie.swf',
+		silverlight_xap_url : '__PUBLIC__/script/plupload2/Moxie.xap',
+
+		init : {
+			BeforeUpload: function(up, file) {
+				up.setOption('multipart_params', {catID : $('#currCategoryId').val()});
+				$.ajax({
+					url:'__GROUP__/Ajaxhandle/checkFilePartsComm',
+					type:'post',
+					data:{filename : file.name},
+					async:false,
+					success:function(re) {
+						if (re*1) {
+							var hasUpChunks = re * 1;							
+							file.loaded = hasUpChunks * 1024 * 1024;
+						}
+					}
+				});
+			},
+
+			ChunkUploaded: function(up, file, info) {
+				//console.log(file);
+				var re = $.parseJSON(info.response);
+				if (re.error) {
+					file.loaded = 0;
+					file.destroy();
+				}
+			},
+
+			FileUploaded: function(up, file, info) {
+				//console.log('[ File ]' + info);
+				// Called when file has finished uploading
+				//console.log(file);
+				var fileEle = $('#' + file.id), actionClass, iconClass;
+
+				var re = $.parseJSON(info.response);
+
+				if (re.error) {
+					actionClass = 'ui-state-error plupload_failed';
+					iconClass = 'ui-icon-alert';
+					fileEle.find('.plupload_file_name').first().append('&nbsp;&nbsp;<i style="color:#a94442"><b>[Error]:</b>' + re.error.message + '</i>');
+				} else {
+					actionClass = 'plupload_done';
+					iconClass = 'ui-icon-circle-check';
+					if (!$.isEmptyObject(re.result)) {
+						var new_type_html = '';
+						new_type_html += '<li class="clearfix res-file-' + re.result.type + '">';
+						new_type_html += '<div class="cbx-block"><input type="checkbox" class="" value="' + re.result.id + '"><span class="my-check"></span></div>';
+						new_type_html += '<div class="resinfo" data-id="' + re.result.id + '" data-onlyRead="1">';
+						new_type_html += '<span class="ftype-icon">';
+						switch (re.result.type) {
+							case 'image' : new_type_html += '<i class="icon-picture" data-url="' + re.result.url + '"></i>'; break;
+							case 'video' : new_type_html += '<i class="icon-film"></i>'; break;
+							case 'music' : new_type_html += '<i class="icon-music"></i>'; break;
+							default : new_type_html += '<i class="icon-file"></i>';
+						}
+						new_type_html += '</span>';
+						new_type_html += '<span class="resname">' + re.result.pic + '</span></div>';
+						new_type_html += '<div class="opers fr">';
+						new_type_html += '<a href="javascript:void(0);" class="download hide" data-id="' + re.result.id + '" title="下载"><i class="icon-download-alt"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="moveto hide" data-id="' + re.result.id + '" title="移动"><i class="icon-external-link"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="rename" data-id="' + re.result.id + '" title="添加说明文字"><i class="icon-edit"></i></a> ';
+						new_type_html += '<a href="javascript:void(0);" class="del" data-id="' + re.result.id + '" title="删除"><i class="icon-trash"></i></a> ';
+						new_type_html += '</div>';
+						new_type_html += '</li>';
+					
+						$('.res-list').append(new_type_html);
+						dynamicCalcHeight();
+					}
+					
+					fileEle.removeClass('plupload_done ui-state-default').addClass(actionClass).find('.plupload_action_icon').first().removeClass('ui-icon-circle-check').addClass(iconClass);
+					
+					//up.removeFile(file);
+				}
+
+			},
+
+			UploadComplete: function(up, files) {
+				// Called when all files are either uploaded or failed
+				//console.log('--------------------------------');
+                /* $.each(files, function(i, f) {
+					up.removeFile(f);
+				}); */
+			},
+ 
+            Error: function(up, errors) {
+                // Called when error occurs
+                //console.log(errors);
+            }
+		}
+	});
+	
+	$('#PLUploader').delegate('#clsBtn', 'click', function(){
+		$('#PLUploader').hide();
+		hideFramesMasklayer();
+		if ($('#uploader').plupload('getFiles').length > 0) {
+			$('#uploader').plupload('clearQueue');
+		}
+		//window.location.reload();
+	});
+
+	$('#hugeFileUp').click(function() {
+		$('#PLUploader').show();
+		showFramesMasklayer();
+	});
+
+	$('.help-tips').hover(
+		function() {
+			$(this).children('div').first().show();
+		},
+		function() {
+			$(this).children('div').first().hide();
+		}
+	);
+	
+	$('.res-window').delegate('li.res-file-image span.resname', 'mouseover', function() {
+		var win_height = $(window).height(),
+			li_height = $(this).closest('li').height(),
+			li_offset = $(this).closest('li').offset(),
+			image_url = $(this).closest('div.resinfo').find('i[data-url]').first().attr('data-url');
+		
+		var image_box_html = '<div class="res-image-box"><span class="jl-tooltip-arrow"></span><img src="' + image_url + '"></div>';
+		$(this).closest('div.resinfo').addClass('mouseover');
+		$(this).after(image_box_html);
+		if (win_height*1 - li_height*1 - li_offset.top*1 < 300) {
+			$(this).siblings('.res-image-box').first().css({'top' : 'auto', 'bottom' : '1px'});
+			$(this).siblings('.res-image-box').find('.jl-tooltip-arrow').first().css({'top' : 'auto', 'bottom' : '16px'});
+		}
+	})
+	
+	$('.res-window').delegate('li.res-file-image span.resname', 'mouseout', function() {
+		$(this).closest('div.resinfo').removeClass('mouseover');
+		$(this).siblings('.res-image-box').remove();
+	})
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,92 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__URL__/rolesList">管理组</a></li>
+	<li class="active">创建管理组</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<!-- <div class="form-group">
+		<label class="col-sm-2 control-label" for="usrGrp">所属管理组</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="role_id" id="usrGrp">
+				<option value="">请选择</option>
+				<option value="1">超级管理员</option>
+			</select>
+		</div>
+	</div> -->
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrName">组名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="name" id="usrName" value="{$role.name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">状态</label>
+		<div class="col-sm-3">
+			<eq name="role.status" value="1">
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1" checked> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0"> 禁用</label>
+			<else/>
+				<label class="radio-inline"><input type="radio" name="status" id="status_y" value="1"> 启用</label>
+				<label class="radio-inline"><input type="radio" name="status" id="status_n" value="0" checked> 禁用</label>
+			</eq>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="roleRemark">备注</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="roleRemark" rows="4">{$role.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$role.id}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/rolesList';
+	});
+	
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+            name : {  
+                required : true,
+            }
+        },  
+        messages : {
+            name : {  
+                required : "组名称必填." ,
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

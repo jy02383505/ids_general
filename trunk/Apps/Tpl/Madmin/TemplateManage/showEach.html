@@ -1,0 +1,48 @@
+<!--lym-->
+<include file="Public/header" />
+
+<!-- table展示模板字段	 -->
+<div class="row">
+	<div class="col-md-12" style="background-color:#EEEEEE;">
+		<h4>{$rows[0][typename]} &nbsp;</h4>
+	</div>
+	<div class="col-md-12">
+		<table class="table ">
+			<tr>
+				<th>id</th>
+				<th>模板名称</th>
+				<th>分辨率</th>
+				<th>节目名称</th>
+				<th>场景</th>
+                <th class="hide">场景</th>
+			</tr>
+			<volist name="rows" id="row">
+				<tr>
+					<td>{$row[id]}</td>	
+					<td>{$row[tplname]}</td>	
+					<td>{$row[tplpx_width]}&times;{$row[tplpx_height]}</td>	
+					<td>{$row[program_name]}</td>	
+					<?php 
+                    $url = $row[tpltype] == "azad"?"index_azad":"scene_list";
+                    //安卓广告机单独处理，x86和安卓触摸机一样
+                    ?>
+					<td><a class="oper " href='{:U("TemplateManage/$url")}/tplclassid/{$row[tplclassid]}/tpltype/{$row[tpltype]}' title="管理场景"><i class="icon-sitemap"></i></a></td>
+                    <td class="hide"><a class="oper edit" href="__GROUP__/TemplateManage/scene_list/tplclassid/{$row[tplclassid]}/tType/{$row[tpltype]}" title="管理场景"><i class="icon-sitemap"></i></a></td>
+				</tr>
+			</volist>
+		</table>
+	</div>
+</div>
+
+
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+<script src="__PUBLIC__/bootstrap/bootstrap.min.js"></script>
+<script>
+	$('#terminalTabs a').click(function(e){
+		e.preventDefault();
+		$(this).tab('show');
+	})
+	$('#terminalTabs a:first').tab('show');
+</script>
+
+<include file="Public/footer" />

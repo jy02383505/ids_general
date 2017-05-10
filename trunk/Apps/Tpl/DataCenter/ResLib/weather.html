@@ -1,0 +1,72 @@
+<include file="Madmin:Public:header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<ol class="breadcrumb hide">
+	<li><a href="">数据采集</a></li>
+	<li class="active">天气预报信息</li>
+</ol>
+
+<div class="row well">
+	<form class="form-inline edit-form" role="form">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td class="text-right" width="80"><b>设置城市：</b>
+					</td>
+					<td>
+						<select id="opera" class="form-control input-sm" onchange="changeherf()">
+							<option value="长沙">长沙</option>
+							<option value="太原">太原</option>
+							<option value="北京">北京</option>
+						</select>
+						<a href="__URL__/getWeatherInfo/city/长沙" id="setAddr" class="btn btn-info btn-sm">获取最新天气信息</a>
+                        <a href="__URL__/ExcelOut" class="btn btn-info btn-sm">导出EXCEL</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">天气信息({$Think.now})</h5>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th class="">日期</th>
+                <th class="">天气情况</th>
+                <th class="">白天的天气预报图片</th>
+                <th class="">晚上的天气预报图片</th>
+				<th class="">风力</th>
+				<th class="">温度</th>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="weathers">
+				<volist name="weathers" id="vo">
+					<tr>
+						<td>{$vo.date}</td>
+						<td>{$vo.weather}</td>
+                        <td><img src="/{$vo.dayPictureUrl}"/></td>
+                        <td><img src="/{$vo.nightPictureUrl}"/></td>
+						<td>{$vo.wind}</td>
+						<td>{$vo.temperature}</td>
+					</tr>
+				</volist>
+			</notempty>
+		</tbody>
+	</table>
+</div>
+
+<include file="Madmin:Public:jsLoader" />
+<script type="text/javascript">
+$(function($){
+});
+function changeherf() {
+    var opera = document.getElementById("opera").value;
+    document.getElementById("setAddr").href="__URL__/getWeatherInfo/city/"+opera;
+}
+</script>
+<include file="Madmin:Public:footer" />

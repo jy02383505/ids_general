@@ -1,0 +1,104 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">基本设置</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="siteName">站点名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="sitename" id="siteName" value="{$syscfg.b_sitename}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="siteTitle">站点标题</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="sitetitle" id="siteTile" value="{$syscfg.b_sitetitle}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="usrMobile">站点LOGO</label>
+		<div class="col-sm-6">
+			<div class="up-image-box" style="position:relative;">
+				<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;">（建议上传图片尺寸：168 x 168 像素.）</span>
+				<div id="uploadfyQueueList"></div> 
+				<div class="showimg clearfix">
+					<notempty name="syscfg['b_sitelogo']">
+						<span><img src="/{$Think.config.upload_comm_path}{$syscfg.b_sitelogo}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="cover_image" class="gcovers" value="{$syscfg.b_sitelogo}">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	$('#siteName', window.parent.frame_top.document).html('{$syscfg.b_sitename|default=""}');
+	
+	$(':reset').click(function(){
+		window.location.reload();		
+	});
+	
+	var site_logo = "{$Think.config.b_sitelogo|default=''}";
+	var logo_src = site_logo == '' ? '__PUBLIC__/images/logo.png?{:rand()}' : '/{$Think.config.upload_comm_path}{$Think.config.b_sitelogo}?{:rand()}';
+	$('#siteLogo', window.parent.frame_top.document).children('img').first().attr('src', logo_src);
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', savename : 'logo', isMyUpRoot : 1},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                $(".gcovers").first().val(re.savePath);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+	
+});
+</script>
+<include file="Public/footer" />

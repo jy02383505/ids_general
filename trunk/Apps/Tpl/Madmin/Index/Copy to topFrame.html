@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+	</head>
+	
+	<body class="top-nav-body clearfix">
+	
+		<div class="fl company-logo">
+			<h1>
+				<if condition="$Think.config.b_sitename neq ''">
+					{$Think.config.b_sitename}
+				</if>
+			</h1>
+		</div>
+		
+		<div class="fr top-links">
+			<div class="tl-up">
+				<p>欢迎您，{$Think.session.username}！　<a href="__GROUP__/Syscfg/modifyLoginPass" target="frame_right_main">修改登录密码</a>　<a href="__GROUP__/Login/eout" target="_top">退出登录</a></p>
+			</div>
+			<div class="tl-down">
+				<ul class="top-menus clearfix">
+					<assign name="homepage" value="homepage" />
+					<in name="homepage" value="$topNavs">
+					<li class="active"><a href="__GROUP__/Index/leftFrame/menuID/homepage" target="frame_left_menu" data-id="homepage" data-def="__GROUP__/Index/rightFrame"><i class="icon-home"></i> 后台首页</a></li>
+					</in>
+					
+					<assign name="scences" value="scences" />
+					<in name="scences" value="$topNavs">
+					<li><a href="__GROUP__/Index/leftFrame/menuID/scences" target="frame_left_menu" data-id="scences" data-def="{$homeScenceURL}"><i class="icon-tasks"></i> 内容管理</a></li>
+					</in>
+					
+					<assign name="syscfg" value="syscfg" />
+					<in name="syscfg" value="$topNavs">
+					<li><a href="__GROUP__/Index/leftFrame/menuID/syscfg" target="frame_left_menu" data-id="syscfg" data-def="__GROUP__/Syscfg/basicCfg"><i class="icon-cogs"></i> 系统设置</a></li>
+					</in>
+					
+					<assign name="endPoints" value="endPoints" />
+					<in name="endPoints" value="$topNavs">
+					<li><a href="__GROUP__/Index/leftFrame/menuID/endPoints" target="frame_left_menu" data-id="endPoints" data-def="__GROUP__/Endpoints/index"><i class="icon-laptop"></i> 终端管理</a></li>
+					</in>
+					
+					<assign name="ucenter" value="ucenter" />
+					<in name="ucenter" value="$topNavs">
+					<li><a href="__GROUP__/Index/leftFrame/menuID/ucenter" target="frame_left_menu" data-id="ucenter" data-def="__GROUP__/Users/index"><i class="icon-user"></i> 用户管理</a></li>
+					</in>
+				</ul>					
+			</div>
+		</div>
+		
+		<div class="my-cover" style="display:none;"></div>
+
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		
+			$('.top-menus > li > a').click(function() {
+				var menuID = $.trim($(this).attr('data-id')),
+					def = $.trim($(this).attr('data-def'));
+				
+				$('.top-menus >li').removeClass('active');
+				$(this).parent('li').first().addClass('active');
+				
+				//setLeftMenu(menuID, def);
+				
+				//return false;
+			});
+
+			function setLeftMenu(menuID, menuDef) {
+				
+				if (menuID) {
+					
+					if (menuID == 'scences') {
+						$.getJSON('__URL__/leftFrame', function(data){
+							if (data.length > 0) {
+								var li = '';
+								$.each(data, function(i, menu){
+									li += '<li id="scence-' + menu.id + '">';
+									
+									var subData = menu.sub_plugins;
+									if (subData) {
+										li += '<a href="javascript:void(0);" title="' + menu.scencename + '">';
+										li += '<span class="folded"></span>';
+										li += '<i class=""></i>&nbsp;';
+										li += '<font>' + menu.short_scencename + '</font>';
+										li += '<div class="item-tools"><i class="icon-edit" data-sid="' + menu.id + '"></i></div>';
+										li += '</a>';
+										
+										if (subData.length > 0) {
+											li += '<ul data-folded="1">';
+											$.each(subData, function(j, submenu){
+												li += '<li id="plugins-' + submenu.id + '">';
+												li += '<a href="__GROUP__/Plugins/index/pid/' + submenu.id + '" target="frame_right_main">';
+												li += '<i class="icon-caret-right"></i>&nbsp;<font>' + submenu.name + '</font>';
+												li += '</a>';
+												li += '</li>';
+											});
+											li += '</ul>';
+										}
+										
+									} else {
+										li += '<a href="__GROUP__/Scences/index/sid/' + menu.id + '" target="frame_right_main" title="' + menu.scencename + '">';
+										li += '<span class="folded"></span>';
+										li += '<i class=""></i>&nbsp;';
+										li += '<font>' + menu.short_scencename + '</font>';
+										li += '<div class="item-tools"><i class="icon-edit" data-sid="' + menu.id + '"></i></div>';
+										li += '</a>';
+									}
+									
+									li += '</li>';
+									
+								});
+								
+								$('#'+menuID, window.parent.frame_left_menu.document).html(li);
+								
+								setMenuDef(menuID, menuDef);
+							}
+						});
+					}
+					
+				}
+				
+				$.each($('.menu-list > li', window.parent.frame_left_menu.document), function(i, o){
+					$(o).children('a').first().removeClass('hover').children('span').first().removeClass('un-folded').addClass('folded');
+					$(o).children('ul').first().attr('data-folded', 1).hide();
+				});	
+				$('.menu-list > li > a, .menu-list li li a', window.parent.frame_left_menu.document).removeClass('active');
+				$('.menu-list', window.parent.frame_left_menu.document).hide();
+				
+				if (menuID) {
+					setMenuDef(menuID, menuDef);
+					$('#'+menuID, window.parent.frame_left_menu.document).show();
+				}
+			}
+			
+			function setMenuDef(menuID, menuDef) {
+				var tl = 0;
+				
+				window.parent.frame_right_main.location.href = menuDef;
+				
+				$.each($('#' + menuID + ' > li > a', window.parent.frame_left_menu.document), function(i, o) {
+					if ($(o).attr('href') == menuDef) {
+						$(o).addClass('active');
+						tl = 1;
+					}
+				});
+				
+				if (!tl) {
+					$.each($('#' + menuID + ' ul li > a', window.parent.frame_left_menu.document), function(i, o) {
+						if ($(o).attr('href') == menuDef) {
+							$(o).addClass('active').parents('ul').first().show().siblings('a').first().addClass('active');
+							tl = 0;
+						}
+					});
+				}
+				
+				if (!tl) {
+					$.each($('#' + menuID + ' .icon-edit', window.parent.frame_left_menu.document), function(i, o) {
+						if ('__GROUP__/Scences/index/sid/' + $(o).attr('data-sid') == menuDef) {
+							$(o).parents('a').first().addClass('active');
+							tl = 0;
+						}
+					});
+				}
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,45 @@
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">数据内容</h5>
+		<div class="fr">
+			<div id="upArea"></div>
+			<div class="my-cover" style="display:none;"></div>
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+		</div>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<!-- <th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th> -->
+				<th class="text-center">#ID</th>
+				<th class="text-center" width="80%">文件</th>
+				<th class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="pluginsData['resData']">
+				<volist name="pluginsData['resData']" id="vo">
+					<tr>
+						<!-- <td><input type="checkbox" value="{$vo.id}"></td> -->
+						<td class="text-center">{$vo.id}</td>
+						<td class="img-show-td"><a href="/{$Think.config.upload_root_path}{$vo.filepath}">{$vo.filepath}</a></td>
+						<td style="text-align:center;">
+							<a class="oper view-video" href="__GROUP__/Ajaxhandle/resDownloadByFilePath/fname/{$vo.filepath}" title="点击下载"><i class="icon-download-alt"></i></a>
+							<a class="oper del" href="javascript:void(0);" data-did="{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+						</td>
+					</tr>
+				</volist>
+			</notempty>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>

@@ -1,0 +1,192 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<style>
+/* #uploadfyQueueList{position:absolute;top:0;left:114px;width:600px;}
+.uploadify-queue-item{margin:0;max-width:480px;padding:4px;}
+.uploadify-progress{margin-top:3px;} */
+a.del-gallery-item, a.set-as-cover{display:block;position:absolute;bottom:33px;right:8px;font-size:28px;color:#666;}
+a.set-as-cover{right:48px;}
+a.set-as-cover.is-cover{color:#16a085;}
+a.set-as-cover:hover{color:#1abc9c;}
+a.del-gallery-item:hover{color:#a94442;}
+.uploadify {display:inline-block;line-height:30px;}
+.store-info .btn-default, .store-info .btn-default:hover, .store-info .btn-default:active, .store-info .btn-default:visited{background-color:#fff;border-color:#ccc;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="">商场管理</a></li>
+	<li><a href="">商铺管理</a></li>
+	<li class="active">商铺相册</empty></li>
+</ol>
+
+<div class="store-info row" style="padding: 10px 20px 10px 36px;margin-bottom:10px;border-bottom:1px solid #eee;line-height:30px;">
+	<div class="col-md-2"><b>商铺名称</b>：{$store.sname}</div>
+	<div class="col-md-2"><b>名称拼音首字母</b>：{$store.pyshort}</div>
+	<div class="col-md-1"><b>所在楼层</b>：{$store.floor}</div>
+	<div class="col-md-4"><b>商铺地址</b>：{$store.adress}</div>
+	<div class="col-md-3 text-right">
+		<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+		<a href="__URL__/stores" type="button" class="btn btn-default btn-sm" style="padding:3px 10px 4px;font-size:14px;">返回商铺列表</a>
+	</div>
+</div>
+
+<div class="up-image-box" style="position:relative;width:auto;">
+	<div class="showimg clearfix" style="position:relative;width:auto;">
+		<volist name="gallery" id="vo">
+			<span>
+				<img src="/{$Think.config.upload_root_path}{$vo.filepath}?{:rand()}" />
+				<a href="javascript:void(0);" class="del-gallery-item" data-resid="{$vo.resourceid}" title="删除"><i class="icon-minus-sign"></i></a>
+				<eq name="vo.resourceid" value="$store.store_cover">
+				<a href="javascript:void(0);" class="set-as-cover is-cover" data-iscover="1" data-resid="{$vo.resourceid}" title="设置为商铺形象宣传封面图"><i class="icon-bookmark"></i></a>
+				<else/>
+				<a href="javascript:void(0);" class="set-as-cover" data-iscover="0" data-resid="{$vo.resourceid}" title="设置为商铺形象宣传封面图"><i class="icon-bookmark-empty"></i></a>
+				</eq>
+			</span>
+		</volist>
+	</div>
+</div>
+
+<div id="upArea"></div>
+<div class="my-cover" style="display:none;"></div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var tmpClassid = '{$store.classid|default=""}';
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/stores';
+	});
+	
+	$('.showimg span').hover(
+		function() { $(this).css({'background-color' : '#f5f5f5'}); },
+		function() { $(this).css({'background-color' : '#ffffff'}); }
+	);
+	
+	$('.showimg').delegate('a.del-gallery-item', 'click', function(){
+		var resourceId = $(this).attr('data-resid'),
+			isCover = $(this).siblings('.set-as-cover').first().attr('data-iscover')*1,
+			confirmInfo = '确认要删除该图片吗？';
+			that = this;
+		
+		if (isCover > 0) {
+			confirmInfo = '您要删除的图片已被设置为商铺形象宣传封面图，' + confirmInfo;
+		}
+			
+		$.kw.confirm(confirmInfo, function() {
+			$.post('__GROUP__/Ajaxhandle/delStoreGalleryItem', {storeclassid:tmpClassid, resourceid:resourceId}, function(data) {
+				if (data.stat*1) {
+					$(that).closest('span').remove();
+				} else {
+					$.kw.alert(data.msg);
+				}
+			}, 'json');
+		});
+	});
+	
+	$('.showimg').delegate('a.set-as-cover', 'click', function(){
+		var resourceId = $(this).attr('data-resid'),
+			isCover = $(this).attr('data-iscover')*1,
+			that = this;
+		
+		if (isCover > 0) {
+			return false;
+		}
+		
+		$.post('__GROUP__/Ajaxhandle/setStoreCover', {storeclassid:tmpClassid, resourceid:resourceId}, function(data) {
+			if (data.stat*1) {
+				$('.showimg').find('.set-as-cover').removeClass('is-cover').attr({'data-iscover' : '0'}).find('i').removeClass().addClass('icon-bookmark-empty');
+				$(that).addClass('is-cover').attr({'data-iscover' : '1'}).children('i').first().removeClass().addClass('icon-bookmark');
+			} else {
+				$.kw.alert(data.msg);
+			}
+		}, 'json');
+	});
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : true,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传商铺形象照',
+			'width' : 160,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'store', tmpClassID : tmpClassid, type : 'gallery'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'upArea',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess', 'onSelectError'],
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			/* 'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().append('<span><img src="' + re.url + '?' + Math.random() + '" /><a href="javascript:void(0);" class="del-gallery-item" data-resid="' + re.resourceid + '" title="删除"><i class="icon-minus-sign"></i></a></span>');
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			} */
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$(".showimg").first().append('<span><img src="' + re.url + '?' + Math.random() + '" /><a href="javascript:void(0);" class="del-gallery-item" data-resid="' + re.resourceid + '" title="删除"><i class="icon-minus-sign"></i></a><a href="javascript:void(0);" class="set-as-cover" data-iscover="0" data-resid="' + re.resourceid + '" title="设置为商铺形象宣传封面图"><i class="icon-bookmark-empty"></i></a></span>');
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p></div>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+				}
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').empty().hide();
+		hideFramesMasklayer();
+	});
+});
+</script>
+<include file="Public/footer" />

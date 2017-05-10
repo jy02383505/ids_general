@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+		<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<meta content="no-cache,must-revalidate" http-equiv="Cache-Control">
+		<meta content="no-cache" http-equiv="pragma">
+		<meta content="0" http-equiv="expires">
+		<meta content="telephone=no, address=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes"> 
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/mobile.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			.books-info{padding:0 0 0 24px;margin-top:28px;color:#f0f0f0;line-height:28px;}
+			.book-cover{display:block;width:240px;text-align:center;height:272px;background-color:rgba(255, 255, 255, 0.1);margin-right:18px;}
+			.book-cover span{height:100%;display:inline-block;vertical-align:middle;}
+			.book-cover img{max-height:240px;max-width:240px;vertical-align:middle;}
+			.book-info{width:982px;}
+
+			.book-lending{padding:0 0 0 24px;margin-top:28px;color:#f0f0f0;line-height:28px;}
+			.book-lending table{border-collapse:collapse;background-color:rgba(255, 255, 255, 0.1);width:100%;}
+			.book-lending table th{border:1px solid rgba(0, 0, 0, 0.1);border-bottom-width:2px;}
+			.book-lending table td{border:1px solid rgba(0, 0, 0, 0.1);padding:0 6px;}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="top-bar clearfix">
+				<span class="fl"><a href="{$Think.server.http_referer}" class="go-back">&lt;</a></span>
+				<span class="fl page-title">图书详情</span>
+				<span class="fr"><a href="__URL__/index" class="go-home">回到首页</a></span>
+			</div>
+			<div class="books-info">
+				<p style="text-align:center;margin-top:148px;color:#f0f0f0;font-size:18px;"><img src="__PUBLIC__/images/mobile/loading.gif" /></p>
+			</div>
+			<div class="book-lending"></div>
+		</div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			var isbn = "{$Think.get.isbn|default=''}",
+				ref = "{$Think.server.http_referer|default=''}",
+				api_unid = '227ff4f8-3551-4d19-03dc-b601080f4332';
+			
+			if (isbn == '') {
+				setMessage('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />网络异常，请求失败！');
+			} else {
+				
+				$.ajax({
+					url : '__URL__/getApiData',
+					type : 'post',
+					data : {type : 'new_book', apid : api_unid, isbn : isbn},
+					dataType : 'json',
+					timeout : 10000,
+					success: function(re) {
+						if (re.stat*1) {
+							var book = re.books.bookinfo, list_html = '';
+								list_html += '<div class="fl book-cover"><span></span><img src="'+ book.coverPath + '" /></div>';
+								list_html += '<div class="fl book-info">';
+								list_html += '<p><span>书名：</span>' + book.title + '（ISBN：' + book.isbn + '）</p>';
+								list_html += '<p><span>作者：</span>' + book.author + '</p>';
+								list_html += '<p><span>出版社：</span>' + book.publisher + '</p>';
+								list_html += '<p><span>出版日期：</span>' + book.pubdate + '</p>';
+								//list_html += '<p><span>价格：</span>' + book.price + '</p>';
+								list_html += '<p><span>页数：</span>' + book.pages + '</p>';
+								list_html += '<p><span>简介：</span></p>';
+								list_html += '<p>' + book.summary + '</p>';
+								list_html += '</div>';
+								list_html += '<div class="clearfix10">';
+								list_html += '</div>';
+							$('.books-info').first().html(list_html);
+							
+							if (ref.indexOf('searchResults') != -1 && !$.isEmptyObject(re.books.booklenging)) {
+								var list_html2 = '<h1 style="color:#f0f0f0;padding:10px 2px 0px;border-bottom:1px solid rgba(255,255,255,0.5);">&nbsp;<font style="font-size:12px;">》</font>馆藏信息</h1>';
+								list_html2 += '<table>';
+								list_html2 += '<tr>';
+								list_html2 += '<th>馆藏地</th>';
+								list_html2 += '<th>索书号</th>';
+								list_html2 += '<th>条形码</th>';
+								list_html2 += '<th>登录号</th>';
+								list_html2 += '<th>借阅类型</th>';
+								list_html2 += '<th>状态</th>';
+								list_html2 += '</tr>';
+								$.each(re.books.booklenging, function(i, item) {
+									list_html2 += '<tr>';
+									list_html2 += '<td>' + item.Collection + '</td>';
+									list_html2 += '<td>' + item.shelfNo + '</td>';
+									list_html2 += '<td>' + item.barCode + '</td>';
+									list_html2 += '<td>' + item.loginNo + '</td>';
+									list_html2 += '<td>' + item.type + '</td>';
+									list_html2 += '<td>' + item.status + '</td>';
+									list_html2 += '</tr>';
+								});
+								list_html2 += '</table>';
+								$('.book-lending').first().html(list_html2);
+							}
+						} else {
+							setMessage('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />' + re.msg);
+						}
+					},
+					error: function() {
+						setMessage('<img src="__PUBLIC__/images/mobile/notice.png" style="vertical-align:middle;margin-right:10px;" />网络异常，请求失败！');
+					}
+				});
+			
+			}
+			
+			function setMessage(contents) {
+				$('.books-info p').first().html(contents);
+			}
+		});
+		</script>
+	</body>
+</html>

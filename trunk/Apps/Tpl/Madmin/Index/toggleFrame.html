@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			body{background:#fff;}
+		</style>
+	</head>
+	<body>
+		<div class="my-cover" style="display:none;"></div>
+		<div id="toggle_slider"><a href="javascript:void(0);"></a></div>
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+			$('#toggle_slider').children('a').first().click(function() {
+				toggleMenu(this);
+			});
+
+			function toggleMenu(theObj) {
+				frmBody = parent.document.getElementById('frame_body');
+
+				if (frmBody.cols == "0,12,*") {
+					frmBody.cols="230,12,*";
+					$(theObj).css({'background-position':'-11px -8px'});
+				} else {
+					frmBody.cols="0,12,*";
+					$(theObj).css({'background-position':'-45px -8px'});
+				}
+			}
+		</script>
+	</body>
+</html>

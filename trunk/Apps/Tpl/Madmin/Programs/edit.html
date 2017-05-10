@@ -1,0 +1,131 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li class="active"><empty name="program.program_classid">新建节目<else />修改节目信息</empty></li>
+</ol>
+<form id="progForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="programName">节目名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="program_name" id="programName" value="{$program.program_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">默认节目</label>
+		<div class="col-sm-3">
+        	<assign name="is_default" value="{$program.is_default}" />
+        	<if condition="($program.is_default eq '')  OR empty($is_default) ">
+        	<label class="radio-inline"><input type="radio" name="is_default" id="is_default1" value="0" checked > 否</label>
+            <else />
+            <label class="radio-inline"><input type="radio" name="is_default" id="is_default1" value="0" > 否</label>
+            </if>
+            <label class="radio-inline"><input type="radio" name="is_default" id="is_default2" value="1" <eq name="program.is_default" value="1">checked</eq> > 是</label>			
+		</div>
+	</div>    
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="programNote">描述</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="program_note" id="programNote">{$program.program_note}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="program_classid" id="programClassid" value="{$program.program_classid}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	$(':reset').click(function() {
+		window.location.href = '__URL__/index';
+	});
+	
+	$('#progForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules :
+        {
+        	program_name : {  
+                required : true  
+            }, 
+        },  
+        messages :
+        {  
+        	program_name : {  
+                required : "节目名称必填."  
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			//form.submit();
+			return false;
+		}
+	});
+	
+	
+	$('#progForm').submit(function() {
+		var programName = $.trim($('#programName').val()),
+			programNote = $.trim($('#programNote').val()),
+			programClassid = $.trim($('#programClassid').val());
+		var is_default =  $('input[name="is_default"]:checked ').val();
+		
+		//alert(is_default);return;
+		
+		$.ajax({
+			type:'POST',
+			url:'__URL__/saveProgramData',
+			data:{'program_name' : programName, 'program_note' : programNote, 'program_classid' : programClassid,'is_default':is_default},
+			async:false,
+			dataType:'json',
+			beforeSend:function() {
+				
+			},
+			success:function(re) {
+				if (re.stat*1) {
+					var programTrees = window.parent.programTree;
+					var node_data = re.data,
+						newNode = {name:node_data.program_name, unid:node_data.program_classid, node_type:'program'};
+					if (programClassid == '') {
+						programTrees.addNodes(null, newNode);
+					} else {
+						var nodeObj = programTrees.getNodeByParam("unid", programClassid, null);
+						nodeObj.name = programName;
+						programTrees.updateNode(nodeObj);
+					}
+					
+					$.kw.alert('操作成功！', '', function() {
+						window.location.href = '__URL__/index';
+					});
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('操作失败！请重试……');
+			}
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

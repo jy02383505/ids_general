@@ -1,0 +1,360 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<ol class="breadcrumb">
+	<li><a href="__URL__/index">节目管理</a></li>
+	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+	<li><a href="__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}">栏目管理</a></li>
+	<li class="active"><empty name="$column.classid">新建栏目<else />修改栏目信息</empty></li>
+</ol>
+<form id="progForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属节目</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$program.program_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">所属栏目组</label>
+		<div class="col-sm-3">
+			<p class="form-control-static">{$group.dirgroup_name}</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">上级栏目</label>
+		<div class="col-sm-8">
+			<select class="form-control input-sm" name="parent_classid" id="parentClassId" style="width:360px">
+				<option value="">顶级栏目</option>
+				<volist name="columns" id="col">
+					<eq name="col.classid" value="$column.parent_classid">
+						<option value="{$col.classid}" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+					<else />
+						<in name="col.classid" value="$subColumns">
+							<option value="{$col.classid}" disabled>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+						<else />
+							<eq name="col.dir_type" value="$column.dir_type">
+								<eq name="col.has_arti" value="1">
+									<option value="{$col.classid}" disabled>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+								<else />
+									<option value="{$col.classid}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+								</eq>
+							<else />
+								<option value="{$col.classid}" disabled>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$col.space} {$col.dir_name}</option>
+							</eq>
+						</in>
+					</eq>
+				</volist>
+			</select>
+			<span style="position:absolute;top:7px;left:384px;"><i class="icon-exclamation-sign" style="font-size:;color:#666;"></i> 注意栏目类型必须一致.</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="dirName">栏目名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="dir_name" id="dirName" value="{$column.dir_name}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">栏目类型</label>
+		<div class="col-sm-3">
+			<select class="form-control input-sm" name="dir_type" id="columnType" style="width:200px;">
+				<option value="commdir">普通栏目</option>
+				<eq name="column.dir_type" value="spotdir">
+				<option value="spotdir" selected>热点地图</option>
+				<else />
+				<option value="spotdir">热点地图</option>
+				</eq>
+				
+				<if condition="$Think.config.app_type eq 'store'">
+				<eq name="column.dir_type" value="routedir">
+				<option value="routedir" selected>线路导航</option>
+				<else />
+				<option value="routedir">线路导航</option>
+				</eq>
+				
+				<eq name="column.dir_type" value="storedir">
+				<option value="storedir" selected>商铺展示</option>
+				<else />
+				<option value="storedir">商铺展示</option>
+				</eq>
+				</if>
+				
+				<eq name="column.dir_type" value="weatdir">
+				<option value="weatdir" selected>天气预报</option>
+				<else />
+				<option value="weatdir">天气预报</option>
+				</eq>
+				
+				<eq name="column.dir_type" value="newsdir">
+				<option value="newsdir" selected>图片新闻</option>
+				<else />
+				<option value="newsdir">图片新闻</option>
+				</eq>
+				
+				<eq name="column.dir_type" value="htaqdir">
+				<option value="htaqdir" selected>热点问题</option>
+				<else />
+				<option value="htaqdir">热点问题</option>
+				</eq>
+				
+				<eq name="column.dir_type" value="moviedir">
+				<option value="moviedir" selected>综合资讯</option>
+				<else />
+				<option value="moviedir">综合资讯</option>
+				</eq>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">栏目图标</label>
+		<div class="col-sm-3">
+			<div class="up-image-box up-ico" style="position:relative;">
+				<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"></span>
+				<div id="uploadfyQueueList"></div> 
+				<div class="showimg clearfix">
+					<notempty name="column.dir_ico">
+						<span><img src="/{$Think.config.upload_root_path}{$column.dir_ico_path}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="dir_ico" id="dirIco" class="gcovers" value="{$column.dir_ico}">
+			</div>
+		</div>
+	</div>
+	<php> if (in_array($column['dir_type'], array('routedir', 'spotdir'))) { </php>
+	<div class="form-group" id="upMap">
+	<php> } else { </php>
+	<div class="form-group" id="upMap" style="display:none">
+	<php> } </php>
+		<label class="col-sm-2 control-label" for="">上传地图</label>
+		<div class="col-sm-3">
+			<div class="up-image-box up-map" style="position:relative;">
+				<input id="file_upload_map" class="btn btn-default" name="file_upload" type="file">
+				<span style="position:absolute;top:8px;left:114px;"></span>
+				<div id="uploadfyQueueListMap"></div> 
+				<div class="showimg clearfix">
+					<notempty name="column.dir_map">
+						<span><img src="/{$Think.config.upload_root_path}{$column.dir_map_path}?{:rand()}" /></span>
+					</notempty>
+				</div>
+				<input type="hidden" name="dir_map" id="mapPic" value="{$column.dir_map}">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="dirRemark">描述</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="remark" id="dirRemark">{$column.remark}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="dirgroup_classid" id="dirgroupClassID" value="{$group.dirgroup_classid}">
+			<input type="hidden" name="column_classid" id="columnClassID" value="{$column.classid}">
+			<input type="hidden" name="temp_column_classid" id="tempColumnClassID" value="{$tempClassId}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var temp_classid = '{$tempClassId|default=""}';
+	
+	$(':reset').click(function() {
+		window.location.href = '__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}';
+	});
+	
+	$('#columnType').change(function() {
+		var type = $(this).val();
+		if (type == 'spotdir' || type == 'routedir') {
+			$('#upMap').show();
+		} else {
+			$('#upMap').hide();
+		}
+	});
+	
+	$('#progForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules :
+        {
+        	dir_name : {  
+                required : true  
+            }, 
+        },  
+        messages :
+        {  
+        	dir_name : {  
+                required : "栏目名称必填."  
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			//form.submit();
+			return false;
+		}
+	});
+	
+	$('#progForm').submit(function() {
+		var parentClassId = $.trim($('#parentClassId').val()),
+			dirName = $.trim($('#dirName').val()),
+			columnType = $.trim($('#columnType').val()),
+			dirIco = $.trim($('#dirIco').val()),
+			mapPic = $.trim($('#mapPic').val()),
+			dirRemark = $.trim($('#dirRemark').val()),
+			dirgroupClassID = $.trim($('#dirgroupClassID').val()),
+			columnClassID = $.trim($('#columnClassID').val()),
+			tempColumnClassID = $.trim($('#tempColumnClassID').val()),
+			programClassid = '{$program.program_classid}';
+		
+		$.ajax({
+			type:'POST',
+			url:'__URL__/saveColumnData',
+			data:{'parent_classid' : parentClassId, 'dir_name' : dirName, 'dir_type' : columnType, 'remark' : dirRemark, 'dir_ico' : dirIco, 'dir_map' : mapPic, 'dirgroup_classid' : dirgroupClassID, 'column_classid' : columnClassID, 'temp_column_classid' : tempColumnClassID},
+			async:false,
+			dataType:'json',
+			beforeSend:function() {
+				
+			},
+			success:function(re) {
+				if (re.stat*1) {
+					var programTrees = window.parent.programTree;
+					var node_data = re.data,
+						newNode = {name:node_data.dir_name, unid:node_data.classid, node_type:'column', program_id:programClassid, dirgroup_classid:dirgroupClassID},
+						pClassId = $.trim(node_data.parent_classid) == '' ? node_data.dirgroup_classid : node_data.parent_classid,
+						pnodeObj = programTrees.getNodeByParam("unid", pClassId, null);
+					if (columnClassID == '') {
+						programTrees.addNodes(pnodeObj, newNode);
+					} else {
+						var nodeObj = programTrees.getNodeByParam("unid", columnClassID, pnodeObj);
+						nodeObj.name = dirName;
+						programTrees.updateNode(nodeObj);
+					}
+					
+					$.kw.alert('操作成功！', '', function() {
+						var jumpURL = '__URL__/columns/pid/' + programClassid + '/id/' + dirgroupClassID;
+						if (node_data.parent_classid != '') {
+							jumpURL += '/cid/' + node_data.parent_classid;
+						}
+						window.location.href = jumpURL;
+					});
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('操作失败！请重试……');
+			}
+		});
+	});
+	
+	// Uploadify 批量上传
+	var program_classid = '{$program.program_classid|default=""}',
+		column_classid = '{$column.classid|default=""}';
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传图片',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'column', 'progClassID' : program_classid, coluClassID : temp_classid, type : 'ico'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueList',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".up-ico .showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                $(".gcovers").first().val(re.resourceid);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload_map').uploadify({
+			'debug' : false,
+			'multi' : false,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传地图',
+			'width' : 100,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'column', 'progClassID' : program_classid, coluClassID : temp_classid, type : 'map'},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'uploadfyQueueListMap',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onUploadSuccess', 'onSelectError'],
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".up-map .showimg").first().html('<span><img src="' + re.url + '?' + Math.random() + '" /></span>');
+	                $("#mapPic").first().val(re.resourceid);
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			}
+		});
+	}, 10);
+});
+</script>
+<include file="Public/footer" />

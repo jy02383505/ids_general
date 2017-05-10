@@ -1,0 +1,474 @@
+<include file="Public/header" />
+
+<style>
+.ul_play {padding:0px 0 0 0;background-color:#f2f2f2;}
+.ul_play li.header{padding:10px 10px 10px 10px;height:40px;}
+
+.ul_dateplan {padding:0px 10px 0 10px;background-color:#d7d7d7;}
+.ul_dateplan li{height:40px;line-height:40px;margin:0;background-color:#d7d7d7;}
+.ul_dateplan li.line{height:40px;line-height:40px;border-top:1px #e1e1e1 solid;margin:0;background-color:#d7d7d7;font-size:14px;}
+.ul_dateplan li div.td1{float:left;width:160px;height:40px;line-height:40px;font-size:14px;font-weight:bold;}
+.ul_dateplan li div.td2{float:left;width:160px;height:40px;line-height:40px;font-size:14px;}
+.ul_dateplan li div.td3{float:left;width:500px;height:40px;line-height:40px;font-size:14px;}
+.ul_dateplan li div.td4{float:left;width:300px;height:40px;line-height:40px;font-size:14px;}
+.ul_dateplan li.line_empty{border-top:1px #e1e1e1 solid;}/*无记录*/
+</style>
+<ol class="breadcrumb">
+	<li><a href="{:U('Programs/index')}">节目管理</a></li>
+    <li><a href="{:U('Programs/playPlans')}">播放计划管理</a></li>
+	<li class="active">
+        <switch name="ACTION_NAME" >
+        <case value="addDayArranges" break="1">添加</case>
+        <case value="editDayArranges">修改</case>
+        <default />添加
+        </switch>日安排
+    
+    </li>
+</ol>
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeName">日安排名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="title" id="title" value="{$datas.Name}">
+		</div>
+	</div>
+         
+    <div class="form-group">
+		<label class="col-sm-2 control-label" for="">分辨率</label>
+        <div class="col-sm-1">
+        	<input class="form-control input-sm" type="text" name="resolution" id="resolution" value="{$datas.Resolution}"  placeholder='如：1024*768'>
+        </div>
+		<div class="col-sm-1">
+            <select class="form-control input-sm" name="resolution_sel" id="resolution_sel">
+                <option value="">--选择输入--</option>
+                <volist name="res" id="vo">
+                    <eq name="vo" value="$datas.Resolution">
+                        <option value="{$vo}" >{$vo}</option>
+                    <else/>
+                        <option value="{$vo}">{$vo}</option>
+                    </eq>
+                </volist>
+             </select>
+		</div>
+	</div> 
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label " for="">模板类型</label>
+		<div class="col-sm-2">
+        	<in name="datas.TplType" value="x86,azt,azad">
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType1" value="x86" <eq name="datas.TplType" value="x86">checked</eq> > x86</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType2" value="azt" <eq name="datas.TplType" value="azt">checked</eq> > azt</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType3" value="azad" <eq name="datas.TplType" value="azad">checked</eq> > azad</label>
+            <else/>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType1" value="x86" checked > x86</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType2" value="azt" > azt</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType3" value="azad" > azad</label>            
+            </in>
+		</div>
+        <div class="col-sm-2"><span class="help-block"></span></div>
+	</div>  
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="dayArrangeId" id="dayArrangeId" value="{$datas.Id}">
+			<button type="button" class="btn btn-info btn-sm" id="btn_submit">提交</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">返回日安排列表</button>
+		</div>
+	</div>  
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">日安排详细</label>
+		<div class="col-sm-8">
+			<ul class="ul_play">
+            	<li class="header">
+                    <!--<button  type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#newRecModal">新增时段</button>-->
+                    <button  type="button" class="btn btn-info btn-xs pull-right" id="newRec" <eq name="ACTION_NAME" value="addDayArranges"> disabled="disabled"</eq> >新增时段</button>
+                </li>
+                <li class="body">
+                	<ul class="ul_dateplan" >
+                    	<li>
+                        	<div class="td1"><B>开始时间</B></div>
+                            <div class="td2 hide"><B>结束时间</B></div>
+                            <div class="td3"><B>节目模板</B></div>
+                            <div class="td4 text-center"><B>操作</B></div>
+                        </li>
+                        <empty name="datas_detail">
+                        <li	class="line_empty">无记录</li>
+                        </empty>
+						<volist name="datas_detail" id="vo">
+                    	<li	class="line">
+                        	<div class="td1">{$vo.BeginTime}</div>
+                            <div class="td2 hide">{$vo.EndTime}</div>
+                            <div class="td3">{$vo.tplname}</div>
+                            <div class="td4 text-center">
+                                <a class="oper del" style="font-size:14px;" href="javascript:void(0);" data-url="__URL__/delDayArrangeDetails/dayArrangeId/{$id}/dayArrangeDetailId/{$vo.Id}/" title="删除" data-detail-id={$vo.Id} ><i class="icon-trash"></i></a>
+                            </div>
+                        </li>
+                        </volist>
+                    </ul>
+                </li>
+            </ul>
+            
+		</div>
+	</div>
+   
+  </form>
+    
+
+
+<form id="editForm" class="form-horizontal" role="form" >
+<!-------新增时段 模态对话框 modal-lg modal-sm---------->
+<div class="modal fade " id="newRecModal" draggable='true'>
+    <div class="modal-dialog ">
+    	<div class="modal-content">
+    		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">新增时段</h4>
+			</div>
+			<div class="modal-body" >
+                	
+					<div class="form-group">
+                    	<label class="col-sm-2 control-label">开始时间</label>
+                        <div class="col-sm-3">
+                            <select class="form-control " name="hour" id="hour_s" >
+                                <option value="">时</option>
+                                <for start="0" end="24">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" <eq name="h" value="$istr">selected</eq>  >  {$istr} 时 </option>
+                                </for>                  
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control input-sm" name="minute" id="minute_s">
+                                <option value="">分</option>
+                                <for start="0" end="60">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" <eq name="m" value="$istr">selected</eq>  >  {$istr} 分 </option>
+                                </for>   
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control input-sm" name="second" id="second_s">
+                                <option value="">秒</option>
+                                <for start="0" end="60">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" <eq name="s" value="$istr">selected</eq> >  {$istr} 秒 </option>
+                                </for>   
+                            </select>
+                        </div>                        
+					</div>
+                    
+					<div class="form-group hide">
+                    	<label class="col-sm-2 control-label">结束时间</label>
+                        <div class="col-sm-3">
+                            <select class="form-control " name="hour" id="hour_e" >
+                                <option value="">时</option>
+                                <for start="0" end="24">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" >  {$istr} 时 </option>
+                                </for>                  
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control input-sm" name="minute" id="minute_e">
+                                <option value="">分</option>
+                                <for start="0" end="60">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" >  {$istr} 分 </option>
+                                </for>   
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control input-sm" name="second" id="second_e">
+                                <option value="">秒</option>
+                                <for start="0" end="60">
+                                <?php
+                                    if ($i < 10){
+                                        $istr = "0".$i;
+                                    }else{
+                                        $istr = $i;
+                                    }
+                                ?>
+                                <option value="{$istr}" >  {$istr} 秒 </option>
+                                </for>   
+                            </select>
+                        </div>                        
+					</div>
+                    
+                    <div class="form-group">
+                    	<label class="col-sm-2 control-label">节目</label>
+                        <div class="col-md-8">
+                            <select class="form-control input-sm" name="tplclassid" id="tplclassid">
+                                <option value="">--请选择--</option>
+                                <volist name="tpls" id="vo">
+                                <option value="{$vo.tplclassid}" <eq name="tplclassid" value="$vo.tplclassid">selected</eq> >{$vo.tplname}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                <div style="clear:both;width:100%;height:1px;"></div>
+			</div>
+			<div class="modal-footer">
+            	<label class="col-sm-10 control-label" for=""></label>
+                <div class="col-md-2">
+				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_ok">确定</button>
+                </div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-------新增时段 模态对话框---------->
+</form>
+
+
+
+
+<include file="Public/jsLoader" />
+
+
+
+<script>
+$(document).ready(function() {
+	var url = '__URL__/dayArranges';
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = url;
+	});	
+	
+	//提交	
+	$('#btn_submit').click(function(){
+		var title = $("#title").val();
+		var id = $("#dayArrangeId").val();
+		var tplType = '';				//模板类型
+		var resolution = '';			//分辨率
+		if (id == ''){
+			id = 0;
+		}
+
+		//获取iCheck单选按钮的选中项的值		
+		$("input[name='tplType']:radio").each(function(){
+			if(true == $(this).is(':checked')){
+				tplType = $(this).val();
+				return;
+			}
+		});
+		
+		//分辨率
+		resolution = $("#resolution").val();
+		//alert("from=ajax&id="+id+"&title="+title+"&resolution="+resolution+"&tplType="+tplType+"&rnd="+Math.random());
+		if (title == ''){
+			$.kw.alert("名称必须填写");
+			$("#title").focus();
+			return;
+		}	
+		if (resolution == ''){
+			$.kw.alert("分辩率必须填写");
+			$("#resolution").focus();
+			return;
+		}
+		
+		//提交日安排
+		$.ajax({
+			url:'__URL__/saveDayArranges',
+			type:'post',
+			data:"from=ajax&id="+id+"&title="+title+"&resolution="+resolution+"&tplType="+tplType+"&rnd="+Math.random(),
+			async:true,//false为同步
+			dataType:'json',
+			success:function(re) {
+				if (re.stat * 1 > 0){
+					//alert(re.msg);
+					$.kw.alert(re.msg);
+				//	$("#dayArrangeId").val(re.data);//设置隐藏表单域
+				//	$("#newRec").removeAttr("disabled");//使新增时段按钮可用
+					
+					//新增成功的话，跳到修改地址，否则刷新后会是新增界面
+					if (id == 0 && re.data > 0){
+						var editUrl = '__URL__/editDayArranges/id/'+re.data;
+						window.location.href = editUrl;
+					}
+					
+					
+				}else{
+					$.kw.alert(re.data);//失败提示	
+					
+					//显示一会儿后清空提示
+					/*
+					setTimeout(function(){
+						$("#lession_time_dialog_message").html("");
+					},1000);*/					
+				}
+
+			},
+			error:function() {
+				alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		}); 
+	});		
+	
+	//选择输入分辨率	
+	$("#resolution_sel").change(function(){
+		var resolution_sel = $(this).val();
+		//alert(resolution_sel);
+		var resolution = $("#resolution").val();
+		//alert(resolution);
+		if (resolution != ''){
+			$.kw.confirm('确认更改分辨率？', function() {
+				$("#resolution").val(resolution_sel);
+			});
+		} else{
+			//直接将sel的值填入文本框，不再提示
+			$("#resolution").val(resolution_sel);
+		}
+		
+	});
+	
+	
+	$('#newRec').click(function(){
+		$('#newRecModal').modal({ keyboard: false });   // initialized with no keyboard
+		$('#newRecModal').modal('show');                // 初始化后立即调用 show 方法
+		
+	});	
+	
+	//对话框　确定按钮
+	$('#btn_ok').click(function(){
+		var hour_s = $("#hour_s").val();
+		var minute_s = $("#minute_s").val();
+		var second_s = $("#second_s").val();
+		
+		var hour_e = $("#hour_e").val();
+		var minute_e = $("#minute_e").val();
+		var second_e = $("#second_e").val();
+		
+		if (hour_s == '' || minute_s == '' || second_s == ''){
+			alert("开始时间设置不完整");
+			return;
+		}
+		
+	//	if (hour_e == '' || minute_e == '' || second_e == ''){
+	//		alert("结束时间设置不完整");
+	//		return;
+	//	}
+		
+		var start = hour_s + ":" + minute_s + ":" + second_s;
+	//	var end   = hour_e + ":" + minute_e + ":" + second_e;
+		
+		var tplclassid  = $("#tplclassid").val();//模板classid
+		
+		var id = $("#dayArrangeId").val();
+		if (id == 0 || start == '' || tplclassid == ''){
+			return;
+		}
+		
+		//alert(start);
+		//ajax提交
+		$.ajax({
+			url:'__URL__/addDayArrangeDetails',
+			type:'post',
+			data:"dayArrangeId="+id+"&start="+start+"&tplclassid="+tplclassid+"&rnd="+Math.random(),
+			async:true,//false为同步
+			dataType:'json',
+			success:function(re) {
+				if (re.stat * 1 > 0){
+					$.kw.alert(re.msg);
+					window.location.reload();
+				}else{
+					$.kw.alert(re.msg);//失败提示	
+				}
+
+			},
+			error:function() {
+				alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		}); 
+		
+	});	
+	
+	
+	//删除日安排详细
+	$('.del').click(function(){
+		var tmp = $(this);
+		var dayArrangeId = $("#dayArrangeId").val();//日安排Id
+		var dayArrangeDetailId = $(this).attr("data-detail-id");//日安排详细Id
+		//alert(dayArrangeId);alert(dayArrangeDetailId);
+		
+		if (dayArrangeDetailId * dayArrangeId == 0){
+			$.kw.alert('获取参数错误');
+			return;
+		}
+		
+		$.kw.confirm('确认要删除所选择的记录吗？', function() {
+			//var currid = tmp.parent().parent().attr("attr-data-id");
+			
+			//alert("ID=" + currid);
+			$.ajax({
+				url:'__URL__/delDayArrangeDetails',
+				type:'post',
+				data:"dayArrangeId="+dayArrangeId+"&dayArrangeDetailId="+dayArrangeDetailId+"&rnd="+Math.random(),
+				async:true,//false为同步
+				dataType:'json',
+				success:function(re) {
+					if (re.stat * 1 > 0){
+						//alert(re.msg);
+						//alert(re.data);
+						window.location.reload();
+					}else{
+						alert(re.msg);
+						//alert(re.data);//失败提示	
+					}
+				},
+				error:function() {
+					alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			}); 			
+		});
+
+		
+	});		
+	
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<include file="Public/footer" />

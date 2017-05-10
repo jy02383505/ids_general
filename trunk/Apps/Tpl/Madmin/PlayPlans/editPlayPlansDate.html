@@ -1,0 +1,597 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="__PUBLIC__/script/jquery/jquery.min.js"></script>
+
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+<style>
+.ul_play {padding:10px 0 0 0;background-color:#f2f2f2;}
+.ul_play li.header{padding:0 10px 0 10px;height:30px;line-height:30px;}
+.ul_play li.line_empty{height:30px;line-height:30px;padding:0 0 0 10px;}/*无记录*/
+
+.ul_dateplan {padding:0px 10px 0 10px;background-color:#d7d7d7;}
+.ul_dateplan li{height:30px;line-height:30px;margin:0;background-color:#d7d7d7;}
+.ul_dateplan li.line{height:30px;line-height:30px;border-top:1px #e1e1e1 solid;margin:0;background-color:#d7d7d7;}
+.ul_dateplan li.ul_dateplan_name{height:30px;line-height:30px;font-weight:bold;font-size:14px;border-bottom:1px #e1e1e1 solid;background-color:#d7d7d7;}
+.ul_dateplan li div.td1{float:left;width:160px;height:30px;line-height:30px;}
+.ul_dateplan li div.td2{float:left;width:160px;height:30px;line-height:30px;}
+.ul_dateplan li div.td3{float:left;width:300px;height:30px;line-height:30px;}
+
+</style>
+
+<script type="text/javascript">
+
+</script>
+
+
+<ol class="breadcrumb">
+	<li><a href="{:U('Programs/index')}">节目管理</a></li>
+    <li><a href="{:U('Programs/playPlans')}">播放计划管理</a></li>
+	<li class="active">
+        <switch name="ACTION_NAME" >
+        <case value="addPlayPlans" break="1">添加</case>
+        <case value="editPlayPlans">修改</case>
+        <default />添加
+        </switch>日播放计划
+    
+    </li>
+</ol>
+<eq name="ACTION_NAME" value="editPlayPlans">
+    <div class="alert alert-warning alert-dismissible fade in hide notic_resolution" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+      <strong>注意：</strong> 更改分辨率将会导致已有（日安排）被清空.
+    </div>
+  
+    <div class="alert alert-warning alert-dismissible fade in hide notic_tpltype" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+      <strong>注意：</strong> 更改模板类型将会导致已有计划内容（日安排）被清空.
+    </div>  
+</eq>
+
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<input type="hidden" name="planType" value="date"><!--日播放计划-->
+    <input type="hidden" name="playPlanId" id="playPlanId" value="{$datas_plan.Id}">   
+    <input type="hidden" name="old_resolution" id="old_resolution" value="{$datas_plan.Resolution}"><!--原分辨率-->
+    <input type="hidden" name="old_tplType" id="old_tplType" value="{$datas_plan.TplType}"><!--原模板类型-->
+	
+
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="storeName">播放计划名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="title" id="title" value="{$datas_plan.Name}">
+		</div>
+        
+	</div>
+         
+    <div class="form-group">
+		<label class="col-sm-2 control-label" for="">分辨率</label>
+        <div class="col-sm-1">
+        	<input class="form-control input-sm resolution" type="text" name="resolution" id="resolution" value="{$datas_plan.Resolution}"  placeholder='如：1024*768'>
+        </div>
+		<div class="col-sm-1">
+            <select class="form-control input-sm resolution_sel" name="resolution_sel" id="resolution_sel">
+                <option value="">--选择输入--</option>
+                <volist name="res" id="vo">
+                    <eq name="vo" value="$datas_plan.Resolution">
+                        <option value="{$vo}" >{$vo}</option>
+                    <else/>
+                        <option value="{$vo}">{$vo}</option>
+                    </eq>
+                </volist>
+             </select>
+		</div>
+		<div class="col-sm-5 " >
+			<p class="form-control-static">更改分辨率将会导致计划内容被清空</p>
+		</div>
+	</div>  
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label " for="">模板类型</label>
+		<div class="col-sm-3">
+        	<in name="datas_plan.TplType" value="x86,azt,azad">
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType1" value="x86" <eq name="datas_plan.TplType" value="x86">checked</eq> > x86触摸机</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType2" value="azt" <eq name="datas_plan.TplType" value="azt">checked</eq> > 安卓触摸机</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType3" value="azad" <eq name="datas_plan.TplType" value="azad">checked</eq> > 安卓广告机</label>
+            <else/>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType1" value="x86" checked > x86触摸机</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType2" value="azt" > 安卓触摸机</label>
+                <label class="radio-inline"><input type="radio" name="tplType" id="tplType3" value="azad" > 安卓广告机</label>            
+            </in>
+		</div>
+ 		<div class="col-sm-5 " >
+			<p class="form-control-static">更改模板类型将会导致计划内容被清空</p>
+		</div>       
+        <div class="col-sm-2"><span class="help-block"></span></div>
+	</div> 
+    
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="sex">计划类型</label>
+       	<label  class="col-sm-10 control-label" style="text-align:left;">日计划</label>
+	</div>  
+ 
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-primary  btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">返回播放计划列表</button>
+		</div>
+	</div> 
+
+       
+	<div class="form-group <eq name="ACTION_NAME" value="addPlayPlans">hide</eq>" style="margin-top:20px;">
+		<label class="col-sm-2 control-label" for="storeNote">计划内容</label>
+
+		<div class="col-sm-8">
+        	<div style="height:30px;">
+            	<div class="col-sm-8 ">
+                    
+                </div>
+               
+            	<button type="button" class="btn btn-primary btn-sm pull-right" <eq name="ACTION_NAME" value="addPlayPlans">disabled </eq> id="btn-new">新增日期</button>
+            	<label class="col-sm-2 control-label pull-right hide"><input type="checkbox" value="1" id="expand" checked>全部展开</label>
+            </div>
+            
+            <empty name="datas_date">
+            <ul class="ul_play">
+            <li	class="line_empty">无记录</li>
+            </ul>
+            </empty>
+            
+ 			<div class="data-list">           
+			<table class="table table-hover list-tbl">
+			<thead>
+            <tbody>
+                <volist name="datas_date" id="vo"> 
+                <tr>
+                    <td width="36"><input type="checkbox" value="{$vo.Id}"></td>
+                    <td width="200"><span class="glyphicon glyphicon-calendar"></span><span style="padding:0 10px 0 10px;">{$vo.Date}</span></td>
+                    <td >
+                    <button  type="button" class="btn btn-link btn-cfg" style="margin-left:20px;" data-date="{$vo.Date}" data-id="{$vo.Id}" data-dayArrangeId="{$vo.DayArrangeId}"><i class="icon-pencil"></i>选择日安排</button>
+                    <button  type="button" class="btn btn-link del" style="margin-left:20px;" href="__URL__/editPlayPlans/planType/date/id/{$vo.Id}" data-id={$vo.Id} title="删除"><i class="icon-trash">删除</i></button>
+                    <span style="margin-left:60px;">　<B>{$vo.dayArrangeName}</B>
+                    </td>
+                    <td width="100">
+                    <button  type="button" class="btn btn-link btn-show-detail pull-right"  data-id="{$vo.Id}"><i class="glyphicon glyphicon-paperclip"></i>详细</span></button>
+                    </td>
+                </tr>
+                <div class=" hide" id="detail-{$vo.Id}">
+                	<ul class="ul_dateplan" >
+                    	<li class="ul_dateplan_name ">
+                        	<span class="glyphicon glyphicon-chevron-up "></span>
+                        	<span>{$vo.dayArrangeName}</span>
+                        </li>
+                    	<li>
+                        	<div class="td1">开始时间</div>
+                            <div class="td2 hide">结束时间</div>
+                            <div class="td3">播放</div>
+                        </li>
+                        
+                    	<volist name="vo.datas_detail" id="voo">
+                    	<li	class="line">
+                        	<div class="td1">{$voo.BeginTime}</div>
+                            <div class="td2 hide">{$voo.EndTime}</div>
+                            <div class="td3" data-tplclassid="{$voo.TplClassId}">{$voo.tplName}</div>
+                        </li>
+                    	</volist>
+                    </ul>
+                </div>
+ 			</volist>
+            <tbody>
+            </table>
+            <table class="table">
+                <tr>
+                    <td>
+                        <input type="checkbox" class="select-all" title="全选/全不选">
+                        <button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button>
+                    </td>
+                    <td class="page-box text-right" width="80%">{$page} </td>
+                </tr>
+            </table>
+ 			</div>
+            
+		</div>
+	</div>
+
+  
+    
+
+</form>
+
+<form id="showDetailForm" class="form-horizontal" role="form" >
+<!-------显示详细 模态对话框 modal-lg modal-sm---------->
+<div class="modal fade bs-example-modal-lg" id="show-detail" draggable='true'>
+    <div class="modal-dialog " style="min-width:800px">
+    	<div class="modal-content">
+    		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">日安排详细</h4>
+			</div>
+			<div class="modal-body"  id="detail-content">
+				<!--此处将显示日详细内容-->
+			</div>
+			<div class="modal-footer">
+            	<label class="col-sm-5 control-label" for=""></label>
+                <div class="col-md-7">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-------显示详细 模态对话框---------->
+</form>
+
+
+
+<script language="javascript" type="text/javascript" src="__PUBLIC__/My97DatePicker/WdatePicker.js"></script>
+<form id="editForm" class="form-horizontal" role="form" >
+<!-------新增时段 模态对话框 modal-lg modal-sm---------->
+<div class="modal fade " id="newRecModal" draggable='true'>
+    <div class="modal-dialog " style="min-width:800px;">
+    	<div class="modal-content">
+    		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">新增日计划</h4>
+			</div>
+			<div class="modal-body" >
+            	<div class="form-group">
+                	<label class="col-sm-2 control-label">日期</label>
+                	<div class="col-md-3">
+                        <input class="form-control form_datetime1" name="date" id="thedate" type="text" readonly placeholder="开始日期" style="width:160px;" onClick="WdatePicker({onpicking:function(dp){$('#enddate').val( dp.cal.getNewDateStr());}})" value="{$defaultDate}" >
+                    </div>
+                    <div class="col-md-1" style="width:20px;margin-left:0px;padding-left:0px;"><p class="form-control-static">至</p></div>
+                 	<div class="col-md-3">
+                        <input type="text" class="form-control form_datetime2 enddate" name="enddate" id="enddate" readonly value="{$defaultDate}" style="width:160px;"  onClick="WdatePicker()" placeholder='截止日期'>
+                    </div>  
+                    <div class="col-sm-1">
+                    	<p class="form-control-static" style="margin-left:0px;padding-left:0px;"></p>
+                    </div>                 
+            	</div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">日安排</label>
+
+                    <div class="col-md-8">
+                        <select class="form-control input-sm" name="dayArrangeId" id="dayArrangeId">
+                            <option value="">--请选择--</option>
+                            <volist name="datas_day" id="vo">
+                            <option value="{$vo.Id}" <eq name="defaultDayArrangeId" value="$vo.Id">selected</eq>  >{$vo.Name}-{$vo.Resolution}-{$vo.TplType}</option>
+                            </volist>
+                        </select>                      
+                </div>
+                <div style="clear:both;width:100%;height:1px;"></div>
+			</div>
+			<div class="modal-footer">
+            	<div class="col-sm-5 control-label" for=""><p class="form-control-static">如仅设置一天，开始、截止日期请保持相同</p></div>
+                <div class="col-md-7">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_ok">确定保存</button>
+                </div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-------新增时段 模态对话框---------->
+</form>
+
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/ueditor.all.js"> </script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var tmpClassid = '{$unid|default=""}';
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/playPlans';
+	});
+
+});
+</script>
+
+
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	// 判断分辨率
+	jQuery.validator.addMethod("isResolution", function(value, element) {   
+		var d = /([0-9]*)\*([0-9]*)/;
+		return this.optional(element) || (d.test(value));
+	}, "请正确填写正确的分辨率");
+		
+	$('#editForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+        	title : {  
+                required : true,
+            },
+        	resolution : {  
+				required : true,
+				isResolution:true,
+            },
+        },  
+        messages : {
+        	title : {  
+                required : "名称必填.",
+            },
+        	resolution : {  
+                required : "分辨率必填.",
+				isResolution:"分辨率格式有误",
+            },
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+
+
+
+<script>
+$(document).ready(function() {
+	var dotype = "";//新增还是修改 add or edit
+	var doid = 0;//当前操作的记录Id
+	
+  	//分辨率改变时，显示提示
+	$(".resolution").change(function(){
+		$(".notic_resolution").removeClass("hide");
+	});
+	//下拉选择设置分辨率，改变时显示提示
+	$(".resolution_sel").change(function(){
+		$(".notic_resolution").removeClass("hide");
+	});
+	
+	//模板类型改变时，显示提示
+	$("input[name=tplType]").on('ifChanged', function(event){
+		$(".notic_tpltype").removeClass("hide");
+	});	
+	
+	
+	
+	//展开或关闭各星期的日详细
+	$('#expand').on('ifChecked', function(event){
+		var val = $(this).val();
+		$(".ul_dateplan").toggle();
+	});
+	//END
+	
+	
+	//展开或关闭各星期的日详细
+	$('#expand').on('ifUnchecked', function(event){
+		var val = $(this).val();
+		$(".ul_dateplan").toggle();
+	});
+	//END
+	
+	//选择输入分辨率	
+	$("#resolution_sel").change(function(){
+		var resolution_sel = $(this).val();
+		//alert(resolution_sel);
+		var resolution = $("#resolution").val();
+		//alert(resolution);
+		if (resolution != ''){
+			$.kw.confirm('确认更改分辨率？', function() {
+				$("#resolution").val(resolution_sel);
+			});
+		} else{
+			//直接将sel的值填入文本框，不再提示
+			$("#resolution").val(resolution_sel);
+		}
+		
+	});
+
+	//修改日计划
+	$('.btn-cfg').click(function(){
+		dotype = 'edit';//修改
+		
+		doid = $(this).attr("data-id");
+		var date = $(this).attr("data-date");
+		var dayArrangeId = $(this).attr("data-dayArrangeId");
+		
+		//alert(doid + ' ' + date + ' ' + dayArrangeId);
+		
+		//将弹窗中的值预设
+		$("#thedate").val(date);
+		$("#dayArrangeId").val(dayArrangeId);//预先选中select的某一项
+		
+		$('#newRecModal').modal({ keyboard: false });   // initialized with no keyboard
+		$('#newRecModal').modal('show');                // 初始化后立即调用 show 方法
+	});	
+
+	//新增日计划		
+	$('#btn-new').click(function(){
+		dotype = 'add';//新增
+		
+		$('#newRecModal').modal({ keyboard: false });   // initialized with no keyboard
+		$('#newRecModal').modal('show');                // 初始化后立即调用 show 方法
+		
+	});	
+	
+	//对话框　确定按钮
+	$('#btn_ok').click(function(){
+		var playPlanId = $("#playPlanId").val();
+		
+		//获取到日期和日安排Id
+		var date = $("#thedate").val();//开始日期
+		var enddate = $("#enddate").val();//截止日期
+		var dayArrangeId = $("#dayArrangeId").val();
+		
+		if (date == ''){
+			$.kw.alert("日期必须指定");
+			return;	
+		}
+		if (dayArrangeId == 0){
+			$.kw.alert("日安排必须指定");
+			return;	
+		}	
+		
+		
+	//	alert(playPlanId + ' ' +date + ' ' + dayArrangeId);
+
+	//	alert(dotype + '' + doid);
+
+		//保存选择的日安排Id到周计划表
+		$.ajax({
+			url:'__URL__/addPlayPlanDateRecord',
+			type:'post',
+			data:"dotype=" + dotype +"&playPlanId="+playPlanId + "&dayArrangeId=" + dayArrangeId + '&doid=' + doid + "&date=" + date + "&enddate=" + enddate + "&rnd="+Math.random(),
+			async:true,//false为同步
+			dataType:'json',
+			success:function(re) {
+				if (re.stat * 1 > 0){
+					$.kw.alert(re.msg);
+					window.location.reload();
+				}else{
+					$.kw.alert(re.msg);//失败提示	
+				}
+			},
+			error:function() {
+				alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		}); 		
+	});		
+	
+	//删除日计划的某一天
+	/*
+	$('.del').click(function(){
+		var tmp = $(this);
+		var dayPlayPlanId = $(this).attr("data-id");
+		var playPlanId = $("#playPlanId").val();
+		
+		if (dayPlayPlanId * playPlanId == 0){
+			$.kw.alert('获取参数错误');
+			return;
+		}
+		
+		$.kw.confirm('确认要删除所选择的记录吗？', function() {
+			//var currid = tmp.parent().parent().attr("attr-data-id");
+			
+			//alert("ID=" + currid);
+			$.ajax({
+				url:'__URL__/delDayPlayPlan',
+				type:'post',
+				data:"playPlanId="+playPlanId+"&dayPlayPlanId="+dayPlayPlanId+"&rnd="+Math.random(),
+				async:true,//false为同步
+				dataType:'json',
+				success:function(re) {
+					if (re.stat * 1 > 0){
+						$.kw.alert(re.msg);
+						//alert(re.data);
+						window.location.reload();
+					}else{
+						alert(re.msg);
+						//alert(re.data);//失败提示	
+					}
+				},
+				error:function() {
+					alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			}); 			
+		});
+
+		
+	});		
+	*/
+	
+	$('.del').click(function() {
+		var nid = $(this).attr('data-id')*1;
+		del(nid);
+	});
+	
+	$('.multi-del').click(function() {
+		var checkedItems = $('.list-tbl tbody').first().find(':checkbox:checked'),
+			nids = new Array();
+		if (checkedItems.size() <= 0) {
+			$.kw.alert('没有选择操作对象！');
+			return false;
+		} else {
+			$.each(checkedItems, function (i, o) {
+				nids.push($(o).val()*1);
+			});
+			del(nids.join(','));
+		}
+	});
+	
+	function del(nids) {
+		//alert(nids);return;
+		$.kw.confirm('确定要删除吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__URL__/delDayPlayPlan',
+				data:{'nids' : nids},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请刷新页面后重试……');
+				}
+			});
+		});
+	}
+	
+	
+	//查看详细，显示日安排详细
+	$('.btn-show-detail').click(function(){	
+		var id = $(this).attr("data-id");
+		var idstr = "#detail-"+id;
+		
+		var cont = $(idstr).html();
+		$("#detail-content").html(cont);
+//		alert(cont);
+		
+//		alert(id);
+		$('#show-detail').modal({ keyboard: false });   // initialized with no keyboard
+		$('#show-detail').modal('show');                // 初始化后立即调用 show 方法		
+	});	
+	
+
+
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<include file="Public/footer" />

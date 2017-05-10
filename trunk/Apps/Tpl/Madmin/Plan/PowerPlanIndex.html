@@ -1,0 +1,168 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="{:U('Plan/PowerPlanIndex')}">开关机计划管理</a></li>
+	<li class="active">列表</li>
+</ol>
+
+<div id="pluginsInfo" class="row well">
+	<div class="col-md-8"></div>
+	<div class="col-md-4 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<button class="btn btn-info btn-sm" id="addNewPowerPlan" data-toggle="modal" data-target="#addNewPowerPlanModal">新建开关机计划</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="3%"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th width="4%">#ID</th>
+				<th width="15%">开关机计划名称</th>
+                <th width="8%">类型</th>
+				<th style="text-align:center;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="datas" id="vo">
+			<tr>
+				<td><input type="checkbox" value="{$vo.id}"></td>
+				<td>{$vo.id}</td>
+				<td><a href='{:U("Plan/EditPowerPlan", "PlanId=$vo[id]")}' title="">{$vo.Name}</a></td>
+                <td>
+                	<if condition="$vo.Type eq 'week'">
+                		周计划
+                	<elseif condition="$vo.Type eq 'date'"/>
+                		月计划
+                	</if>
+                </td>
+				<td style="text-align:center;">
+                    <a class="oper edit" href="__URL__/EditPowerPlan/PlanId/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-id="{$vo.id}" data-url="__URL__/delPowerPlan/PlanId/{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button	>
+             </td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal fade" id="addNewPowerPlanModal" tabindex='-1'>
+    <div class="modal-dialog">
+    	<div class="modal-content">
+    		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">新建开关机计划</h4>
+			</div>
+			<div class="modal-body">
+                <div class="form-group">
+                	<label>名称</label>
+                	<input type="text" class="form-control" name="title" id="title" placeholder="开关机计划名称">
+                </div>
+                <div class="form-group">
+                	<label>计划类型</label>
+                    <select name="type" class="form-control">
+                    	<option value="">---请选择---</option>
+                    	<option value="week">周计划</option>
+                    	<option value="date">月计划</option>
+                    </select>
+                </div>
+			</div>
+			<div class="modal-footer">
+                <div class="col-md-offset-2">
+ 	            	<button type="button" class="btn btn-primary" id="btn_submit">提交</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script>
+$(document).ready(function() {
+	//删除
+	$('.del').click(function() {
+		var nid = $(this).attr('data-id')*1;
+		delNews(nid);
+	});
+
+	$('.multi-del').click(function() {
+		var checkedItems = $('.list-tbl tbody').first().find(':checkbox:checked'),
+			nids = new Array();
+		if (checkedItems.size() <= 0) {
+			$.kw.alert('没有选择操作对象！');
+			return false;
+		} else {
+			$.each(checkedItems, function (i, o) {
+				nids.push($(o).val()*1);
+			});
+			delNews(nids.join(','));
+		}
+	});
+	
+	function delNews(nids) {
+		$.kw.confirm('确定要删除吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__URL__/multiDelPowerPlan',
+				data:{'nids' : nids},
+				async:false,
+				dataType:'json',
+				success:function(re) {
+					if (re.stat*1) {
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请刷新页面后重试……');
+				}
+			});
+		});
+	}	
+	
+	$('#btn_submit').click(function(){
+		var title = $("#title").val();
+		var type = $('select[name=type]').val();
+		
+		if (!title || !type){
+			$.kw.alert("名称和计划类型必须填写");
+			return false;
+		}	
+		//提交开关机计划
+		$.post('{:U("Plan/SavePowerPlan")}', {from: 'ajax', title: title, type: type}, function(re){
+			if(re.stat*1){
+				$.kw.alert(re.msg);
+				setTimeout(function(){
+					location.reload();
+				}, 800)
+			}else{
+				$.kw.alert(re.data);	
+			}
+		// })
+		}, 'json')
+	});	
+});
+</script>
+
+<include file="Public/footer" />

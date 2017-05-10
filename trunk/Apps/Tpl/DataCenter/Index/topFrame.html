@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			.top-nav-body{background:#11949A url(__PUBLIC__/images/header-bg.png) repeat-x;}
+			a#siteLogo{display:block;width:78px;height:84px;min-width:62px;line-height:84px;text-align:center;padding: 0 6px 0 10px;}
+			a#siteLogo img{max-width:62px;max-height:62px;/* position:relative;top:-2px; */}
+			a#siteName{display:block;height:84px;line-height:84px;color:#fff;font-size:22px;}
+			
+			.top-center{width:auto;margin-right:10px;}
+			.top-right{width:240px;background:transparent url(__PUBLIC__/images/v-line.png) no-repeat left top;padding:10px 20px;}
+			.loginer-info{color:#fff;padding:8px 0;font-size:14px;}
+			.loginer-info{}
+			.loginer-menus{}
+			.loginer-menus a{color:#f0f0f0;padding:4px 8px;background:rgba(0,0,0,0.3);margin-right:8px;border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;}
+			.loginer-menus a i{position:relative;top:1px;font-size:15px;}
+			
+			.top-menus li{height:auto;line-height:normal;border-radius:0;margin:0 1px;}
+			.top-menus li a{height:84px;line-height:normal;border-radius:0;padding:0 36px;text-align:center;color:#e0e0e0;}
+			.top-menus li a span{display:block;width:100%;line-height:normal;text-align:center;margin:18px 0 6px 0;}
+			.top-menus li a i{top:0;margin:0;font-size:22px;color:#e0e0e0;}
+			.top-menus li.active{background:rgba(0,0,0,0.3) url(__PUBLIC__/images/focus-shape.png) no-repeat center bottom;}
+			.top-menus li.active a span{color:#fff;}
+			.top-menus li.active a i{color:#2ECC71;}
+		</style>
+	</head>
+	
+	<body class="top-nav-body">
+	
+		<div class="fl top-left clearfix">
+			<a id="siteLogo" class="fl" href="/" target="_top">
+				<php> if (C('b_sitelogo')) { </php>
+					<img src="/{$Think.config.upload_comm_path}{$Think.config.b_sitelogo}?{:rand()}">
+				<php>	} else {	</php>
+					<img src="__PUBLIC__/images/logo.png?{:rand()}">
+				<php>	}	</php>
+			</a>
+			<a id="siteName" class="fl" href="/" target="_top">数据管理中心</a>
+		</div>
+		
+		<div class="fr top-right">
+			<div class="loginer-info">欢迎您，{$Think.session.username}！</div>
+			<div class="loginer-menus clearfix">
+				<a class="fl" href="__GROUP__/Syscfg/modifyLoginPass" target="frame_right_main"><i class="icon-lock"></i> 修改登录密码</a>
+				<a class="fl" href="__GROUP__/Login/eout" target="_top"><i class="icon-signout"></i> 退出登录</a>
+			</div>
+		</div>
+		
+		<div class="fr top-center hide">
+			<ul class="top-menus clearfix">
+				<assign name="homepage" value="homepage" />
+				<in name="homepage" value="$topNavs">
+				<li class="active">
+					<a href="__GROUP__/Index/leftFrame/menuID/homepage" target="frame_left_menu" data-id="homepage" data-def="__GROUP__/Index/rightFrame" class="clearfix">
+						<span class="fl"><i class="icon-home"></i></span>后台首页
+					</a>
+				</li>
+				</in>
+				
+				<assign name="scences" value="scences" />
+				<in name="scences" value="$topNavs">
+				<li>
+					<a href="__GROUP__/Index/leftFrame/menuID/scences" target="frame_left_menu" data-id="scences" data-def="{$homeScenceURL}" class="clearfix">
+						<span class="fl"><i class="icon-tasks"></i></span>内容管理
+					</a>
+				</li>
+				</in>
+				
+				<assign name="syscfg" value="syscfg" />
+				<in name="syscfg" value="$topNavs">
+				<li>
+					<a href="__GROUP__/Index/leftFrame/menuID/syscfg" target="frame_left_menu" data-id="syscfg" data-def="__GROUP__/Syscfg/basicCfg" class="clearfix">
+						<span class="fl"><i class="icon-cog"></i></span>系统设置
+					</a>
+				</li>
+				</in>
+				
+				<assign name="endPoints" value="endPoints" />
+				<in name="endPoints" value="$topNavs">
+				<li>
+					<a href="__GROUP__/Index/leftFrame/menuID/endPoints" target="frame_left_menu" data-id="endPoints" data-def="__GROUP__/Endpoints/index" class="clearfix">
+						<span class="fl"><i class="icon-laptop"></i></span>终端管理
+					</a>
+				</li>
+				</in>
+				
+				<assign name="ucenter" value="ucenter" />
+				<in name="ucenter" value="$topNavs">
+				<li>
+					<a href="__GROUP__/Index/leftFrame/menuID/ucenter" target="frame_left_menu" data-id="ucenter" data-def="__GROUP__/Users/index" class="clearfix">
+						<span class="fl"><i class="icon-user"></i></span>用户管理
+					</a>
+				</li>
+				</in>
+				
+				<assign name="resLib" value="resLib" />
+				<in name="resLib" value="$topNavs">
+				<li>
+					<a href="__GROUP__/Index/leftFrame/menuID/resLib" target="frame_left_menu" data-id="ucenter" data-def="__GROUP__/ResLib/historic" class="clearfix">
+						<span class="fl"><i class="icon-briefcase"></i></span>资源库
+					</a>
+				</li>
+				</in>
+			</ul>
+		</div>
+		
+		<div class="my-cover" style="display:none;"></div>
+
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/common.js"></script>
+	</body>
+</html>

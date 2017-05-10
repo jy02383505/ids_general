@@ -1,0 +1,47 @@
+<extend name='Public:baseRight'/>
+
+<block name="content">
+    <ol class="breadcrumb">
+        <li><a href="{:U('TemplateManage/index')}">模板管理</a></li>
+        <li><a href="{:U('Scene/index')}/tplclassid/{$Think.get.tplclassid}/tpltype/{$Think.get.tpltype}">场景管理</a></li>
+        <li class="active">设定场景播放顺序&时长</li>
+    </ol>
+
+    <form class="form-horizontal" method="post" action="{:U('Scene/setOrderTime')}">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">场景名称</label>
+            <div class="col-sm-3">
+                <input class="form-control input-sm" type="text" name="scenecname" value="{$row[scencename]}" readonly>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">播放顺序</label>
+            <div class="col-sm-3">
+                <input class="form-control input-sm" type="text" name="playorder" value="{$row[playorder]}" placeholder="0-100,0优先">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="programNote">播放时长</label>
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <input class="form-control" type="text" name="playtime" value="{$row[playtime] / 60}">
+                    <div class="input-group-addon">分钟</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="">&nbsp;</label>
+            <div class="col-sm-4">
+                <input type="hidden" name="id" value="{$row[id]}">
+                <input type="hidden" name="tpltype" value="{$Think.get.tpltype}">
+                <input type="hidden" name="scene_id" value="{$Think.get.scene_id}">
+                <input type="hidden" name="tplclassid" value="{$Think.get.tplclassid}">
+                <button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+                <button type="reset" class="btn btn-default btn-sm">取消</button>
+            </div>
+        </div>
+    </form>
+</block>

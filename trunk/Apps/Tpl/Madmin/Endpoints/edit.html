@@ -1,0 +1,474 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="__URL__/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li class="active">编辑终端</li>
+</ol>
+<form id="editForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+<table class="table table-bordered">
+	<tbody>
+		<tr>
+			<td class="text-right" width="14%"><b>管理终端</b></td>
+			<td colspan="2">
+				<neq name="tend.is_latest_ver" value="1">
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="DownLoadDataFile" style="margin-right:12px;">更新终端数据</button>
+				</neq>
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="PublishNewMainSoft" style="margin-right:12px;">更新终端软件版本</button>
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="RestartMain" style="margin-right:12px;">重启终端主程序</button>
+				<eq name="Think.get.et" value="x86">
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="ShutdownMain" style="margin-right:12px;">关闭终端主程序</button>
+				</eq>
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="RestartSystem" style="margin-right:12px;">重启终端计算机</button>
+				<button type="button" class="btn btn-info btn-xs tend-oper" data-cmd="CloseSystem" style="margin-right:12px;">关闭终端计算机</button>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>终端状态</b></td>
+			<td width="56%" id="tendStat">
+				<eq name="tend.touchEndPoint_Online" value="1">
+					<span class="text-success"><b>在线</b></span>　
+				<else/>
+					<span class="text-danger"><b>离线</b></span>　
+				</eq>
+				<eq name="isWrite" value="1">
+				（<a href="#;"  id="tendRefresh">刷新</a>）
+				</eq>
+			</td>
+			<td rowspan="9">
+				<div id="tendShotSnap" style="padding:0 10px;">
+					<p><b>终端截图</b></p>
+					<notempty name="tend.lastShotSnap">
+						<img src="/{$Think.config.upload_comm_path}shotsnap/{$tend.lastShotSnap}" class="img-thumbnail" style="max-width:280px;max-height:280px;margin-bottom:8px;">
+						<br><button type="button" id="viewLargePic" data-src="/{$Think.config.upload_comm_path}shotsnap/{$tend.lastShotSnap}" class="btn btn-info btn-sm">查看大图</button>
+					<else/>
+						<img src="__PUBLIC__/images/demo.png" class="img-thumbnail" style="max-width:280px;max-height:280px;margin-bottom:8px;"><br>
+					</notempty>
+					<eq name="isWrite" value="1">
+					<button type="button" id="CaptureScreen" class="btn btn-info btn-sm">终端截图</button>
+					</eq>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>所属终端分组</b></td>
+			<td id="tendGroup">
+				<volist name="tend.groupName" id="pg">
+				<neq name="i" value="1">
+					&nbsp;&nbsp;&gt;&nbsp;
+				</neq>
+				{$pg.groupname}
+			</volist>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>终端编号</b></td>
+			<td id="tendMainId">{$tend.touchMainId}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>计算机名</b></td>
+			<td id="tendPCName">{$tend.touchEndPoint_ComputerName}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>硬盘使用情况</b></td>
+			<td id="tendDiskUsage">{$tend.touchEndPoint_DiskTotalSize}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>CPU速率</b></td>
+			<td id="tendCpuRate">{$tend.touchEndPoint_CpuRate}</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>终端名称</b></td>
+			<td class="my-form-group">
+			<eq name="isWrite" value="1">
+				<input class="form-control input-sm" type="text" name="epName" id="epName" value="{$tend.touchEndPointName}" style="display:inline-block;width:120px;">&nbsp;
+			<else/>
+				{$tend.touchEndPointName}
+			</eq>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>心跳间隔（秒）</b></td>
+			<td class="my-form-group">
+			<eq name="isWrite" value="1">
+				<input class="form-control input-sm" type="text" name="epInterval" id="epInterval" value="{$tend.touchEndPointInterval}" style="display:inline-block;width:120px;">&nbsp;<span class="my-help-txt">必须在10-60之间.</span>
+			<else/>
+				{$tend.touchEndPointInterval}
+			</eq>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>广告延时（分钟）</b></td>
+			<td class="my-form-group">
+			<eq name="isWrite" value="1">
+				<input class="form-control input-sm" type="text" name="epDelayTime" id="epDelayTime" value="{$tend.touchMainAdsDelayTime}" style="display:inline-block;width:120px;">&nbsp;<span class="my-help-txt">必须在10-60之间.</span>
+			<else/>
+				{$tend.touchMainAdsDelayTime}
+			</eq>
+			</td>
+		</tr>
+		<tr>
+			<td class="text-right" width="14%"><b>未完成任务列表</b><br>
+			<eq name="isWrite" value="1">
+				<notempty name="tendTasks">
+					<!-- 【<a class="oper del" href="javascript:void(0);" data-url="__URL__/delEndTask/type/all/touchMainId/{$tend.touchMainId}">清空任务列表</a>】 -->
+				</notempty>
+			</eq>
+			</td>
+			<td colspan="2" class="data-list">
+				<notempty name="tendTasks">
+					<table id="taskList" class="table table-hover table-condensed">
+						<thead>
+							<tr>
+								<th>任务ID</th>
+								<th>指令名称</th>
+								<th>指令参数1</th>
+								<th>指令参数2</th>
+								<th>指令说明</th>
+								<th>创建时间</th>
+								<eq name="isWrite" value="1">
+								<!-- <th>操作</th> -->
+								</eq>
+							</tr>
+						</thead>
+						<tbody>
+							<volist name="tendTasks" id="vo">
+								<tr>
+									<td>{$vo.taskId}</td>
+									<td>{$vo.commandName}</td>
+									<td>{$vo.commandParam1}</td>
+									<td>{$vo.commandParam2}</td>
+									<td>{$vo.commandNote}</td>
+									<td>{$vo.creattime}</td>
+									<eq name="isWrite" value="1">
+									<!-- <td><a class="oper del" href="javascript:void(0);" data-url="__URL__/delEndTask/type/one/taskId/{$vo.taskId}" title="删除"><i class="icon-trash"></i></a></td> -->
+									</eq>
+								</tr>
+							</volist>
+						</tbody>
+					</table>
+				<else/>
+					<span class="text-danger">暂无任务</span>
+				</notempty>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" class="text-center" style="padding:24px 0;">
+				<input type="hidden" name="tid" value="{$tend.tid}">
+				<eq name="isWrite" value="1">
+				<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+				</eq>
+				<button type="reset" class="btn btn-default btn-sm">
+				<eq name="isWrite" value="1">
+					取消
+				<else/>
+					返回
+				</eq>
+				</button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</form>
+
+<div id="alert-layer" style="display:none;"></div>
+<div id="origiPicShow" style="display:none;border:5px solid #fff;border-radius:6px;-webkit-border-radius:6px;-moz-border-radius:6px;position:absolute;top:0px;left:0px;z-index:9999">
+	<img src="" style="height:480px;">
+	<i class="icon-remove-sign close-btn" style="position:absolute;top:-27px;right:-20px;font-size:32px;color:#fff;cursor:pointer;"></i>
+</div>
+
+<div class="my-cover"></div>
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title">信息提示</h4>
+		</div>
+		<div class="modal-body text-center">
+			<div class="loading-box" style="text-align:center;">
+				<p style="font-size:72px;margin:30px auto 30px"><i class="icon-spinner icon-spin"></i></p>
+				<p style="line-height:28px;">正在处理，请不要关闭当前窗口……</p></div>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var tid = {$tend.tid|default=0},
+		endType = '{$Think.get.et|default="x86"}';
+	
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/index/et/' + endType;
+	});
+	
+	$('#tendRefresh').click(function() {
+		updateTendinfo();
+	});
+	
+	setInterval(function() {
+		$.post('__GROUP__/Ajaxhandle/getEndInfo', {tid : tid}, function(re) {
+			if (re.stat*1 > 0) {
+				var tend = re.data;
+				var shotsnapSrc = tend.lastShotSnap ? '/{$Think.config.upload_comm_path|default=""}shotsnap/' + tend.lastShotSnap : '__PUBLIC__/images/demo.png';
+				$('#tendShotSnap').find('img').first().attr('src', shotsnapSrc);
+				$('#viewLargePic').attr('data-src', shotsnapSrc);
+			}
+		}, 'json');
+	}, 5000);
+	
+	function updateTendinfo() {
+		$.ajax({
+			url:'__GROUP__/Ajaxhandle/getEndInfo',
+			type:'post',
+			data:{tid : tid},
+			async:false,
+			dataType:'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+					var tend = re.data;
+					if (tend.touchEndPoint_Online) {
+						$('#tendStat').children('span').removeClass('text-danger').addClass('text-success').html('<b>在线</b>');
+					} else {
+						$('#tendStat').children('span').removeClass('text-success').addClass('text-danger').html('<b>离线</b>');
+					}
+					$('#tendMainId').html(tend.touchMainId);
+					var groupName = '';
+					$.each(tend.groupName, function(i, g) {
+						groupName += ((i+1 == 1) ? '' : '&nbsp;&nbsp;&gt;&nbsp;') + g.groupname;
+					});
+					
+					$('#tendGroup').html(groupName);
+					$('#tendPCName').html(tend.touchEndPoint_ComputerName);
+					$('#tendDiskUsage').html(tend.touchEndPoint_DiskTotalSize);
+					$('#tendCpuRate').html(tend.touchEndPoint_CpuRate);
+					$('#epName').val(tend.touchEndPointName);
+					$('#epInterval').val(tend.touchEndPointInterval);
+					$('#epDelayTime').val(tend.touchMainAdsDelayTime);
+					var shotsnapSrc = tend.lastShotSnap ? '/{$Think.config.upload_comm_path|default=""}shotsnap/' + tend.lastShotSnap : '__PUBLIC__/images/demo.png';
+					$('#tendShotSnap').find('img').first().attr('src', shotsnapSrc);
+					$('#viewLargePic').attr('data-src', shotsnapSrc);
+					if (tend.taskList) {
+						var tasksHtmlStr = '';
+						$.each(tend.taskList, function(i, task) {
+							tasksHtmlStr += '<tr>';
+							tasksHtmlStr += '<td>' + task.taskId + '</td>';
+							tasksHtmlStr += '<td>' + task.commandName + '</td>';
+							tasksHtmlStr += '<td>' + task.commandParam1 + '</td>';
+							tasksHtmlStr += '<td>' + task.commandParam2 + '</td>';
+							tasksHtmlStr += '<td>' + task.commandNote + '</td>';
+							tasksHtmlStr += '<td>' + task.creattime + '</td>';
+							//tasksHtmlStr += '<td><a class="oper del" href="javascript:void(0);" data-url="__URL__/delEndTask/type/one/taskId/' + task.taskId + '" title="删除"><i class="icon-trash"></i></a></td>';
+							tasksHtmlStr += '</tr>';
+						});
+						
+						if ($('#taskList').size() <= 0) {
+							var tbl_header = '<table id="taskList" class="table table-hover table-condensed">';
+								tbl_header += '<thead>';
+								tbl_header += '<tr>';
+								tbl_header += '<th>任务ID</th>';
+								tbl_header += '<th>指令名称</th>';
+								tbl_header += '<th>指令参数1</th>';
+								tbl_header += '<th>指令参数2</th>';
+								tbl_header += '<th>指令说明</th>';
+								tbl_header += '<th>创建时间</th>';
+								tbl_header += '</tr>';
+								tbl_header += '</thead>';
+								tbl_header += '<tbody>';
+							var tbl_footer = '</tbody>';
+								tbl_footer += '</table>';
+							$('.data-list').empty().html(tbl_header + tasksHtmlStr + tbl_footer);							
+						} else {
+							$('#taskList').find('tbody').first().html(tasksHtmlStr);
+						}
+					}
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+	}
+	
+	$('#viewLargePic').click(function(){
+		$('#origiPicShow').find('img').attr('src', $.trim($(this).attr('data-src')) + '?' + Math.random());
+		$('#alert-layer').show();
+		setDivCenter('#origiPicShow');
+	});
+	$('#origiPicShow').delegate('.close-btn', 'click', function(){
+		$('#origiPicShow').hide();
+		$('#alert-layer').hide();
+	});
+	
+	$('#taskList').delegate('.del', 'click', function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	$('.tend-oper').click(function() {
+		var cmd = $.trim($(this).attr('data-cmd'));
+		
+		$.kw.confirm('确认要执行该操作吗？', function() {
+			$.ajax({
+				url:'__URL__/soapClientWay',
+				type:'post',
+				async:false,
+				data:{type : 'eps', cmd : cmd, tids : tid, endType : endType},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						//window.location.reload();
+						$.kw.alert('发布成功！');
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+		
+	});
+	
+	$('#CaptureScreen').click(function(){
+		$(this).attr({disabled:true}).html('再次终端截图  等待时间：<b id="wait">60</b> 秒');
+		
+		var wait = $('#wait');
+		var interval = setInterval(function(){
+			var time = wait.text()*1;
+				time--;
+				wait.text(time);
+			if(time <= 0) {
+				$('#CaptureScreen').removeAttr('disabled').html('终端截图');
+				clearInterval(interval);
+			};
+		}, 1000);
+		
+		$.ajax({
+			url:'__URL__/soapClientWay',
+			type:'post',
+			async:false,
+			data:{type : 'eps', cmd : 'CaptureScreen', tids : tid, endType : endType},
+			dataType:'json',
+			success:function(re){
+				if (re.stat*1) {
+					$.kw.alert('操作成功！');
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function(){
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		});
+		
+		/* $.ajax({
+			url:'__URL__/addEndTask',
+			type:'post',
+			data:{type : 'capturescreen', tid : tid},
+			async:false,
+			dataType:'json',
+			success:function(re) {
+				if (re.stat*1 > 0) {
+					$.kw.alert('操作成功！');
+				} else {
+					$.kw.alert(re.msg);
+				}
+			},
+			error:function() {
+				$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+			}
+		}); */
+	});
+	
+	$('#editForm').validate({
+		errorElement : 'span',
+		errorClass : 'my-help-block',
+		focusInvalid : true,  
+        rules : {  
+        	epName : {  
+                required : true  
+            },  
+            epInterval : {  
+                required : true,
+                range : [10,60]
+            },
+            epDelayTime : {  
+                required : true,
+                range : [10,60]
+            }
+        },  
+        messages : {  
+        	epName : {  
+                required : "终端名称必填."  
+            },
+            epInterval : {  
+                required : "心跳时间必填." ,
+                range : "必须在10-60之间."
+            },  
+            epDelayTime : {  
+                required : "广告延时时间必填." ,
+                range : "必须在10-60之间."
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.my-form-group').addClass('has-error');  
+        },  
+
+        success : function(label) { 
+            label.closest('.my-form-group').removeClass('has-error');  
+            label.parent('td').find('.my-help-txt').show();  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {
+            element.parent('td').append(error);  
+            element.parent('td').find('.my-help-txt').hide();  
+        },  
+		submitHandler: function(form) {
+			//form.submit();
+			var epName = $.trim($('#epName').val());
+			var epInterval = $.trim($('#epInterval').val())*1;
+			var epDelayTime = $.trim($('#epDelayTime').val())*1;
+			
+			if ( (epName != '') || (epInterval > 10 && epInterval < 100) || (epDelayTime > 10 && epDelayTime < 100) ) {
+				
+				var formdata = {'type':'eps','tids':tid,'epName':epName,'epInterval':epInterval,'epDelayTime':epDelayTime};
+				$.ajax({
+					url: '__URL__/soapClientMultiWay',
+					type: 'post',
+					async: false,
+					data: formdata,
+					dataType: 'json',
+					success:function(re) {
+						if (re.stat*1) {
+							$.kw.alert('操作请求发送成功！请注意查看终端状态……', '', function() {
+								window.location.reload();
+							});
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function(){
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+				
+			}
+			
+			return false;
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

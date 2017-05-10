@@ -1,0 +1,47 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">广告管理</a></li>
+	<li class="active">广告列表</li>
+</ol>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th>#ID</th>
+				<th>终端组</th>
+				<th>管理广告</th>
+			</tr>
+		</thead>
+		<tbody>
+		<volist name="epgroups" id="vo">
+			<tr>
+				<td>{$vo.id}</td>
+				<td>{$vo.groupname}</td>
+				<td>
+					<php>	if (checkAccess('Ads', 'preview')) {	</php>
+					<a class="oper view" href="__URL__/preview/gid/{$vo.groupclassid}" title="查看详细"><i class="icon-search"></i></a>
+					<php>	}	</php>
+					<php>	if (checkAccess('Ads', 'edit')) {	</php>
+					<a class="oper edit" href="__URL__/edit/gid/{$vo.groupclassid}" title="配置管理"><i class="icon-wrench"></i></a>
+					<php>	}	</php>
+				</td>
+			</tr>
+		</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>&nbsp;</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	
+});
+</script>
+<include file="Public/footer" />

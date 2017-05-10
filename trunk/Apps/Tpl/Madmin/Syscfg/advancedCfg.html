@@ -1,0 +1,52 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">高级设置</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="copyRight">版权信息</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="copyright" id="copyRight">{$syscfg.a_copyright}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="afterSales">售后信息</label>
+		<div class="col-sm-8">
+			<textarea class="form-control" name="aftersales" id="afterSales">{$syscfg.a_aftersales}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="mediaLib">媒体库的目录</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="medialib" id="mediaLib" value="{$syscfg.a_medialib}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="mainUpfile">主程序升级文件目录</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="main_upfile" id="mainUpfile" value="{$syscfg.a_main_upfile}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="dataUpfile">数据更新文件目录</label>
+		<div class="col-sm-5">
+			<input class="form-control input-sm" type="text" name="data_upfile" id="dataUpfile" value="{$syscfg.a_data_upfile}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($) {
+	
+});
+</script>
+<include file="Public/footer" />

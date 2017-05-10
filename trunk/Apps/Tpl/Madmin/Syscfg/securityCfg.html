@@ -1,0 +1,49 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">系统设置</a></li>
+	<li class="active">基本设置</li>
+</ol>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label">登录验证</label>
+		<div class="col-sm-3">
+			<php> if ($syscfg['s_login_vcode'] == "1") { </php>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_yes" value="1" checked> 开启
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_no" value="0"> 关闭
+				</label>
+			<php>	} else if ($syscfg['s_login_vcode'] == "0") {	</php>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_yes" value="1"> 开启
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_no" value="0" checked> 关闭
+				</label>
+			<php>	} else {	</php>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_yes" value="1"> 开启
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="loginvcode" id="loginvcode_no" value="0"> 关闭
+				</label>
+			<php>	}	</php>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($) {
+	
+});
+</script>
+<include file="Public/footer" />

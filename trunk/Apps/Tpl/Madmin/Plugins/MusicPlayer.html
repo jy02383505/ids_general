@@ -1,0 +1,87 @@
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix" style="margin-bottom:6px;">
+		<h5 class="fl">音乐列表</h5>
+		<div class="fr">
+			<div id="upArea"></div>
+			<div class="my-cover" style="display:none;"></div>
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file" multiple="true">
+		</div>
+	</div>
+	<div id="embedPlay" style="display:none;">
+		<iframe src="" name="musicPlayer" width="100%" height="48"></iframe>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th class="text-center">#ID</th>
+				<th class="text-center" width="80%">文件</th>
+				<th class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="pluginsData['resData']">
+				<volist name="pluginsData['resData']" id="vo">
+					<tr>
+						<td><input type="checkbox" value="{$vo.id}"></td>
+						<td class="text-center">{$vo.id}</td>
+						<td>{$vo.filepath}<img class="curr-player" src="__PUBLIC__/images/playing.gif" style="position:relative;top:-4px;margin-left:8px;display:none;"></td>
+						<td style="text-align:center;">
+							<a class="oper music-play" href="__GROUP__/Ajaxhandle/musicPLayer/id/{$vo.id}" target="musicPlayer" data-did="{$vo.id}" data-src="/{$Think.config.upload_root_path}{$vo.filepath}" title="点击播放"><i class="icon-play-circle"></i></a>
+							<a class="oper del" href="javascript:void(0);" data-did="{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+						</td>
+					</tr>
+				</volist>
+			</notempty>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button>
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<div id="musicPLayer" class="hide">
+	<div id="jquery_jplayer" class="jp-jplayer"></div>
+	<div id="jp_container" class="jp-audio" role="application" aria-label="media player">
+		<div class="jp-type-single">
+			<div class="jp-gui jp-interface">
+				<div class="jp-controls">
+					<button class="jp-play" role="button" tabindex="0">play</button>
+					<button class="jp-stop" role="button" tabindex="0">stop</button>
+				</div>
+				<div class="jp-progress">
+					<div class="jp-seek-bar">
+						<div class="jp-play-bar"></div>
+					</div>
+				</div>
+				<div class="jp-volume-controls">
+					<button class="jp-mute" role="button" tabindex="0">mute</button>
+					<button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+					<div class="jp-volume-bar">
+						<div class="jp-volume-bar-value"></div>
+					</div>
+				</div>
+				<div class="jp-time-holder">
+					<div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+					<div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+					<div class="jp-toggles">
+						<button class="jp-repeat" role="button" tabindex="0">repeat</button>
+					</div>
+				</div>
+			</div>
+			<div class="jp-details">
+				<div class="jp-title" aria-label="title">&nbsp;</div>
+			</div>
+			<div class="jp-no-solution">
+				<span>使用要求</span>
+				请安装或更新您的Flashplayerch插件至最新版本。 <a href="http://get.adobe.com/flashplayer/" target="_blank">获取Flash插件</a>.
+			</div>
+		</div>
+	</div>
+</div>

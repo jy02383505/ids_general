@@ -1,0 +1,98 @@
+<include file="Public/header" />
+<style>
+.jl-nav-tabs{padding:0 32px;}
+.jl-nav-tabs li a{line-height:14px;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="__GROUP__/Endpoints/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li class="active">插播消息管理</li>
+</ol>
+
+<div class="" style="padding:0 14px;">
+
+	<ul class="jl-nav-tabs clearfix" style="">
+		<eq name="Think.get.type" value="grp">
+			<li class="active"><a href="__URL__/noticeMsg/type/grp/et/{$Think.get.et|default='x86'}" data-restype="grp"> 组插播消息</a></li>
+		<else />
+			<li class=""><a href="__URL__/noticeMsg/type/grp/et/{$Think.get.et|default='x86'}" data-restype="grp"> 组插播消息</a></li>
+		</eq>
+		<eq name="Think.get.type" value="eps">
+			<li class="active"><a href="__URL__/noticeMsg/type/eps/et/{$Think.get.et|default='x86'}" data-restype="eps"> 终端插播消息</a></li>
+		<else />
+			<li class=""><a href="__URL__/noticeMsg/type/eps/et/{$Think.get.et|default='x86'}" data-restype="eps"> 终端插播消息</a></li>
+		</eq>
+	</ul>
+	
+	<div class="data-list">
+		<table class="table table-hover list-tbl">
+			<thead>
+				<tr>
+					<!-- <th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th> -->
+					<th>#ID</th>
+					<th><eq name="Think.get.type" value="grp">终端组名称<else />终端编号</eq></th>
+					<th>消息名称</th>
+					<th>开始时间</th>
+					<th>结束时间</th>
+					<th>消息内容</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<volist name="notices" id="vo">
+				<tr>
+					<!-- <td><input type="checkbox"></td> -->
+					<td>{$vo.id}</td>
+					<td><eq name="Think.get.type" value="grp">{$vo.groupname}<else />{$vo.tepids}</eq></td>
+					<td>{$vo.noticeInfo.msgname}</td>
+					<td>{$vo.noticeInfo.startdate} {$vo.noticeInfo.starttime}</td>
+					<td>{$vo.noticeInfo.enddate} {$vo.noticeInfo.endtime}</td>
+					<td><span title="{$vo.noticeInfo.txtcontent}">{$vo.noticeInfo.short_txtcontent}</span></td>
+					<td colspan="2">
+						<a class="oper stop-notice" href="javascript:void(0);" data-id="{$vo.id}" title="停播"><i class="icon-ban-circle"></i></a>
+					</td>
+				</tr>
+				</volist>
+			</tbody>
+		</table>
+		<table class="table">
+			<tr>
+				<td>
+					<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+					<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->&nbsp;
+				</td>
+				<td class="page-box text-right" width="80%">{$page}</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($) {
+	$('.stop-notice').click(function() {
+		var nid = $(this).attr('data-id')*1;
+		$.kw.confirm('确认要停播该消息吗？', function() {
+			$.ajax({
+				url: '__URL__/stopNotice',
+				type: 'post',
+				async: false,
+				data: {recordID : nid},
+				dataType:'json',
+				success:function(re){
+					if (re.stat*1) {
+						$.kw.alert('发布成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function(){
+					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+				}
+			});
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

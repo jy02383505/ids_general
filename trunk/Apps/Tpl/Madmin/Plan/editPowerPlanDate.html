@@ -1,0 +1,285 @@
+<!--lym-->
+<extend name="Public:baseRight"/>
+	<block name="css">
+		<link rel="stylesheet" href="__PUBLIC__/jquery-datetimepicker/css/jqdatetimepicker.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/icheck/green.css">
+	</block>	
+
+	<block name="js">
+		<script src="__PUBLIC__/jquery-datetimepicker/js/jquery.datetimepicker.full.min.js"></script>
+		<script src="__PUBLIC__/icheck/icheck.min.js"></script>
+	</block>	
+
+	<block name="style">
+	</block>
+
+<block name="content">
+<div>
+	<ol class="breadcrumb">
+	    <li><a href="{:U('Plan/powerPlanIndex')}">开关机计划管理</a></li>
+		<li class="active">
+	        修改开关机月计划
+	    </li>
+	</ol>
+
+	<form method="post" class="form-horizontal">
+		<div class="col-sm-offset-1 col-sm-8">
+			<input type="hidden" name="PlanId" value="{$Think.get.PlanId}">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">开关机计划名称</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control input-sm" name="title" value="{$plan[Name]}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">开关机计划类型</label>
+				<div class="col-sm-8">
+					<code style="line-height:30px;">月计划</code>
+				</div>
+				<input type="hidden" name="type" value="date">
+			</div>
+			<input type="hidden" name="operation" value="datePowerPlanUpdate">
+			<div class="col-sm-offset-2">
+				<button type="submit" class="btn btn-sm btn-primary">保存更改</button>&nbsp;
+				<button type="button" class="btn btn-sm btn-default backToPowerPlan">返回开关机计划列表</button>
+			</div>
+			<div class="form-group" style="margin-top:25px;">
+				<label class="col-sm-2 control-label">计划内容</label>
+				<button class="btn btn-sm btn-primary pull-right" type="button" data-oper="add" data-toggle="modal" data-target="#addPowerPlanDayArrange">新增日期</button>
+			</div>
+		</div>
+	</form>
+
+	<empty name="powerMonthPlans">
+		<ul>
+			<li	class="line_empty">无记录</li>
+		</ul>
+	</empty>
+	<div class="container">
+		<table class="table table-hover">
+			<tr>
+				<th width="5%">
+					<input type="checkbox" class="selectAll">
+				</th>
+				<th width="5%">id</th>
+				<th>开关机单日安排</th>
+				<th>起始日期</th>
+				<th>结束日期</th>
+				<th>操作</th>
+			</tr>
+			<volist name="powerMonthPlans" id="row">
+				<tr>
+					<td>
+						<input type="checkbox" name="selectAll" value="{$row[id]}">
+					</td>
+					<td>{$row[id]}</td>
+					<td>{$row[powerDayArrangeName]}</td>
+					<td>{$row[beginDate]}</td>
+					<td>{$row[endDate]}</td>
+					<td>
+						<a type="button" data-id="{$row[id]}" title="修改" data-oper="save" data-toggle="modal" data-target="#addPowerPlanDayArrange" data-beginDate="{$row[beginDate]}" data-endDate="{$row[endDate]}" data-dayArrangeId="{$row[dayArrangeId]}" class="glyphicon glyphicon-pencil editShow" style="cursor:pointer;"></a>
+						<a href='javascript:;' data-id="{$row[id]}" class="delPowerMonthPlan" title="删除"><span class="glyphicon glyphicon-trash"></span></a>
+					</td>
+				</tr>
+			</volist>
+		</table>
+		<div class="row">
+			<div class="page-box pull-left" style="margin-top:20px;padding-left:8px;">
+				<input type="checkbox" class="selectAll">
+				<button type="button" class="btn btn-sm btn-default multiDel" style="margin:0 15px 0 20px;">批量删除</button>
+			</div>
+			<div class="page-box pull-right" style="margin-top:20px;">
+				{$show}
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<!-- editPowerPlanModal -->
+<div class="modal fade" id="addPowerPlanDayArrange" tabindex='-1'>
+    <div class="modal-dialog " style="min-width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增月计划</h4>
+            </div>
+            <div class="modal-body"  id="detail-content">
+                <form class="form-horizontal addOrEditPowerMonthPlan">
+                    <input type="hidden" name="powerPlanId" value="{$Think.get.PlanId}">
+                    <input type="hidden" name="id" value="0">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">日期</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control input-sm" name="beginDate" value="{$beginDate}">
+                        </div><div class="col-sm-1" style="line-height:28px;width:42px;">至</div>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control input-sm" name="endDate" value="{$endDate}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">选择单日安排</label>
+                        <div class="col-sm-6">
+                            <select name="dayArrangeId" class="form-control">
+                                <option value="">---请选择---</option>
+                                <volist name="dayArranges" id="row">
+                                    <option value="{$row[id]}">{$row[Name]}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <label class="col-sm-5 control-label">
+                    <p class="form-control-static">如仅设置一天，开始、截止日期请保持相同</p>
+                </label>
+                <div class="col-md-7">
+                    <button type="button" class="btn btn-sm btn-primary addOrEditPowerMonthPlanSubmit" id="save">保存</button>
+                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(function(){
+	// datetimepicker initialization
+	$.datetimepicker.setLocale('zh');
+	$('input[name=beginDate], input[name=endDate]').datetimepicker({
+		autoClose: true,
+		timepicker: false,
+		format: 'Y-m-d'
+	});
+
+	// icheck initialization
+	$('input').iCheck({
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass: 'iradio_flat-green',
+        increaseArea: '20%'
+    });
+
+	// select all
+	$('.selectAll').on('ifChecked', function(){
+		$('input[name=selectAll],input.selectAll').iCheck('check');
+	})
+
+	// cancel all
+	$('.selectAll').on('ifUnchecked', function(){
+		$('input[name=selectAll],input.selectAll').iCheck('uncheck');
+	})
+
+	// update page-box without flush
+	function updatePageBox(num){
+		var num = num || mValue.length;
+		var pageInfo = $('.page-box.pull-right').html(); // 4 条记录 1/1 页
+		var pattern = /(\\d+)/;
+		var newPageInfo = pageInfo.replace(pattern, function(result){
+			return result - num;
+		});
+		$('.page-box.pull-right').html(newPageInfo);
+	}
+
+	// multi delete
+	$('.multiDel').click(function(){
+		mValue = [];
+		$.each($('input[name=selectAll]:checked'), function(i, o){
+			mValue.push($(o).val());
+			$(o).parents('tr').attr('delFlag', '1');
+		})
+		if(!mValue.length){
+			$.kw.alert('请选择！');
+			return false;
+		}
+		$.kw.confirm('确认删除吗？', function(){
+			$.post('{:U("Ajaxhandle/ajaxMultiDelPowerDayArrange")}', {ids: mValue}, function(re){
+				if(re == '1'){
+					updatePageBox();
+					$.each($('tr'), function(i, o){
+						if($(o).attr('delFlag') == '1'){
+							$(o).find('input[name=selectAll]').iCheck('uncheck');
+							$(o).hide(1000);
+						}
+					})
+				}else{
+					$.kw.alert('服务器买药去了，请稍后再试！');
+				}
+			})
+		})
+	})
+
+	// 返回开关机计划列表
+	$('.backToPowerPlan').click(function(){
+		location.href = '{:U("Plan/powerPlanIndex")}';
+	})
+
+	// 设置一个时间间隔来进行页面刷新
+	function send_post_to_reload(mstime, msg){
+		var mstime = mstime || 800;
+		var msg = msg || '操作成功！';
+	    $.kw.alert(msg);
+	    setTimeout(function(){
+	        window.location.reload();
+	    }, mstime)
+	}
+
+	// 添加月安排，表单提交
+	$('.addOrEditPowerMonthPlanSubmit').click(function(){
+		if(!$('input[name=beginDate]').val() || !$('input[name=endDate]').val() || !$('select[name=dayArrangeId]').val()){
+			$.kw.alert('日期或单日安排不能为空！');
+			return false;
+		}
+		var formData = $('form.addOrEditPowerMonthPlan').serializeArray();
+		$.post('{:U("Plan/addOrEditPowerMonthPlan")}', {formData: formData}, function(re){
+			if(re.stat == '1'){
+				send_post_to_reload(1000, re.msg);
+			}else{
+				$.kw.alert(re.msg);
+			}
+		}, 'json')
+	})
+
+	// delete powerMonthPlan
+	$('.delPowerMonthPlan').click(function(){
+		var self = $(this);
+		var powerMonthPlanId = $(this).attr('data-id');
+		$.kw.confirm('确认删除吗？', function(){
+			$.post('{:U("delPowerMonthPlan")}', {powerMonthPlanId: powerMonthPlanId}, function(re){
+				if(re == '1'){
+					self.parent().parent().hide(1000);
+					updatePageBox(1);
+				}else{
+					send_post_to_reload(800, '删除失败！');
+				}
+			})
+		})
+	})
+
+	// 组织不同的模态框所对应的数据，此处设置选中下拉框属性时，必须使用js原生，否则jquery会出现bug，时常选不中
+	$('#addPowerPlanDayArrange').on('show.bs.modal', function(event){
+		var button = $(event.relatedTarget);
+		var beginDate = button.data('begindate');
+		var endDate = button.data('enddate');
+		var dayArrangeId = button.data('dayarrangeid');
+		var modal = $(this);
+		var oper = button.data('oper');
+		var id = button.data('id') || 0;
+		modal.find('input[name=beginDate]').val(beginDate);
+		modal.find('input[name=endDate]').val(endDate);
+		modal.find('input[name=id]').val(id);
+		var options = modal.find('option');
+		$.each(options, function(i, o){
+			if(o.value == dayArrangeId){
+				this.selected = true;
+			}else{
+				this.selected = false;
+			}
+		})
+	})
+
+})
+
+</script>
+
+</block>

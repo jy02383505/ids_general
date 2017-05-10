@@ -1,0 +1,55 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">广告管理</a></li>
+	<li class="active">广告列表</li>
+</ol>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th>#ID</th>
+				<th>广告标题</th>
+				<th>应用终端尺寸类型</th>
+				<th>轮播间隔时间</th>
+				<th>操作</th>
+				<th class="text-right" style="width:120px">
+					<a href="__URL__/addAdsRes" type="button" class="btn btn-info btn-xs" style="margin-left:12px;">添加广告资源</a>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+		<volist name="ads" id="vo">
+			<tr>
+				<td>{$vo.id}</td>
+				<td>{$vo.adstitle}</td>
+				<td><eq name="vo.ads_sizetype" value="h">横屏<else />竖屏</eq></td>
+				<td>{$vo.adsdelay}</td>
+				<td colspan="2">
+					<a class="oper edit" href="__URL__/addAdsRes/id/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/delAdsRes/id/{$vo.id}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+		</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>&nbsp;</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

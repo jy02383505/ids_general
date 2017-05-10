@@ -1,0 +1,172 @@
+<!--lym-->
+<extend name="Public:baseRight"/>
+	<block name="css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/flat-ui/css/flat-ui.min.css">	
+		<link rel="stylesheet" href="__PUBLIC__/jui/css/jquery-ui.min.css">	
+	</block>	
+
+	<block name="js">
+		<script src="__PUBLIC__/flib/flat-ui/js/flat-ui.min.js"></script>
+		<script src="__PUBLIC__/flib/flat-ui/application.js"></script>
+		<script src="__PUBLIC__/jui/js/jquery-ui.min.js"></script>
+	</block>	
+
+	<block name="style">
+		<style>
+			.ajaxSetExigent:hover{
+				cursor: pointer;
+			}
+			.playorder, .playtime{
+				width: 60px;
+				height: 24px;
+				border-radius: 4px;
+			}
+			.mytb tr{
+				cursor: move;
+			}
+			.hint_order{
+				float: right;
+				position: relative;
+				top: -15px;
+			}
+		</style>
+	</block>
+
+<block name="content">
+
+	<ol class="breadcrumb">
+	    <li><a href="{:U('TemplateManage/index')}">模板管理</a></li>
+	    <li class="active">场景管理</li>
+	</ol>
+
+	<volist name="rows" id="row">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4>{$row[scencename]}</h4>
+				<if condition="$Think.get.tpltype eq 'azad'">
+					<code class="hint_order">注：场景顺序的修改，请直接拖动该条记录</code>
+				</if>
+			</div>
+			<div class="panel-body">
+				<table class="table table-striped table-hover table-bordered">
+					<tr>
+						<th>序号</th>
+						<th>id</th>
+						<th>场景名称</th>
+						<!-- <th>紧急场景(点击可修改)</th> -->
+						<if condition="$Think.get.tpltype eq 'azad'">
+							<th>播放时间(双击可更改)</th>
+						</if>
+					</tr>
+					<tbody>
+						<volist name="row[children]" id="scene">
+							<tr data-id="{$scene[id]}">
+								<td>{$i}</td>	
+								<td>{$scene[id]}</td>	
+								<td>{$scene[scencename]}</td>
+								<!-- <td class="ajaxSetExigent" data-pid="{$scene[parentscence_id]}" data-id="{$scene[id]}">
+									<input type="checkbox" name="isExigentScene" value="{$scene[isExigentScene]}" {$scene[isExigentScene]?checked:''} data-toggle="switch" data-on-text="<span class='fui-check'></span>" data-off-text="<span class='fui-cross'></span>" />
+								</td> -->
+								<if condition="$Think.get.tpltype eq 'azad'">
+									<td><input data-id="{$scene[id]}" type="text" value="{$scene[playtime]/60}" maxlength="4" readonly name="playtime" class="playtime"> <code>分钟</code></td>
+								</if>
+							</tr>
+						</volist>
+					</tbody>
+				</table>
+				{$show}
+			</div>
+		</div>
+	</volist>
+
+<script>
+$(function(){
+	//点击"确认修改顺序"按钮之后，发起ajax请求，从后台服务器端更改该页面所有场景的播放顺序。
+	//顺序更改完成后，弹出提示框告知用户“修改成功！”，1.5秒后，页面自动刷新，并以新的顺序展示之。
+	$('#saveOrderBtn').click(function(){
+		obj_list = [];
+		$('.mytb tr').each(function(i){
+			jobj = {};
+			jobj["id"] = $(this).attr('data-id');
+			jobj["playorder"] = $(this).attr('data-order');
+			obj_list.push(jobj);
+		})	
+
+		$.post('{:U("ajax_setPlayorder")}', {result: obj_list}, function(data){
+			if(data == $('.mytb tr').size()){
+				$.kw.alert('播放顺序变更成功！');
+				setTimeout(function(){
+					window.location.reload();
+				}, 1500)
+			}else{
+				$.kw.alert('服务器吃药去了，请稍后再试！');
+				setTimeout(function(){
+					window.location.reload();
+				}, 1500)
+			}
+		})
+	})
+
+	// flat-ui开关控制紧急场景设置
+	var switchDiv = $('.ajaxSetExigent>div');	//on|off div
+	switchDiv.click(function(){
+		var checkedId = $('.ajaxSetExigent input[value=1]').parents('td').attr('data-id');
+		var thisDiv = $(this);	//on|off divClicked
+		var thisId = thisDiv.parents('td').attr('data-id');
+		var thisPid = thisDiv.parents('td').attr('data-pid');
+		var isCancel = 0;
+		if(checkedId == thisId){
+			//点击的是当前的紧急场景,即取消当前紧急场景
+			var isCancel = 1;
+			thisDiv.find('input').val('0');
+			$.post('{:U(setExigent)}', {'id': thisId, 'oldId': checkedId, 'isCancel': isCancel}, function(data){
+				if(data){
+					$.kw.alert('设置成功！');
+				}else{
+					$.kw.alert('操作失败！');
+				}
+			})
+		}else{
+			switchDiv.removeClass('bootstrap-switch-on');
+			switchDiv.addClass('bootstrap-switch-off');
+			$('.ajaxSetExigent input[value=1]').val('0');
+			thisDiv.removeClass('bootstrap-switch-off');
+			thisDiv.addClass('bootstrap-switch-on');
+			thisDiv.find('input').val('1');
+			$.post('{:U(setExigent)}', {'id': thisId, 'oldId': checkedId, 'isCancel': isCancel}, function(data){
+				if(data){
+					$.kw.alert('设置成功！');
+				}else{
+					$.kw.alert('操作失败！');
+				}
+			})
+		}
+	})
+
+	// 播放时长字段双击事件
+	$('.playtime').dblclick(function() {
+		$(this).attr('readonly', false).select();
+		origin_time_val = $(this).val();
+	});
+
+	// 播放时长字段失焦事件
+	$('.playtime').change(function(){
+		var scene_id = $(this).attr('data-id');
+		var thisVal = $(this).val();
+		var obj = $(this);
+		$.post('{:U("ajax_setPlaytime")}', {'id': scene_id, 'playtime': thisVal}, function(data){
+			if(data == '1'){
+				$.kw.alert('设置成功！');
+				obj.attr('readonly', true);
+			}else{
+				$.kw.alert(data);
+				obj.val(origin_time_val).attr('readonly', true);
+			}
+		})
+	})
+
+})
+
+</script>
+
+</block>

@@ -1,0 +1,151 @@
+<include file="Public/header" />
+<style type="text/css">
+.tpls-box {width:100%;min-height:60px;}
+.tpl-item {position:relative;padding:8px 8px 0 8px;background:#f1f1f1;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;margin:0 16px 16px 0;}
+.tpl-item .tpl-shots {width:220px;height:220px;overflow:hidden;text-align:center;line-height:220px;}
+.tpl-item img {max-width:220px;max-height:220px;}
+.tpl-item p {line-height:36px;text-align:left;margin:10px 0 0;border-top:1px solid #d1d1d1;}
+a.tpl-sel {display:block;position:absolute;right:6px;bottom:0px;width:36px;height:36px;background:url(__PUBLIC__/images/item-selected-s.png) no-repeat -184px -257px;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="__GROUP__/Endpoints/index/et/{$Think.get.et|default='x86'}">终端管理</a></li>
+	<li><a href="__URL__/index/et/{$Think.get.et|default='x86'}">终端组列表</a></li>
+	<li class="active"><gt name="epg.id" value="0">修改<else /></gt>添加终端组</li>
+</ol>
+<p class="bg-warning text-center egp-msgbox" style="padding:8px 12px;color:#333;position:relative;">
+	<i class="icon-warning-sign" style="color:#a94442"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span>如果尝试创建一个下级子属终端组，操作成功后，该组的上级组的模板设置会被自动取消！</span>
+	<i class="icon-remove fr" style="cursor:pointer"></i>
+</p>
+<form id="upassForm" class="form-horizontal" role="form" method="post" action="__SELF__">
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="pGroup">上级组</label>
+		<div class="col-sm-2">
+			<select class="form-control input-sm" name="parent_classid" id="pGroup">
+				<option value="">顶级组</option>
+				<volist name="pGrps" id="grp">
+					<eq name="grp.groupclassid" value="$epg.parent_classid">
+						<option value="{$grp.groupclassid}" selected>{$grp.space} {$grp.groupname}</option>
+					<else />
+						<php> if (in_array($grp['groupclassid'], $childrenGrps) || $grp['level'] == 3) { </php>
+							<option value="{$grp.groupclassid}" disabled>{$grp.space} {$grp.groupname}</option>
+						<php> } else { </php>
+							<option value="{$grp.groupclassid}">{$grp.space} {$grp.groupname}</option>
+						<php> } </php>
+					</eq>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="groupName">组名称</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="text" name="groupname" id="groupName" value="{$epg.groupname}">
+		</div>
+	</div>
+	<empty name="realChildrenGrps">
+	<div class="form-group">
+	<else />
+	<div class="form-group" style="display:none;">
+	</empty>
+		<label class="col-sm-2 control-label" for="tplclassID">应用模板</label>
+		<div class="col-sm-10">
+			<p class="form-control-static">为该终端组在下面的模板列表中选择一套模板。</p>
+			<input type="hidden" name="tplclassid" id="tplclassID" value="{$epg.tplclassid}">
+			<div class="tpls-box clearfix">
+				<volist name="tpls" id="vo">
+				<div class="tpl-item fl">
+					<div class="tpl-shots">
+						<img src="__PUBLIC__/images/demo.png">
+					</div>
+					<p>{$vo.tplname}</p>
+					<eq name="vo.tplclassid" value="$epg.tplclassid">
+						<a href="javascript:void(0);" data-id="{$vo.tplclassid}" class="tpl-sel" style="background-position:-50px -257px;"></a>
+					<else />
+						<a href="javascript:void(0);" data-id="{$vo.tplclassid}" class="tpl-sel"></a>
+					</eq>
+				</div>
+				</volist>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="id" value="{$epg.id}">
+			<input type="hidden" name="endType" value="{$Think.get.et|default='x86'}">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	
+	var endType = '{$Think.get.et|default="x86"}';
+	
+	$('.tpl-item').mouseover(function() {
+		$(this).css({background : '#e1e1e1'});
+	}).mouseout(function() {
+		$(this).css({background : '#f1f1f1'});
+	});
+	
+	$('.tpl-sel').click(function() {
+		$('.tpl-sel').css({'background-position' : '-184px -257px'});
+		$(this).css({'background-position' : '-50px -257px'});
+		$('#tplclassID').val($(this).attr('data-id'));
+	});
+
+	$('button[type="reset"]').click(function(){
+		window.location.href = '__URL__/index/et/' + endType;
+	});
+	
+	$('.egp-msgbox i.icon-remove').click(function() {
+		$(this).closest('p').fadeOut();
+	});
+	
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+        	groupname : {  
+                required : true,
+            }
+        },  
+        messages : {
+        	groupname : {  
+                required : "组名称必填." ,
+            }
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('div').append(error);  
+        },  
+		submitHandler: function(form) {
+			/* var parentClassId = $.trim($('#pGroup').val());
+			if (parentClassId != '') {
+				$.kw.confirm('本次操作将会创建一个下级子属终端组，操作成功后，该组的上级组的模板会被自动取消！<br>确认要继续保存吗？', function() {
+					form.submit();
+				});
+				return false;
+			} else { */
+				form.submit();
+			//}
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

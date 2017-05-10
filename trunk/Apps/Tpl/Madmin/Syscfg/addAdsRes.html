@@ -1,0 +1,245 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+<style>
+/* #uploadfyQueueList{position:absolute;top:0;left:114px;width:600px;}
+.uploadify-queue-item{margin:0;max-width:480px;padding:4px;}
+.uploadify-progress{margin-top:3px;} */
+a.del-gallery-item, a.set-as-cover{display:block;position:absolute;bottom:33px;right:8px;font-size:28px;color:#666;}
+a.set-as-cover{right:48px;}
+a.set-as-cover.is-cover{color:#16a085;}
+a.set-as-cover:hover{color:#1abc9c;}
+a.del-gallery-item:hover{color:#a94442;}
+.uploadify {display:inline-block;line-height:30px;}
+.store-info .btn-default, .store-info .btn-default:hover, .store-info .btn-default:active, .store-info .btn-default:visited{background-color:#fff;border-color:#ccc;}
+</style>
+<ol class="breadcrumb">
+	<li><a href="">广告管理</a></li>
+	<li class="active"><gt name="Think.get.id" value="0">编辑<else />添加</gt>广告资源</li>
+</ol>
+
+<div id="AdsInfo" class="row well">
+	<form class="form-inline edit-form" role="form" method="post" action="__URL__/addAdsRes">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td class="text-right" width="90"><b>广告标题：</b></td>
+					<td width="280">
+						<input type="text" class="form-control input-sm" name="adstitle" value="{$adInfo.adstitle}" style="width:220px;">
+					</td>
+					<td class="text-right" width="160"><b>应用终端尺寸类型：</b></td>
+					<td width="180">
+						<select class="form-control input-sm" name="ads_sizetype" style="width:auto;">
+							<eq name="adInfo.ads_sizetype" value="h">
+								<option value="h" selected>横屏</option>
+							<else />
+								<option value="h">横屏</option>
+							</eq>
+							
+							<eq name="adInfo.ads_sizetype" value="v">
+								<option value="v" selected>竖屏</option>
+							<else />
+								<option value="v">竖屏</option>
+							</eq>
+						</select>
+					</td>
+					<td class="text-right" width="160"><b>轮播间隔时间：</b></td>
+					<td width="180">
+						<input type="text" class="form-control input-sm" name="adsdelay" value="{$adInfo.adsdelay|default=10}" style="width:48px;text-align:center;"> 秒
+					</td>
+					<td>
+						<input type="hidden" name="id" value="{$adInfo.id}">
+						<button type="submit" class="btn btn-info btn-sm">保 存</button>
+					</td>
+					<td class="text-right">
+						<a href="__URL__/ads" type="button" class="btn btn-default btn-sm">返回广告列表</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+
+<gt name="adInfo.id" value="0">
+<div class="adres-images">
+	<div class="store-info row" style="padding: 10px 20px 10px 0px;margin-bottom:10px;border-bottom:1px solid #eee;line-height:30px;">
+		<div class="col-md-12">
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file">
+			<a href="javascript:void(0);" type="button" class="btn btn-default btn-sm" id="systemAutoGenRes" style="padding:3px 10px 4px;margin-left:20px;font-size:14px;"><i class="icon-plus"></i> 系统自动生成</a>
+		</div>
+	</div>
+	
+	<div class="up-image-box" style="position:relative;width:auto;">
+		<div class="showimg clearfix" style="position:relative;width:auto;">
+			<volist name="adsResList" id="vo">
+				<span>
+					<img src="/{$Think.config.upload_thumb_path}{$vo.filepath}?{:rand()}" />
+					<a href="javascript:void(0);" class="del-gallery-item" data-resid="{$vo.id}" title="删除"><i class="icon-minus-sign"></i></a>
+				</span>
+			</volist>
+		</div>
+	</div>
+</div>
+</gt>
+
+<div id="upArea"></div>
+<div class="my-cover" style="display:none;"></div>
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title"></h4>
+		</div>
+		<div class="modal-body">
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/uploadify/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(function($) {
+	var tmpClassid = '{$adInfo.dir_resourceid|default=""}',
+		sizetype = '{$adInfo.ads_sizetype|default="h"}';
+	
+	$('.showimg span').hover(
+		function() { $(this).css({'background-color' : '#f5f5f5'}); },
+		function() { $(this).css({'background-color' : '#ffffff'}); }
+	);
+	
+	$('.showimg').delegate('a.del-gallery-item', 'click', function(){
+		var resId = $(this).attr('data-resid'),
+			confirmInfo = '确认要删除该图片吗？';
+			that = this;
+		
+			
+		$.kw.confirm(confirmInfo, function() {
+			$.post('__GROUP__/Ajaxhandle/delResFromMedialibByIncreID', {resourceid:tmpClassid, resid:resId}, function(data) {
+				if (data.stat*1) {
+					$(that).closest('span').remove();
+				} else {
+					$.kw.alert(data.msg);
+				}
+			}, 'json');
+		});
+	});
+	
+	$('#systemAutoGenRes').click(function() {
+		
+		var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+		loadingHtml += '<p style="font-size:72px;margin:30px auto 30px"><i class="icon-spinner icon-spin"></i></p>';
+		loadingHtml += '<p style="line-height:28px;">系统正在处理中，请不要关闭当前窗口……</p>';
+		loadingHtml += '</div>';
+		$('#resWindow .modal-body').first().html(loadingHtml);
+		$('#resWindow').find('.modal-title').first().html('操作提示');
+		showFramesMasklayer();
+		setDivCenter('#resWindow');
+		
+		$.post('__GROUP__/Ajaxhandle/autoGenAdsRes', {classid : tmpClassid, sizetype : sizetype}, function(re) {
+			if (re.stat*1) {
+				$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+				$('#resWindow .loading-box').first().find('p:eq(1)').html('操作成功！');
+			} else {
+				$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+				$('#resWindow .loading-box').first().find('p:eq(1)').text(re.msg);
+			}
+		}, 'json');
+	});
+	
+	$('button.close, button.close2').click(function(){
+		$('#resWindow').hide();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+	
+	// Uploadify 批量上传
+	setTimeout(function(){
+		$('#file_upload').uploadify({
+			'debug' : false,
+			'multi' : true,
+			'fileObjName' : 'myUpfile',
+			'fileTypeDesc' : '图片',
+			'fileTypeExts' : '*.jpeg; *.jpg; *.png; *.bmp',
+			'buttonText' : '<i class="icon-upload"></i>上传广告图片',
+			'width' : 160,
+			'buttonClass' : 'uploadify',
+			'swf'      : '__PUBLIC__/script/uploadify/uploadify.swf',
+			'formData'     : {dataType : 'image', 'isDBWrite' : 1, 'appModel' : 'ads', tmpClassID : tmpClassid},
+			'uploader' : '__GROUP__/Ajaxhandle/uploadify',
+			'queueID'  : 'upArea',
+			'removeCompleted' : true,
+			'removeTimeout' : 3,
+			'overrideEvents' : ['onDialogClose', 'onUploadSuccess', 'onSelectError'],
+			'onDialogClose' : function(queueData) {
+				succCount = failedCount = 0;
+				errMsg = '';
+				if(queueData.filesQueued > 0) {
+					$('#upArea').show();
+					showFramesMasklayer();
+				}
+			},
+			'onSelectError' : function(file, errorCode, errorMsg) {
+				//console.log(errorCode);
+				//console.log(errorMsg);
+				switch (errorCode) {
+					case -110:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件大小超过最大上传限制50MB！\n\n 请示使用 [ 大文件上传 ] 工具进行上传.');
+						break;
+					case -130:
+						alert('【文件上传失败提示】\n\n ' + file.name + ' : 文件类型不正确.');
+						break;
+				}
+			},
+			/* 'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if (re.stat*1) {
+					$('#' + file.id).find('.data').html('<span class="text-success">&nbsp;上传成功</span>');
+					$(".showimg").first().append('<span><img src="' + re.url + '?' + Math.random() + '" /><a href="javascript:void(0);" class="del-gallery-item" data-resid="' + re.resourceid + '" title="删除"><i class="icon-minus-sign"></i></a></span>');
+				} else {
+					$('#' + file.id).addClass('text-danger').find('.data').html('<span>&nbsp;'+re.msg+'</span>');
+					$('#' + file.id).find('.uploadify-progress-bar').first().css({width : 0});
+				}
+			} */
+			'onUploadSuccess' : function(file, data, response) {
+				var re = $.parseJSON(data);
+				if(re.stat*1) {
+					succCount++;
+					$(".showimg").first().append('<span><img src="' + re.thumbURL + '?' + Math.random() + '" /><a href="javascript:void(0);" class="del-gallery-item" data-resid="' + re.resid + '" title="删除"><i class="icon-minus-sign"></i></a></span>');
+				} else {
+					failedCount++;
+					errMsg += '<p class="text-warning">' + file.name + ' : ' + re.msg + '</p>';
+				}
+			},
+			'onQueueComplete' : function(queueData) {
+				var resultHtml = '<div style="font-size:14px;"><p class="text-success"><b><big>' + succCount + '</big></b>个文件成功上传.</p>';
+					resultHtml += '<p class="text-danger"><b><big>' + failedCount + '</big></b>个文件上传失败.</p></div>';
+				
+				if (errMsg != '') {
+					resultHtml += '<div class="line"></div><h5>错误信息：</h5>';
+					resultHtml += errMsg;
+				}
+				resultHtml += '<div class="text-center" style="margin-top:20px;"><button type="button" id="closeBtn" class="btn btn-info btn-sm">确 定</button></div>';
+				
+				$('#upArea').html(resultHtml);
+				
+				var queuedFile = {};
+				for (var n in this.queueData.files) {
+					queuedFile = this.queueData.files[n];
+					$('#' + queuedFile.id).remove();
+					this.cancelUpload(queuedFile.id);
+				}
+			}
+		});
+	}, 10);
+	
+	$('#upArea').delegate('#closeBtn', 'click', function(){
+		$('#upArea').empty().hide();
+		hideFramesMasklayer();
+	});
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,112 @@
+<include file="Public/header" />
+<ol class="breadcrumb">
+	<li><a href="">用户管理</a></li>
+	<li class="active">修改登录密码</li>
+</ol>
+<form id="upassForm" class="form-horizontal edit-form" role="form" method="post" action="__SELF__">
+	<!-- <div class="form-group">
+		<label class="col-sm-2 control-label" for="oldPass">原始登录密码</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="password" name="old_pass" id="oldPass" value="" required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label fl" for="newPass">新密码</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="password" name="new_pass" id="newPass" value="">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="cfmNewPass">确认新密码</label>
+		<div class="col-sm-3">
+			<input class="form-control input-sm" type="password" name="cfm_new_pass" id="cfmNewPass" value="">
+		</div>
+	</div>
+	
+	
+	
+	<div class="form-group">
+		<label class="col-sm-2 control-label" for="">&nbsp;</label>
+		<div class="col-sm-4">
+			<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+			<button type="reset" class="btn btn-default btn-sm">取消</button>
+		</div>
+	</div> -->
+
+	<table class="table">
+		<tbody>
+			<tr>
+				<td class="text-right valign-top" width="20%"><b>原始登录密码</b></td>
+				<td class="my-form-group"><input class="form-control input-sm" type="password" name="old_pass" id="oldPass" value="" required></td>
+			</tr>
+			<tr>
+				<td class="text-right valign-top" width="20%"><b>新密码</b></td>
+				<td class="my-form-group"><input class="form-control input-sm" type="password" name="new_pass" id="newPass" value=""></td>
+			</tr>
+			<tr>
+				<td class="text-right valign-top" width="20%"><b>确认新密码</b></td>
+				<td class="my-form-group"><input class="form-control input-sm" type="password" name="cfm_new_pass" id="cfmNewPass" value=""></td>
+			</tr>
+			<tr>
+				<td class="text-right" width="20%">&nbsp;</td>
+				<td class="text-left" style="padding:24px 0;">
+					<button type="submit" class="btn btn-info btn-sm">保存更改</button>&nbsp;&nbsp;
+					<button type="reset" class="btn btn-default btn-sm">取消</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</form>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$(function($) {
+	$('#upassForm').validate({
+		errorElement : 'span',
+		errorClass : 'help-block',
+		focusInvalid : true,  
+        rules : {  
+        	old_pass : {  
+                required : true  
+            },  
+            new_pass : {  
+                required : true
+            },  
+            cfm_new_pass : {  
+                required : true,
+                equalTo	: '#newPass'
+            }  
+        },  
+        messages : {  
+        	old_pass : {  
+                required : "原始登录密码必填."  
+            },  
+            new_pass : {  
+                required : "新密码必填."
+            },  
+            cfm_new_pass : {  
+                required : "确认新密码必填.",
+                equalTo : '两次输入新密码不一致'
+            }  
+        },  
+
+        highlight : function(element) {  
+            $(element).closest('.my-form-group').addClass('has-error');  
+        },  
+
+        success : function(label) {  
+            label.closest('.my-form-group').removeClass('has-error');  
+            label.remove();  
+        },  
+
+        errorPlacement : function(error, element) {  
+            element.parent('td').append(error);  
+        },  
+		submitHandler: function(form) {
+			form.submit();
+		}
+	});
+});
+</script>
+<include file="Public/footer" />

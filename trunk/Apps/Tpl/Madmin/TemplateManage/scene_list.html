@@ -1,0 +1,86 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="{:U('TemplateManage/showEach',array('tType'=>$tType))}">模板管理</a></li>
+	<li>场景管理</li>
+</ol>
+
+<div id="" class="row well">
+	<div class="col-md-9">
+
+	</div>
+	<div class="col-md-12 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;text-align:left;">
+                    <b>模板：{$tpl.tplname}</b>
+    				<!--<b>场景名称：{$datas_home.scencename}</b>-->		
+					</td>
+                    <td align="right" style="border:0;text-align:left;">
+                    <div align="right"><a href="{:U('TemplateManage/showEach',array('tType'=>$tType))}" type="button" class="btn btn-info btn-sm " id="addNew">返回</a></div></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th style="width:60px;">ID</th>
+				
+                <th>场景名称</th>
+                <th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="datas" id="vo">
+            
+			<tr>
+				<td>{$vo.id}</td>
+                
+				<td>
+					{$vo.space}
+					<eq name="vo.has_children" value="1">
+						<i class="icon-caret-down" style="cursor:pointer;"></i>
+					<else/>
+						<i class="icon-caret-right" style="cursor:pointer;"></i>
+					</eq>
+					&nbsp;&nbsp;
+					{$vo.scencename}
+				</td>
+                <td></td>
+				<td>
+				</td>
+			</tr>
+           
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>&nbsp;</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	/* $('#nodeFilter').change(function() {
+		window.location.href = '__URL__/nodesList/nid/' + $(this).val();
+	}); */
+});
+</script>
+<include file="Public/footer" />

@@ -1,0 +1,136 @@
+<include file="Public/header" />
+<link rel="stylesheet" href="__PUBLIC__/script/uploadify/uploadify.css">
+
+<ol class="breadcrumb">
+	<li><a href="">管理组</a></li>
+	<li><a href="">管理组列表</a></li>
+	<li class="active">分配权限</li>
+</ol>
+
+<div class="row well" style="padding: 10px 0;">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-6">
+				<b>组名称</b>：{$role.name}
+			</div>
+			<div class="col-md-6">
+				<b>状态</b>：<eq name="role.status" value="1">正常<else/>禁用</eq>
+			</div>
+		</div> 
+		<div class="row" style="margin-top:16px;border-top:1px solid #e3e3e3;padding-top:16px;">
+			<div class="col-md-12">
+				<b>说明</b>：{$role.remark}
+			</div>
+		</div> 
+	</div>
+</div>
+
+<div  class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">组权限分配：</h5>
+		<div class="fr">&nbsp;</div>
+	</div>
+	<form method="post" action="__URL__/assignPerms">
+	<volist name="nodes" id="vo">
+		<eq name="vo.id" value="3">
+		<dl class="node-perms scences-items well" style="background:#fcfcfc;padding:10px;">
+		<else/>
+		<dl class="node-perms well" style="background:#fcfcfc;padding:10px;">
+		</eq>
+			<dt>
+				<in name="vo.id" value="$roleAccess">
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.id}" checked> {$vo.title}</label>
+				<else/>
+					<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.id}"> {$vo.title}</label>
+				</in>
+			</dt>
+			<notempty name="vo['children']">
+			<dd>
+				<volist name="vo['children']" id="svo">
+					<in name="svo.id" value="$roleAccess">
+						<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.id}" checked> {$svo.title}</label>
+					<else/>
+						<label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.id}"> {$svo.title}</label>
+					</in>
+				</volist>
+			</dd>
+			</notempty>
+			<eq name="vo.id" value="3">
+					<dl class="node-perms">
+						<dd class="clearfix" style="font-weight:bold;color:#888;">
+							<div class="fl" style="width:20%;">场景名称</div>
+							<div class="fl" style="width:78%;">包含插件</div>
+						</dd>
+					</dl>
+				<volist name="scencesItems" id="si">
+					<dl class="node-perms">
+						<dd class="clearfix">
+							<div class="fl scences" style="width:20%;">
+							<in name="si.id" value="$sids">
+								<label class="checkbox-inline"><input type="checkbox" name="scences[]" value="{$si.id}" checked> {$si.scencename}</label>
+							<else/>
+								<label class="checkbox-inline"><input type="checkbox" name="scences[]" value="{$si.id}"> {$si.scencename}</label>
+							</in>
+							</div>
+							<div class="fl items" style="width:78%;">
+								<volist name="si['items']" id="isi">
+									<in name="isi.id" value="$iids">
+									<label class="checkbox-inline"><input type="checkbox" name="scence_{$si.id}[]" value="{$isi.id}" checked> {$isi.name}</label>
+									<else/>
+									<label class="checkbox-inline"><input type="checkbox" name="scence_{$si.id}[]" value="{$isi.id}"> {$isi.name}</label>
+									</in>
+								</volist>
+							</div>
+						</dd>
+					</dl>
+				</volist>
+			</eq>
+		</dl>
+	</volist>
+	<div class="text-center">
+		<input type="hidden" name="role_id" value="{$role.id}">
+		<input class="btn btn-info btn-sm" type="submit" value="确认保存">&nbsp;&nbsp;
+		<input class="btn btn-default btn-sm" type="reset" value="取消">
+	</div>
+	</form>
+</div>
+
+<!-- 加载插件模板 -->
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	$('input[type="reset"]').click(function(){
+		window.location.href = '__URL__/rolesList';
+	});
+	
+	$('dt input').click(function() {
+		var isChecked = $(this).prop('checked');
+		$(this).parents('dt').first().siblings('dd').first().find('input').prop({'checked' : isChecked});
+	});
+	
+	$('dd input').click(function() {
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+	});
+	
+	$('.scences :checkbox').click(function(){
+		$(this).parents('div').first().siblings('.items').first().find(':checkbox').prop({checked : $(this).prop('checked')});
+	});
+	
+	$('.items :checkbox').click(function(){
+		$(this).parents('div').first().siblings('.scences').first().find(':checkbox').prop({checked : ($(this).parents('div').first().find(':checkbox:checked').size() > 0)});
+	});
+	
+	$('.scences-items > dt').find(':checkbox').first().click(function() {
+		$('.scences :checkbox, .items :checkbox').prop({checked : $(this).prop('checked')});
+	});
+	
+	$('.scences :checkbox, .items :checkbox').click(function() {
+		$('.scences-items > dt').find(':checkbox').first().prop({checked : ($('.scences-items dl').find(':checkbox:checked').size() > 0)});
+	});
+});
+</script>
+<include file="Public/footer" />

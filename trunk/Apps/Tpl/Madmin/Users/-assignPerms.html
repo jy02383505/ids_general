@@ -1,0 +1,271 @@
+<include file="Public/header" />
+<style>
+.node-perms .checkbox-inline{width:auto;}
+.node-perms .radio-inline, .checkbox-inline{padding-left:4px;}
+.node-perms dd{padding:10px 28px 5px 28px;}
+.node-perms dt span, .node-perms dd span{display:inline-block;width:160px;}
+</style>
+
+<ol class="breadcrumb">
+	<li><a href="__URL__/rolesList">管理组</a></li>
+	<li><a href="__URL__/rolesList">管理组列表</a></li>
+	<li class="active">分配权限</li>
+</ol>
+
+<div class="row well" style="padding: 10px 0;">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-6">
+				<b>组名称</b>：{$role.name}
+			</div>
+			<div class="col-md-6">
+				<b>状态</b>：<eq name="role.status" value="1">正常<else/>禁用</eq>
+			</div>
+		</div> 
+		<div class="row" style="margin-top:8px;border-top:1px solid #e3e3e3;padding-top:8px;">
+			<div class="col-md-12">
+				<b>说明</b>：{$role.remark}
+			</div>
+		</div> 
+	</div>
+</div>
+
+<div  class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">组权限分配：</h5>
+		<div class="fr">&nbsp;</div>
+	</div>
+	<form id="accForm" method="post" action="__URL__/assignPerms">
+	<div class="acc-list clearfix">
+	<volist name="nodes" id="vo">
+		<dl class="node-perms well" data-mod="{$vo.name}" style="background:#fcfcfc;padding:10px 0 0 10px;">
+			<dt>
+				<in name="vo.node_id" value="$roleAccess">
+					<span><label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}" checked> {$vo.title}</label></span>
+				<else/>
+					<span><label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$vo.node_id}"> {$vo.title}</label></span>
+				</in>
+			</dt>
+			<if condition="$vo.name eq 'Programs2'">
+				<dd>
+					<foreach name="vo['items']" item="svo" key="etype">
+						<div class="" style="margin-bottom:20px;padding:10px 10px 0 10px;background-color:#f2f2f2;border-radius:4px;">
+							<div class="sub-dt">
+							<php> if (in_array($etype, array_keys($roleAccessCon['Programs']))) { </php>
+								<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}[]" value="{$etype}" checked> {$svo.title}</label></span>
+							<php> } else { </php>
+								<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}[]" value="{$etype}"> {$svo.title}</label></span>
+							<php> } </php>
+							</div>
+							<div class="sub-dd" style="margin-left:28px;">
+								<foreach name="svo['datalist']" item="ssvo" key="pid">
+									<php> if (in_array($pid, $roleAccessCon['Programs'][$etype])) { </php>
+										<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}_{$etype}[]" value="{$pid}" checked> {$ssvo}</label></span>
+									<php> } else { </php>
+										<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}_{$etype}[]" value="{$pid}"> {$ssvo}</label></span>
+									<php> } </php>
+								</foreach>
+							</div>
+						</div>
+					</foreach>
+				</dd>
+
+			<elseif condition="$vo.name eq 'EndPoints'" />
+				<dd>
+					<foreach name="vo['items']" item="svo" key="etype">
+						<php> if (in_array($etype, $roleAccessCon['EndPoints'])) { </php>
+							<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}[]" value="{$etype}" checked> {$svo.title}</label></span>
+						<php> } else { </php>
+							<span><label class="checkbox-inline"><input type="checkbox" name="perms_{$vo.name}[]" value="{$etype}"> {$svo.title}</label></span>
+						<php> } </php>
+					</foreach>
+				</dd>
+			<else />
+				<dd>
+					<volist name="vo['children']" id="svo">
+						<in name="svo.node_id" value="$roleAccess">
+							<span><label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.node_id}" checked> {$svo.title}</label></span>
+						<else/>
+							<span><label class="checkbox-inline"><input type="checkbox" name="perms[]" value="{$svo.node_id}"> {$svo.title}</label></span>
+						</in>
+					</volist>
+				</dd>
+			</if>
+		</dl>
+	</volist>
+	</div>
+	<div class="text-center" style="background-color:#f5f5f5;border-top:1px solid #e3e3e3;padding:18px 0 32px;">
+		<input type="hidden" name="role_id" value="{$role.id}">
+		<input class="btn btn-info btn-sm" type="submit" value="确认保存">&nbsp;&nbsp;
+		<input class="btn btn-default btn-sm" type="reset" value="取消">
+	</div>
+	</form>
+</div>
+
+<!-- 加载插件模板 -->
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+
+	$('input[type="reset"]').click(function(){
+		window.location.href = '__URL__/rolesList';
+	});
+	
+	$('dt input').siblings('ins').click(function() {
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked'),
+			ddObj = $(this).parents('dt').first().siblings('dd').first();
+		ddObj.find('input').prop({'checked' : isChecked});
+		if (isChecked) {
+			ddObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dt label.checkbox-inline').click(function() {
+		var isChecked = $(this).find(':checkbox').first().prop('checked'),
+			ddObj = $(this).parents('dt').first().siblings('dd').first();
+		ddObj.find(':checkbox').prop({'checked' : isChecked});
+		if (isChecked) {
+			ddObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dd > span input').siblings('ins').click(function() {
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('dd > span label.checkbox-inline').click(function() {
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('div.sub-dt input').siblings('ins').click(function() {
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked'),
+			subDDObj = $(this).closest('div.sub-dt').siblings('div.sub-dd').first();
+		subDDObj.find(':checkbox').prop({'checked' : isChecked});
+		if (isChecked) {
+			subDDObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			subDDObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+		
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('div.sub-dt label.checkbox-inline').click(function() {
+		
+		var isChecked = $(this).find(':checkbox').first().prop('checked'),
+			subDDObj = $(this).closest('div.sub-dt').siblings('div.sub-dd').first();
+		subDDObj.find(':checkbox').prop({'checked' : isChecked});
+		if (isChecked) {
+			subDDObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			subDDObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+		
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('div.sub-dd input').siblings('ins').click(function() {
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked'),
+			subDDObj = $(this).closest('div.sub-dd');
+			subDTObj = subDDObj.siblings('div.sub-dt').first();
+			subItems = subDDObj.find(':checkbox').size(),
+			checkedSubItems = subDDObj.find(':checkbox:checked').size();
+		subDTObj.find('input').prop({'checked' : (checkedSubItems > 0)});
+		if (checkedSubItems > 0) {
+			subDTObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			subDTObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('div.sub-dd label.checkbox-inline').click(function() {
+		var isChecked = $(this).find(':checkbox').first().prop('checked'),
+			subDDObj = $(this).closest('div.sub-dd');
+			subDTObj = subDDObj.siblings('div.sub-dt').first();
+			subItems = subDDObj.find(':checkbox').size(),
+			checkedSubItems = subDDObj.find(':checkbox:checked').size();
+		subDTObj.find('input').prop({'checked' : (checkedSubItems > 0)});
+		if (checkedSubItems > 0) {
+			subDTObj.find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			subDTObj.find('div[class*="icheckbox"]').removeClass('checked');
+		}
+
+		var ddBox = $(this).parents('dd').first(),
+			allItems = ddBox.find(':checkbox').size(),
+			checkedItems = ddBox.find(':checkbox:checked').size();
+		ddBox.siblings('dt').first().find('input').prop({'checked' : (checkedItems > 0)});
+		if (checkedItems > 0) {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').addClass('checked');
+		} else {
+			ddBox.siblings('dt').first().find('div[class*="icheckbox"]').removeClass('checked');
+		}
+	});
+	
+	$('#accForm').submit(function(){
+		/* var sids = [], pids = [];
+		var treeObj = $.fn.zTree.getZTreeObj("scences");
+		var nodes = treeObj.getCheckedNodes(true);
+		if (nodes.length > 0) {
+			$.each(nodes, function(i, o) {
+				if(o._dataType == 'scence') {
+					sids.push(o.id); 
+				} else {
+					pids.push(o.id); 
+				}
+			});
+			$('#sids').val(sids.join('-'));
+			$('#pids').val(pids.join('-'));
+		} */
+		return true;
+	});
+});
+</script>
+<include file="Public/footer" />

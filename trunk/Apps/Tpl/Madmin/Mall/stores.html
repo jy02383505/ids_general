@@ -1,0 +1,127 @@
+<include file="Public/header" />
+
+<ol class="breadcrumb">
+	<li><a href="">商场管理</a></li>
+	<li><a href=""><eq name="Think.get.sc" value="1">商铺<else/>公共设施点位</eq>管理</a></li>
+	<li class="active"><eq name="Think.get.sc" value="1">商铺<else/>点位</eq>列表</li>
+</ol>
+
+<div id="" class="row well">
+	<div class="col-md-9">
+		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td class="text-right" width="90"><b>楼层：</b></td>
+						<td style="border:0;">
+							<select class="form-control input-sm" name="floor" id="storeFloor" style="width:auto;">
+								<option value="">-- 全部 --</option>
+								<for start="1" end="$mallFloors" comparison="elt">
+									<eq name="i" value="$Think.get.floor">
+									<option value="{$i}" selected>{$i}层</option>
+									<else />
+									<option value="{$i}">{$i}层</option>
+									</eq>
+								</for>
+							</select>
+						</td>
+						<td class="text-right" width="90"><b>商铺分类：</b></td>
+						<td>
+							<select class="form-control input-sm" name="type_id" id="storeType">
+								<option value="">-- 全部 --</option>
+								<volist name="storeTypes" id="vo">
+									<eq name="vo.ID" value="$Think.get.type_id">
+										<option value="{$vo.ID}" selected>{$vo.space} {$vo.tName}</option>
+									<else/>
+										<option value="{$vo.ID}">{$vo.space} {$vo.tName}</option>
+									</eq>
+								</volist>
+							</select>
+						</td>
+						<td class="text-right" width="90"><b>商铺名称：</b></td>
+						<td>
+							<input type="text" class="form-control input-sm" name="sname" value="{$Think.get.sname}" style="width:182px;">
+							<button type="submit" class="btn btn-info btn-sm">搜索</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<div class="col-md-3 text-right">
+		<table class="table">
+			<tbody>
+				<tr>
+					<td style="border:0;">
+						<eq name="Think.get.sc" value="1">
+						<a href="__URL__/addStore/spottype/shop" type="button" class="btn btn-info btn-sm" id="addNewStore">添加商铺</a>
+						<else/>
+						<a href="__URL__/addStore/spottype/service" type="button" class="btn btn-info btn-sm" id="addNewStore">添加公共设施点位</a>
+						<a href="__URL__/addStore/spottype/tep" type="button" class="btn btn-info btn-sm" id="addNewStore">添加信息终端点位</a>
+						</eq>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<!-- <th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th> -->
+				<th>#ID</th>
+				<th>商铺名称</th>
+				<th>拼音简写</th>
+				<th>所在楼层</th>
+				<th>商铺地址</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="stores" id="vo">
+			<tr>
+				<!-- <td><input type="checkbox"></td> -->
+				<td>{$vo.Id}</td>
+				<td>{$vo.sname}</td>
+				<td>{$vo.pyshort}</td>
+				<td>{$vo.floor}层</td>
+				<td>{$vo.adress}</td>
+				<td>
+					<a class="oper edit" href="__URL__/editStore/spottype/{$vo.spottype}/id/{$vo.Id}" title="编辑"><i class="icon-pencil"></i></a>
+					<eq name="Think.get.sc" value="1">
+					<a class="oper edit" href="__URL__/storeGallery/id/{$vo.Id}" title="管理形象照片"><i class="icon-th"></i></a>
+					<a class="oper edit" href="__URL__/storeWeixin/id/{$vo.Id}" title="关联微信"><i class="icon-comments"></i></a>
+					</eq>
+					<a class="oper del" href="javascript:void(0);" data-url="__URL__/delStore/id/{$vo.Id}" title="删除"><i class="icon-trash"></i></a>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<!-- <input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> -->
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除该商铺吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+});
+</script>
+<include file="Public/footer" />

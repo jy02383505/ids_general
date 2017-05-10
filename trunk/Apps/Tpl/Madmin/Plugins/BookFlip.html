@@ -1,0 +1,58 @@
+<div class="data-list-table">
+	<div class="dlt-tilbar clearfix">
+		<h5 class="fl">图片列表<span style="font-weight:normal;font-size:12px;">（文件夹路径：/{$Think.config.upload_root_path}{$pluginsData.resData.filepath}/）</span></h5>
+		<div class="fr">
+			<!-- <div class="up-image-box">
+				<div class="myup-btn"> 
+					<span><i class="icon-upload"></i> 上传图片</span>
+					<input class="fileupload" type="file" multiple name="gcover">
+				</div>
+			</div> -->
+			<div id="upArea"></div>
+			<div class="my-cover" style="display:none;"></div>
+			<input id="file_upload" class="btn btn-default" name="file_upload" type="file" multiple="true">
+		</div>
+	</div>
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<th class="text-center" width="40%">图片</th>
+				<th class="text-center">文件名称&nbsp;
+					<eq name="Think.get.ord" value="1">
+						<a href="__URL__/editData/pid/{$pluginsData.itemclassid}/did/{$pluginsData.id}/ord/0"><i class="icon-caret-down order-desc"></i></a>
+					<else/>
+						<a href="__URL__/editData/pid/{$pluginsData.itemclassid}/did/{$pluginsData.id}/ord/1"><i class="icon-caret-up order-asc"></i></a>
+					</eq>
+				</th>
+				<th class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<notempty name="pluginsData['resFiles']">
+				<volist name="pluginsData['resFiles']" id="vo">
+					<tr>
+						<td><input type="checkbox" value="{$Think.config.upload_root_path}{$pluginsData.resData.filepath}/{$vo}"></td>
+						<td class="img-show-td"><img src="/{$Think.config.upload_root_path}{$pluginsData.resData.filepath}/{$vo}" /></td>
+						<td class="editTd" data-fname="{$vo}" data-fpath="{$Think.config.upload_root_path}{$pluginsData.resData.filepath}/" data-edit="0">
+							<span>{$vo}</span>
+							<a href="javascript:void(0);" title="点击编辑"><i class="icon-edit"></i></a>
+						</td>
+						<td style="text-align:center;">
+							<a class="oper del-file" href="javascript:void(0);" data-filepath="{$Think.config.upload_root_path}{$pluginsData.resData.filepath}/{$vo}" title="删除"><i class="icon-trash"></i></a>
+						</td>
+					</tr>
+				</volist>
+			</notempty>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<input type="checkbox" class="select-all" title="全选/全不选">
+				<button type="button" class="btn btn-default btn-sm multi-del-files" style="margin-left:30px;">批量删除</button>
+			</td>
+			<td class="page-box text-right" width="80%">{$page}</td>
+		</tr>
+	</table>
+</div>

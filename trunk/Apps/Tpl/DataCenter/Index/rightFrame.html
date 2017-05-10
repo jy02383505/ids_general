@@ -1,0 +1,34 @@
+<include file="Madmin:Public:header" />
+
+<div class="well" style="padding:0 10px;">
+	<h3>欢迎回来，{$Think.session.username}！</h3>
+	<p>上次登录时间：{$Think.session.last_login_time}.</p>
+</div>
+
+<div class="data-list-table">
+	<div class="dlt-tilbar">
+		<h5>运行环境</h5>
+	</div>
+	<table class="table">
+		<tbody>
+			<volist name="sysinfo" id="vo">
+				<tr>
+					<td>{$vo.title}</td>
+					<td>{$vo.val}</td>
+				</tr>
+			</volist>
+		</tbody>
+	</table>
+</div>
+
+<div style="padding-top:10px;margin-top:36px;border-top:1px solid #ccc;">
+	<p class="text-center">&copy; 2009 - {:date('Y')} 山西久联网络科技有限公司 版权所有.</p>
+</div>
+
+<include file="Madmin:Public:jsLoader" />
+<script type="text/javascript">
+$(function($){
+
+});
+</script>
+<include file="Madmin:Public:footer" />

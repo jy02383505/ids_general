@@ -1,0 +1,111 @@
+<include file="Public/header" />
+
+<style>
+@charset "utf-8";
+*{padding:0;margin:0;}
+li{list-style:none;}
+img{border:none;}
+a{text-decoration:none;outline:none;hide-focus:expression(this.hideFocus=true);}
+body{background:#fff;}
+
+/* play */
+.play{width:700px;height:580px;overflow:hidden;position:relative;margin:0 auto;}
+.mask-layer{position:absolute;width:100%;height:100%;top:0px;right:0px;bottom:0px;left:0px;filter:alpha(opacity=0);background-color:#000;opacity:0;-moz-opacity:0;z-index:9999;}
+.play ul{position:absolute;top:0;left:0;z-index:1;}
+.play ul li{width:700px;height:580px;float:left;position:relative;}
+.play ul li p{font-size:14px;color:#f0f0f0;line-height:20px;text-align:left;text-indent:2em;margin-top:10px;}
+.play ul li img{width:700px;height:420px;}
+#next,#prev{display:block;position:absolute;top:300px;width:40px;height:80px;text-align:center;background:url(__PUBLIC__/images/next-prev.png) no-repeat;z-index:999;}
+#prev{left:48px;background-position:0 -60px;}
+#next{right:48px;background-position:-40px -60px;}
+</style>
+
+<ol class="breadcrumb">
+	<li><a href="javascript:void();">资源库</a></li>
+	<li><a href="__URL__/worldNews">全球要闻（列表）</a></li>
+	<li class="active">图集内容</li>
+</ol>
+
+<p style="margin-top:10px;text-align:center;">
+	<h4 class="text-center">{$newsinfo.news_title}</h4>
+	<h6 class="text-center">{$newsinfo.news_date}</h6>
+	<p class="text-center" style="padding:0 42px;">{$newsinfo.news_content}</p>
+</p>
+
+<notempty name="gallery">
+	<div style="width:100%;text-align:center;margin:20px auto 0;position:relative;background:#333;padding-top:80px;border-radius:10px;">
+		<a class="btn btn-default btn-sm" href="__URL__/worldNews" role="button" style="position:absolute;top:4px;right:4px;">&lt;&lt;&nbsp;返回新闻列表</a>
+		<a href="javascript:void(0);" id="next"></a>
+		<a href="javascript:void(0);" id="prev"></a>
+		<div class="play" id="play">
+			<ul>
+				<volist name="gallery" id="vo">
+					<li>
+						<img src="/Uploads/reslib/news/{$vo.image}" alt="16素材网1" />
+						<p class="text"><span style="display:inline-block;width:30px;height:30px;text-align:center;line-height:30px;text-indent:0;background:#111;border-radius:15px;color:#080;position:relative;top:-4px;left:-10px;font-size:16px;font-weight:bold;font-style:oblique;">{$i}</span> {$vo.note}</p>
+					</li>
+				</volist>
+			</ul>
+			<div class="mask-layer"></div>
+		</div>
+	</div>
+</notempty>
+
+<include file="Public/jsLoader" />
+<script type="text/javascript">
+$(function($){
+	/* $('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除吗？', function() {
+			window.location.href = targetUrl;
+		});
+	}); */
+	
+/* --------------------------------------   相册效果   ----------------------------------------- */
+	
+	var oDiv = $("#play");  //外部盒子
+	var count = $("#play ul li").length;  //内部图片数量
+	var countwidth = $("#play ul li").width();  //图片边框宽度
+	var oUl = $("#play ul").css("width",count*countwidth);  //ul li总宽度
+	var now = 0;
+	var next = $("#next");
+	var prev = $("#prev");
+	//图片循环事件
+	function tab(index){
+		now = index;
+		oUl.stop(true,false).animate({"left":-countwidth * now},400);
+	}
+	
+	//下一张点击事件
+	next.click(function(){
+		//clearInterval(timer);
+		now++;
+		if(now==count){
+			now=0;
+		}
+		tab(now);
+		//timer=setInterval(autoRun, 2000);
+	});
+	//上一张点击事件
+	prev.click(function(){
+		//clearInterval(timer);
+		now--;
+		if(now==-1){
+			now=count-1;
+		}
+		tab(now);
+		//timer=setInterval(autoRun, 2000);
+	});
+	//自动轮播定义
+	function autoRun(){
+		now++;
+		if(now==count){
+			now=0;
+		}
+		tab(now);
+	};
+	//var timer=setInterval(autoRun, 3000);
+	/* --------------------------------------   相册效果   ----------------------------------------- */
+});
+</script>
+<include file="Public/footer" />

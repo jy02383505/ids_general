@@ -1,0 +1,1044 @@
+<include file="Public/header" />
+
+<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+<style>
+
+.ui-icon, .ui-widget-content .ui-icon-circle-check{background-image: url("__PUBLIC__/script/plupload2/jquery.ui.plupload/flick/images/ui-icons_0073ea_256x240.png")}
+</style>
+
+<style>
+#statusTabHeader ul{} 
+#statusTabHeader li{
+	float:left;border:1px #cccccc solid;border-bottom:0px;height:40px;line-height:40px;padding:5px 10px 0px 10px;margin:0px 1px 0 0;
+	position:relative;bottom:0px;margin-top:20px;
+} 
+#statusTabHeader li.current{background-color:#FFFFFF;}
+</style>
+
+<style type="text/css">
+
+	.res-box .col-md-3, .res-box .col-md-9{padding:0;}
+	.res-box .res-tree{border-right:1px solid #ddd;}
+	.res-box .res-window .tool-bar{height:60px;line-height:60px;background:#f5f5f5;border-bottom:1px solid #ddd;/* overflow:hidden; */}
+	.res-box .res-window .tool-bar .breadcrumb{margin:0;background:none;padding:0 4px;}
+	.res-box .res-window .tool-bar .breadcrumb .sel:before{content:none;}
+	.res-box .res-window .tool-bar .btn-sm{padding:4px 10px 3px;font-size:14px;font-weight:500;}
+	.res-box .res-window .tool-bar .btn-default:hover{background-color:#fff;border-color:#ccc;}
+	.res-list{position:relative;}
+	.res-list li{height:auto;line-height:48px;border-bottom:1px solid #ddd;padding:0 10px;position:relative;}
+	.res-list li span.ftype-icon{display:inline-block;width:32px;}
+	.res-list li span.resname{padding:6px 0;}
+	.res-list li .res-image-box{position:absolute;top:1px;left:100%;margin-left:10px;width:480px;height:300px;line-height:300px;text-align:center;background:rgba(0, 0, 0, 0.5);border-radius:4px;z-index:99;}
+	.res-list li .res-image-box img{max-width:460px;height:280px;}
+	.res-list li span.resname input{display:inline-block;width:180px;}
+	.res-list li:hover{background:#f5f5f5;}
+	.res-list li i{font-size:14px;color:#333}
+	/* .res-list li i.icon-folder-close{font-size:22px;color:#aabb00;position:relative;top:3px;} */
+	.res-list li i.icon-folder-close{font-size:18px;color:#333;position:relative;top:3px;}
+	.res-list li .opers {height:48px;}
+	.res-list li .opers a{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;color:#aaa;}
+	.res-list li .opers a i{font-size:16px;color:#a1a1a1;}
+	.res-list li .opers a:hover i{color:#16a085;}
+	.cbx-block{display:inline-block;width:28px;margin:0 5px 0 10px;position:relative;}
+	.checked{display:inline-block;cursor:pointer;position:relative;}
+	.resinfo{display:inline-block;cursor:pointer;position:relative;}
+	.resinfo.mouseover{color:#16a085}
+	.resinfo.mouseover i{color:#16a085}
+	.my-check{position:absolute;top:15px;left:-2px;width:16px;height:16px;background:#fff url(__PUBLIC__/images/icheck.png) -2px -3px;cursor:pointer;z-index:99;}
+	.jl-tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid;top:25px;left:-5px;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:rgba(0, 0, 0, 0.5);}
+	.smy-checked{background-position:-23px -3px;}
+	.addResDescBox a.jl-btn-cancel{display:block;position:absolute;bottom:6px;right:6px;width:20px;height:20px;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;text-align:center;line-height:20px;}
+	.addResDescBox a.jl-btn-cancel i{font-size:16px;}
+	.addResDescBox a.jl-btn-cancel:hover{background:rgba(51, 51, 51, 0.3)}
+	.addResDescBox a.jl-btn-cancel:hover i{color:#16a085}
+</style>
+
+<input type="hidden" name="type" id="type" value="{$type}"><!--类型：节目、栏目组、栏目、文章、各种资源等-->
+<input type="hidden" name="checked" id="checked" value="{$checked}"><!--已审（ys）,待审（ds）,驳回（bh）-->
+
+<div class="row res-box">
+
+	<div class="col-md-2 res-tree">
+		<ul class="ztree" id="itemTree"></ul>
+	</div>
+	<div class="col-md-10 res-window">
+		<div class="row tool-bar">
+			<div class="col-md-4" style="line-height:59px;">
+				<ol class="breadcrumb">
+					<li>
+						<div style="display:inline-block;width:28px;margin:0;position:relative;top:-1px;">
+						</div>
+					</li>
+					<li class="sel">
+                        <switch name="checked">
+                            <case value="ys">已审核</case>
+                            <case value="ds">待审核</case>
+                            <case value="bh">被驳回</case>
+                            <default />
+                                &nbsp;
+                        </switch>                                                
+                    </li>
+					<li class="active"><b>
+                        <switch name="type">
+                            <case value="programs">节目</case>
+                            <case value="group">栏目组</case>
+                            <case value="column">栏目</case>
+                            <case value="article">文章</case>
+                            
+                            <case value="ResLibWorldNews">资源：全球要闻</case>
+                            <case value="ResLibHistoric">资源：历史上的今天</case>
+                            <case value="ResLibFamousQuotes">资源：名人名言</case>
+                            <case value="ResLibBaike">资源：百科</case>
+                            <case value="ResLibHumorJokes">资源：幽默笑话</case>
+                            
+                            <default />
+                                &nbsp;{$type}
+                        </switch></b>
+					</li>  
+				</ol>
+			</div>
+			<div class="col-md-8 text-right"  id="statusTabHeader">
+				<ul>
+                	<a href="__GROUP__/ResLib/ResCheckIndex/type/{$type}/checked/ds" ><li id="ds" <eq name="checked" value="ds"> class="current" </eq> >待审核（{$count_ds}）</li></a>
+                    <a href="__GROUP__/ResLib/ResCheckIndex/type/{$type}/checked/bh" ><li id="bh" <eq name="checked" value="bh"> class="current" </eq> >被驳回（{$count_bh}）</li></a>
+                    <a href="__GROUP__/ResLib/ResCheckIndex/type/{$type}/checked/ys" ><li id="ys" <eq name="checked" value="ys"> class="current" </eq> >已通过（{$count_ys}）</li></a>
+                </ul>
+			</div>
+		</div>
+		
+		<ul class="res-list list-tbl">
+            <empty name="list">
+            <li class="clearfix ">查询结果为空</li>
+            </empty>
+        	<div class="tbody">
+        	<volist name="list"  id="vo">	
+				<li class="clearfix res-file-{$file.filetype}">
+					<div class="cbx-block">
+						<input type="checkbox" value="{$vo.tid}">
+						<span class="my-check"></span>
+					</div>
+                    <div class="checked">
+                        [<switch name="vo.checked">
+                            <case value="-1"><span class="check-bh">已驳回</span></case>
+                            <case value="1"><span class="check-ys">已审核</span></case>
+                            <default /><span class="check-ds">待审核</span>
+                        </switch>]
+                    </div>
+					<div class="resinfo" data-id="{$vo.id}" data-type="file">
+						<span class="resname">
+                    		<switch name="type">
+                            	<case value="ResLibWorldNews">
+                                	<a href="__GROUP__/ResLib/newsGallery/id/{$vo.id}" title="详情">{$vo.name}</a>
+                                </case>
+                                <case value="ResLibHistoric">
+                                	<a href="javascript:void(0);" class="view-details" title="查看详情">{$vo.name}</a><textarea style="display:none;">{$vo.event_content}</textarea>
+                                </case>
+                            	<case value="ResLibFamousQuotes">
+                                	<a href="javascript:void(0);" class="view-details" title="查看详情">{$vo.name}</a><textarea style="display:none;">{$vo.name}</textarea>
+                                </case>
+                             	<case value="ResLibBaike">
+                                	<a href="javascript:void(0);" class="view-details" title="查看详情">{$vo.name}</a><textarea style="display:none;">{$vo.contents}</textarea>
+                                </case>                               
+                              	<case value="ResLibHumorJokes">
+                                	<a href="javascript:void(0);" class="view-details" title="查看详情">{$vo.name}</a><textarea style="display:none;">{$vo.contents}</textarea>
+                                </case>                                
+                                
+                                <default />
+									{$vo.name}
+                            </switch>
+                            
+                            <switch name="type">
+                                <case value="ResLibFamousQuotes">
+                                    <span class="resinfo" style="font-weight:bold;">
+                                        {$vo.author}<!--名人名言，作者-->
+                                    </span>
+                                </case>
+        
+                            </switch>
+                            
+                        </span>
+					</div>
+                    
+
+                    
+					<div class="opers fr">
+                        <switch name="type">
+                            <case value="programs"><!--节目-->
+                            	<a href="__GROUP__/Programs/edit/id/{$vo.id}" class="rename" data-id="{$vo.id}" title="修改"><i class="icon-edit"></i></a>
+                            </case>
+                            <case value="group"><!--栏目组-->
+                            	<a class="oper edit" href="__GROUP__/Programs/editGroup/pid/{$vo.classid}/id/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+                            </case>
+                            <case value="column"><!--栏目-->
+                            	<a class="oper edit" href="__GROUP__/Programs/editColumn/gid/{$vo.dirgroup_classid}/id/{$vo.id}" title="编辑"><i class="icon-pencil"></i></a>
+                            </case>
+                            <case value="article"><!--文章-->
+                            	<a class="oper edit" href="__GROUP__/Programs/editArticle/gid/{$vo.groupId}/cid/{$vo.program_dir_classid}/id/{$vo.article_classid}" title="编辑"><i class="icon-pencil"></i></a>
+                            </case>
+                            
+                            <case value="ResLibWorldNews"><!--资源：全球要闻-->
+                            	<a class="oper" href="__GROUP__/ResLib/newsGallery/id/{$vo.id}" title="详情"><i class="icon-search"></i></a>
+                            </case>
+                            <case value="ResLibHistoric"><!--资源：历史上的今天-->
+                            	<a class="oper view" href="javascript:void(0);" title="查看详情"><i class="icon-search"></i></a>
+                            </case>
+                            <case value="ResLibFamousQuotes"><!--资源：名人名言-->
+                            	<a class="oper view" href="javascript:void(0);" title="查看详情"><i class="icon-search"></i></a>
+                            </case>
+                            <case value="ResLibBaike"><!--资源：百科-->
+                            	<a class="oper view" href="javascript:void(0);" title="查看详情"><i class="icon-search"></i></a>
+                            </case>
+                            <case value="ResLibHumorJokes"><!--资源：幽默笑话-->
+                            	<a class="oper view" href="javascript:void(0);" title="查看详情"><i class="icon-search"></i></a>
+                            </case>
+                            
+                            <default />
+                                &nbsp;{$type}
+                        </switch>                    
+						<switch name="type">
+                        	<case value='programs'><!--节目-->
+                            	<a class="oper del" href="javascript:void(0);" data-id="{$vo.program_classid}" data-url="__GROUP__/Programs/recycle/id/{$vo.program_classid}" title="删除"><i class="icon-trash"></i></a>
+                            </case>
+                            <case value="article"><!--文章-->
+                            	<a class="oper del" href="javascript:void(0);" data-url="__GROUP__/Programs/delArticle/pid/{$vo.program_id}/id/{$vo.article_classid}" title="删除"><i class="icon-trash"></i></a>
+                            </case>
+                            <case value="group"><!--栏目组-->
+								<a class="oper del" href="javascript:void(0);" data-pid="{$vo.program_classid}" data-id="{$vo.dirgroup_classid}" data-url="__GROUP__/Programs/delGroup/pid/{$vo.program_classid}/id/{$vo.dirgroup_classid}" title="删除"><i class="icon-trash"></i></a>
+                            </case>                           
+                            <case value="column"><!--栏目-->
+                            <a class="oper del" href="javascript:void(0);" data-gid="{$vo.dirgroup_classid}" data-id="{$vo.classid}" data-url="__GROUP__/Programs/delColumn/gid/{$group.dirgroup_classid}/id/{$vo.classid}" title="删除"><i class="icon-trash"></i></a>
+                            </case>
+                            
+                            <default /><!--资源-->
+                                <a href="javascript:void(0);" class="del" data-id="{$vo.id}" data-type='{$type}' title="删除"><i class="icon-trash"></i></a>
+                        </switch>  
+                            
+						
+                        
+					</div>
+				</li>
+			</volist>
+            </DIV>
+            
+			<style type="text/css">
+                #write_check_message{display:none;border:0px #FF0000 solid;margin-top:10px;overflow:hidden;}/*附加消息输入框，默认隐藏*/
+            </style>            
+            <div class="form-group" id="write_check_message">
+                <label class="col-sm-1 control-label text-right" for="Num">附加消息</label>
+                <div class="col-sm-11">
+                    <textarea class="form-control" rows="3" name="checkMessage" id="checkMessage"></textarea>
+                    <span id="checkMessage-error" class="help-block"></span>
+                </div>
+            </div>   
+            
+            <li class="clearfix ">
+                <div class="col-md-1" style="padding-left:0px;width:36px;">
+                    <div class="cbx-block" style="">
+                        <input type="checkbox" class="select-all" title="全选/全不选">
+                        <span class="my-check"></span> 
+                    </div>   
+                </div>
+                <div class="col-md-4 text-left">
+                    <switch name="type">
+                    <case value="article11111"><!--文章也不允许批量删除，因为这样无法传pid，和节目管理下的文章批量删除不一样，除非改写删除函数-->
+                    <button type="button" class="btn btn-default btn-sm multi-del" style="margin-left:30px;">批量删除</button> 
+                    </case>
+                            
+                    <default />
+ 					</switch>  
+                    
+                    <php>
+                    //权限验证
+                    if (checkAccess('Programs', 'multiCheckPrograms,multiCheckGroup,multiCheckDir,multiCheckArticles') || checkAccess('ResLib', 'multiCheckWorldNews,multiCheckHistoric,multiCheckFamousQuotes,multiCheckBaike,multiCheckHumorJokes')) {	</php>                         
+                    <neq name="checked" value="ys">
+                    <button type="button" class="btn btn-primary btn-sm multi-check_pass" style="margin-left:0px;">审核通过</button></neq>
+                    <neq name="checked" value="ds">
+                    <button type="button" class="btn btn-primary btn-sm multi-check_not_pass" style="margin-left:10px;">取消审核</button></neq>
+                    <neq name="checked" value="bh">
+                    <button type="button" class="btn btn-primary btn-sm multi-check_rebut" style="margin-left:10px;">驳回</button></neq>
+                    <php>	}	</php>
+                </div>
+                <div class="col-md-7 text-right page-box">
+                    {$page}
+                </div>
+
+           </li>
+
+
+		</ul>
+        
+
+	</div>
+</div>
+
+<div id="upArea"></div>
+
+<div class="my-cover" style="display:none;"></div> <!-- 遮罩层 -->
+<div id="resWindow" class="modal-dialog" style="display:none;width:600px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h4 class="modal-title"></h4>
+		</div>
+		<div class="modal-body">
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+<!--历史上的今天 查看详细弹窗 END-->
+
+<!-- <div class="pic-box" style="width:400"></div> -->
+
+<include file="Public/jsLoader" />
+
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.excheck-3.5.js"></script>
+
+<script language="javascript">
+$(document).ready(function() {  
+	//历史上的今天 start
+	//显示
+	$('.view-details').click(function() {
+		var title = $.trim($(this).text()),
+			content = $.trim($(this).siblings('textarea').first().text());
+		$('#resWindow .modal-title').html('<b>' + title + '</b>&nbsp;&nbsp;<font style="font-size:12px;color:#888;">详细内容&gt;&gt;</font>');
+		$('#resWindow .modal-body').html('<div style="text-indent:2em;line-height:24px;">' + content + '</div>');
+		showFramesMasklayer();
+		$('#resWindow').width($(window).width() - 300);
+		setDivCenter('#resWindow');
+	});   
+
+	$('a.view').click(function() {
+		var currObj = $(this).closest('div').prev('div'),
+			title = $.trim(currObj.find('a').first().text()),
+			content = $.trim(currObj.find('textarea').first().text());
+		$('#resWindow .modal-title').html('<b>' + title + '</b>&nbsp;&nbsp;<font style="font-size:12px;color:#888;">详细内容&gt;&gt;</font>');
+		$('#resWindow .modal-body').html('</h5><div style="text-indent:2em;line-height:24px;">' + content + '</div>');
+		showFramesMasklayer();
+		$('#resWindow').width($(window).width() - 300);
+		setDivCenter('#resWindow');
+	});
+	
+	//关闭
+	$('#resWindow').find('button.close, button.close2').click(function(){
+		$('#resWindow').hide();
+		hideFramesMasklayer();
+	});
+	//历史上的今天					 
+ });
+</script>   
+
+<script type="text/javascript">
+$(document).ready(function() {
+/*	$('.select-all').siblings('.my-check').click(function(){
+		alert("d");
+		$(this).siblings('.select-all').first().click();
+		
+		var isChecked = $(this).siblings('.select-all').first().prop('checked');
+		$('.res-list').find(':checkbox').prop({'checked' : isChecked});
+		
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').removeClass('smy-checked');
+		}
+	});
+	
+	$('.res-list').first().delegate('li > .cbx-block > .my-check', 'click', function(){
+		
+		$(this).siblings(':checkbox').first().click();
+		
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked');
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+		}
+		
+		var allItems = $('.res-list').find(':checkbox').size(),
+			checkedItems = $('.res-list').find(':checkbox:checked').size();
+			$('.select-all').prop({'checked' : (allItems == checkedItems)});
+			
+			if (allItems == checkedItems) {
+				$('.select-all').siblings('.my-check').addClass('smy-checked');
+			} else {
+				$('.select-all').siblings('.my-check').removeClass('smy-checked');
+			}
+	});*/
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+	//tab start
+	$('#ds').on('click', function(event){
+		var t = $(this);
+		$("#statusTabHeader li").each(function(){
+			$(this).removeClass("current");
+		});
+		t.addClass("current");
+
+
+	});
+	
+	$('#ys').click(function(){
+		var t = $(this);
+		$("#statusTabHeader li").each(function(){
+			$(this).removeClass("current");
+		});
+		t.addClass("current");
+	});
+	
+	$('#bh').click(function(){
+		var t = $(this);
+		$("#statusTabHeader li").each(function(){
+			$(this).removeClass("current");
+		});
+		t.addClass("current");
+	});
+	//tab end
+
+	//下面这段放在tab脚本前，会导致click无效，请注意
+	var zTreeObj;
+	// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+	var setting = {};
+	// zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
+	/*
+	var zNodes = [
+		{id:1, pId:0,name:"节目相关", open:true, children:[
+		{id:2, pId:1,name:"节目"},{id:3, pId:1,name:"栏目组"},{id:4, pId:1,name:"栏目"},{id:5, pId:1,name:"文章"}]},
+		{id:6, pId:0,name:"资源相关", open:true, children:[
+		{id:7, pId:6,name:"全球要闻"},{id:8, pId:6,name:"历史上的今天"},{id:9, pId:6,name:"名人名言"},{id:10, pId:6,name:"百科知识"},{id:11, pId:6,name:"幽默笑话"}]}
+	];*/
+	
+	var zNodes = [
+		{id:1, pId:0,name:"节目相关", open:true, children:[
+		{id:2, pId:1,name:"节目"},{id:3, pId:1,name:"栏目组"},{id:4, pId:1,name:"栏目"},{id:5, pId:1,name:"文章"}]},
+		{id:6, pId:0,name:"资源相关", open:true, children:[
+		{id:7, pId:6,name:"全球要闻"},{id:8, pId:6,name:"历史上的今天"},{id:9, pId:6,name:"名人名言"},{id:10, pId:6,name:"百科知识"},{id:11, pId:6,name:"幽默笑话"}]}
+	];
+	$(document).ready(function(){
+		zTreeObj = $.fn.zTree.init($("#itemTree"), setting, zNodes);
+		var node11 = zTreeObj.getNodeByParam("id",'{$treeid}');//treeObj是tree对象
+		zTreeObj.selectNode(node11);
+	});
+	$('input').iCheck('destroy');
+
+
+	var setting = {
+		callback: {
+			onClick: zTreeOnClick
+		}
+	};
+	
+	function zTreeOnClick(event, treeId, treeNode) {
+		//alert(treeNode.tId + ", " + treeNode.name);
+		switch (treeNode.tId){
+			case "itemTree_2"://节目
+				//alert(treeNode.tId + ", " + treeNode.name);
+				window.open("__GROUP__/Programs/ProgramsCheckIndex/type/programs/checked/ds/treeid/2","frame_right_main");
+				break;
+			case "itemTree_3"://栏目组
+				//alert(treeNode.tId + ", " + treeNode.name);
+				window.open("__GROUP__/Programs/ProgramsCheckIndex/type/group/checked/ds/treeid/3","frame_right_main");
+				break;
+			case "itemTree_4"://栏目
+				window.open("__GROUP__/Programs/ProgramsCheckIndex/type/column/checked/ds/treeid/4","frame_right_main");
+				break;				
+			case "itemTree_5"://文章
+				window.open("__GROUP__/Programs/ProgramsCheckIndex/type/article/checked/ds/treeid/5","frame_right_main");
+				break;				
+				
+			case "itemTree_7"://全球要闻
+				window.open("__GROUP__/ResLib/ResCheckIndex/type/ResLibWorldNews/checked/ds/treeid/7","frame_right_main");
+				break;				
+			case "itemTree_8"://历史上的今天
+				window.open("__GROUP__/ResLib/ResCheckIndex/type/ResLibHistoric/checked/ds/treeid/8","frame_right_main");
+				break;
+			case "itemTree_9"://名人名言
+				window.open("__GROUP__/ResLib/ResCheckIndex/type/ResLibFamousQuotes/checked/ds/treeid/9","frame_right_main");
+				break;	
+			case "itemTree_10"://百科
+				window.open("__GROUP__/ResLib/ResCheckIndex/type/ResLibBaike/checked/ds/treeid/10","frame_right_main");
+				break;					
+			case "itemTree_11"://幽默笑话
+				window.open("__GROUP__/ResLib/ResCheckIndex/type/ResLibHumorJokes/checked/ds/treeid/11","frame_right_main");
+				break;						
+							
+				
+			default:
+				//alert(treeNode.tId + ", " + treeNode.name);
+		}
+	};	
+
+
+
+	//选中一个指定id的节点，id为1,2,3,4...
+	/*$('.btn-test').click(function(){
+		var node = zTreeObj.getNodeByParam("id",2);//treeObj是tree对象
+		zTreeObj.selectNode(node);
+	});*/
+
+
+
+	$('.select-all').siblings('.my-check').click(function(){
+		//alert("d");
+		$(this).siblings('.select-all').first().click();
+		
+		var isChecked = $(this).siblings('.select-all').first().prop('checked');
+		$('.res-list').find(':checkbox').prop({'checked' : isChecked});
+		
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+			$('.res-list').find(':checkbox').siblings('.my-check').removeClass('smy-checked');
+		}
+	});
+	
+	$('.res-list').first().delegate('li > .cbx-block > .my-check', 'click', function(){
+		
+		$(this).siblings(':checkbox').first().click();
+		
+		var isChecked = $(this).siblings(':checkbox').first().prop('checked');
+		if (isChecked) {
+			$(this).addClass('smy-checked');
+		} else {
+			$(this).removeClass('smy-checked');
+		}
+		
+		var allItems = $('.res-list').find(':checkbox').size(),
+			checkedItems = $('.res-list').find(':checkbox:checked').size();
+			$('.select-all').prop({'checked' : (allItems == checkedItems)});
+			
+			if (allItems == checkedItems) {
+				$('.select-all').siblings('.my-check').addClass('smy-checked');
+			} else {
+				$('.select-all').siblings('.my-check').removeClass('smy-checked');
+			}
+	});
+
+
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var checked = $("#checked").val();
+	var type = $("#type").val();
+	
+	//alert(type);
+	//alert(checked);
+	
+	
+	//tab start
+
+	
+	//批量审核
+	$('.multi-check_pass').on('click', function(event){	
+		var checked = $("#checked").val();
+		var type = $("#type").val();
+		var t = $(this);
+		var act = '';
+		var word = '审核通过';
+		switch (type){
+			case "programs":
+				act = "Programs/multiCheckPrograms";
+				break;
+			case "group":
+				act = "Programs/multiCheckGroup";
+				break;
+			case "column":
+				act = "Programs/multiCheckDir";
+				break;				
+			case "article":
+				act = "Programs/multiCheckArticles";
+				break;	
+			case "ResLibWorldNews":
+				act = "ResLib/multiCheckWorldNews";
+				break;	
+			case "ResLibHistoric":
+				act = "ResLib/multiCheckHistoric";
+				break;					
+			case "ResLibFamousQuotes":
+				act = "ResLib/multiCheckFamousQuotes";
+				break;									
+			case "ResLibBaike":
+				act = "ResLib/multiCheckBaike";
+				break;		
+			case "ResLibHumorJokes":
+				act = "ResLib/multiCheckHumorJokes";
+				break;				
+			default:
+				;
+		}
+	
+		batDo(act,'ys',t,word);
+	});	
+	
+	//批量取消审核
+	$('.multi-check_not_pass').on('click', function(event){	
+		var checked = $("#checked").val();
+		var type = $("#type").val();
+		var t = $(this);
+		var act = '';
+		var word = '取消审核';
+		
+		switch (type){
+			case "programs":
+				act = "Programs/multiCheckPrograms";
+				break;
+			case "group":
+				act = "Programs/multiCheckGroup";
+				break;
+			case "column":
+				act = "Programs/multiCheckDir";
+				break;				
+			case "article":
+				act = "Programs/multiCheckArticles";
+				break;	
+			case "ResLibWorldNews":
+				act = "ResLib/multiCheckWorldNews";
+				break;	
+			case "ResLibHistoric":
+				act = "ResLib/multiCheckHistoric";
+				break;					
+			case "ResLibFamousQuotes":
+				act = "ResLib/multiCheckFamousQuotes";
+				break;									
+			case "ResLibBaike":
+				act = "ResLib/multiCheckBaike";
+				break;		
+			case "ResLibHumorJokes":
+				act = "ResLib/multiCheckHumorJokes";
+				break;				
+			default:
+				;
+		}
+	
+		batDo(act,'ds',t,word);
+	});	
+	
+	//批量驳回	
+	$('.multi-check_rebut').click(function(){
+		var checked = $("#checked").val();
+		var type = $("#type").val();
+		var t = $(this);
+		var act = '';
+		
+		var aids = '',
+			requestURL = params = null;
+			checkedItems = $('.list-tbl').first().find('.tbody').first().find(':checkbox:checked');
+			$.each(checkedItems, function(i, o){
+				aids += $(o).val() + ';';
+			});
+			if (checkedItems.size() > 0) {
+				$("#write_check_message").css("display","block");
+			} else {
+				$.kw.alert('至少选择一条记录！');
+			} 
+			var checkMessageValue = $("#checkMessage").val();
+			if (checkMessageValue == ""){
+				$("#write_check_message").addClass("has-error");
+				$("#checkMessage-error").html("驳回时，附加消息必须填写，长度为1至255个字符，超长部分将被截断");
+				//alert("请输入附加消息");
+				return;
+			}else{
+				//alert(checkMessageValue);	
+			}
+			
+			
+			switch (type){
+				case "programs":
+					act = "Programs/multiCheckPrograms";
+					break;
+				case "group":
+					act = "Programs/multiCheckGroup";
+					break;
+				case "column":
+					act = "Programs/multiCheckDir";
+					break;				
+				case "article":
+					act = "Programs/multiCheckArticles";
+					break;	
+				case "ResLibWorldNews":
+					act = "ResLib/multiCheckWorldNews";
+					break;	
+				case "ResLibHistoric":
+					act = "ResLib/multiCheckHistoric";
+					break;					
+				case "ResLibFamousQuotes":
+					act = "ResLib/multiCheckFamousQuotes";
+					break;									
+				case "ResLibBaike":
+					act = "ResLib/multiCheckBaike";
+					break;		
+				case "ResLibHumorJokes":
+					act = "ResLib/multiCheckHumorJokes";
+					break;				
+				default:
+					;
+			}
+			batDo(act,'bh',t,checkMessageValue);
+
+	});	
+	
+	
+	/*
+	 * 批量操作的实际执行代码，在click事件中调用
+	 * act :　控制器/方法
+	 * checkedType:ys / ds / bh
+	 * t : $(this)
+	*/
+	function batDo(act,checkedType,t,word){
+		var aids = '',
+			requestURL = params = null;
+			checkedItems = $('.list-tbl').first().find('.tbody').first().find(':checkbox:checked');
+			$.each(checkedItems, function(i, o){
+				aids += $(o).val() + ';';
+			});
+			
+			requestURL = '__GROUP__/' + act;
+			params = {aids : aids,checkedType:checkedType,checkMessage:word};
+		//$("#write_check_message").css({"display":"none"});	
+		if (checkedItems.size() > 0) {
+			
+			$.kw.confirm('确认要执行操作吗？', function() {
+				$.ajax({
+					url:requestURL,
+					type:'post',
+					async:false,
+					data:params,
+
+					dataType:'json',
+					success:function(re){
+						if (re.stat*1) {
+							//alert(re.debug);
+							$.kw.alert('操作成功！', '', function() {
+								window.location.reload();
+							});
+						} else {
+						//	alert(re.debug);
+							$.kw.alert(re.msg + "<br>" + re.debug);
+						}
+					},
+					error:function(){
+						
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少选择一条记录！');
+		}		
+	}
+		
+});
+</script>
+
+<!--节目 START-->
+<eq name="type" value="programs">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		var clazzid = $.trim($(this).attr('data-id'));
+		
+		if (clazzid == '') {
+			$.kw.alert('页面数据错误，请刷新页面重试……');
+			return false;
+		}
+		
+		$.kw.confirm('确认要将该节目放入回收站吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:targetUrl,
+				data:{'id' : clazzid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						var programTrees = window.parent.programTree;
+						var nodeObj = programTrees.getNodeByParam("unid", clazzid, null);
+							
+						programTrees.removeNode(nodeObj);
+						
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请重试……');
+				}
+			});
+		});
+	});	
+});
+</script>	
+</eq>
+<!--节目 END-->
+
+<!--文章 START-->
+<eq name="type" value="article">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除该文章吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	//批量删除
+	$('.multi-del').click(function(){
+		var aids = '',
+			requestURL = params = null;
+			checkedItems = $('.list-tbl').first().find('.tbody').first().find(':checkbox:checked');
+			$.each(checkedItems, function(i, o){
+				aids += $(o).val() + ';';
+			});
+		
+		/*if (columnType == 'routedir' || columnType == 'storedir') {
+			requestURL = '__GROUP__/Ajaxhandle/unbingStoresToColumn';
+			params = {coluClassID : columnClassId, postData : aids};
+		} else {*/
+			requestURL = '__GROUP__/programs/multiDelArticles';
+			params = {aids : aids, pid : programClassId};
+		/*}*/
+		if (checkedItems.size() > 0) {
+			$.kw.confirm('确认要删除吗？', function() {
+				$.ajax({
+					url:requestURL,
+					type:'post',
+					async:false,
+					data:params,
+					dataType:'json',
+					success:function(re){
+						if (re.stat*1) {
+							$.kw.alert('操作成功！', '', function() {
+								window.location.reload();
+							});
+						} else {
+							$.kw.alert(re.msg);
+						}
+					},
+					error:function(){
+						$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+					}
+				});
+			});
+		} else {
+			$.kw.alert('至少选择一条记录！');
+		}
+	});
+});
+</script>	
+</eq>
+<!--文章 END-->
+
+<!--栏目组 START-->
+<eq name="type" value="group">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		var program_clazzid = $.trim($(this).attr('data-pid')),
+			clazzid = $.trim($(this).attr('data-id'));
+		
+		if (clazzid == '' || program_clazzid == '') {
+			$.kw.alert('页面数据错误，请刷新页面重试……');
+			return false;
+		}
+		
+		$.kw.confirm('确认要删除该栏目组吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:targetUrl,
+				data:{'id' : clazzid, 'pid' : program_clazzid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						var programTrees = window.parent.programTree;
+						var nodeObj = programTrees.getNodeByParam("unid", clazzid, null);
+							
+						programTrees.removeNode(nodeObj);
+						
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请重试……');
+				}
+			});
+		});
+	});	
+});
+</script>	
+</eq>
+<!--栏目组 END-->
+
+<!--栏目 START-->
+<eq name="type" value="column">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		var group_clazzid = $.trim($(this).attr('data-gid')),
+			clazzid = $.trim($(this).attr('data-id'));
+		
+		if (clazzid == '' || group_clazzid == '') {
+			$.kw.alert('页面数据错误，请刷新页面重试……');
+			return false;
+		}
+		
+		$.kw.confirm('确认要删除该栏目组吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:targetUrl,
+				data:{'id' : clazzid, 'gid' : group_clazzid},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						var programTrees = window.parent.programTree;
+						var nodeObj = programTrees.getNodeByParam("unid", clazzid, null);
+							
+						programTrees.removeNode(nodeObj);
+						
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请重试……');
+				}
+			});
+		});
+	});
+});
+</script>	
+</eq>
+<!--栏目 END-->
+
+<!--资源 START-->
+<in name="type" value="ResLibWorldNews,ResLibHistoric,ResLibFamousQuotes,ResLibBaike,ResLibHumorJokes">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.del').click(function() {
+		var nid = $(this).attr('data-id')*1;
+		var type = $(this).attr('data-type');
+		del(nid,type);
+	});
+	
+	$('.multi-del').click(function() {
+		var type = $("#type").val();
+		var checkedItems = $('.list-tbl tbody').first().find(':checkbox:checked'),
+			nids = new Array();
+		if (checkedItems.size() <= 0) {
+			$.kw.alert('没有选择操作对象！');
+			return false;
+		} else {
+			$.each(checkedItems, function (i, o) {
+				nids.push($(o).val()*1);
+			});
+			del(nids.join(','),type);
+		}
+	});
+	
+	function del(nids,type) {
+		switch (type){
+			case "programs":
+				act = "Programs/recycle";
+				break;
+			case "group":
+				act = "Programs/delGroup";
+				break;
+			case "column":
+				act = "Programs/delColumn";
+				break;				
+			case "article":
+				act = "Programs/multiCheckArticles";
+				break;	
+			case "ResLibWorldNews":
+				act = "ResLib/delNews";
+				break;	
+			case "ResLibHistoric":
+				act = "ResLib/delHistoric";
+				break;					
+			case "ResLibFamousQuotes":
+				act = "ResLib/delFamousQuotes";
+				break;									
+			case "ResLibBaike":
+				act = "ResLib/delBaike";
+				break;		
+			case "ResLibHumorJokes":
+				act = "ResLib/delHumorJokes";
+				break;				
+			default:
+				;
+		}
+		$.kw.confirm('确定要删除吗？', function() {
+			$.ajax({
+				type:'POST',
+				url:'__GROUP__/'+act,
+				data:{'nids' : nids},
+				async:false,
+				dataType:'json',
+				beforeSend:function() {
+					
+				},
+				success:function(re) {
+					if (re.stat*1) {
+						$.kw.alert('操作成功！', '', function() {
+							window.location.reload();
+						});
+					} else {
+						$.kw.alert(re.msg);
+					}
+				},
+				error:function() {
+					$.kw.alert('操作失败！请刷新页面后重试……');
+				}
+			});
+		});
+	}
+});
+</script>
+</in>
+<!--资源 END-->
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+});
+</script>
+
+<include file="Public/footer" />

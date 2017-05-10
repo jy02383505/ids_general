@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/fa3/css/font-awesome.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/script/zTree_v3/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+		.ztree *{font-family:"Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;}
+		.ztree li a{color:#fff;}
+		.ztree li{background:#34495E;line-height:40px;margin-top:1px;position:relative;}
+		.ztree li a{height:40px;display:block;border-bottom:1px solid #4A5967;}
+		.ztree li a:hover{text-decoration:none;background:#263747;}
+		.ztree li a.curSelectedNode{height:40px;background:#11949A url(__PUBLIC__/images/leftmenu-active.png) no-repeat right center;color:#fff;}
+		/*.ztree li a.curSelectedNode{height:40px;background:#263747;color:#fff;}*/
+		.ztree li span.button{background-image:url(__PUBLIC__/images/mini.png);width:32px;height:32px;}
+		.ztree li span.button.ico_open, .ztree li span.button.ico_close{background-position:-204px -40px;vertical-align:middle;}
+		.ztree li span.button.ico_docu{background-position:-238px -36px;}
+		.ztree li span.button.switch{display:block;}
+		.ztree li span.button.root_open, .ztree li span.button.root_close{display:none;}
+		.ztree li span.button.center_open, .ztree li span.button.center_close, .ztree li span.button.center_open, .ztree li span.button.bottom_open, .ztree li span.button.bottom_close, .ztree li span.button.center_docu, .ztree li span.button.bottom_docu{background-image:url(__PUBLIC__/images/metro.png);height:40px;float:left;background-position:-84px -12px;}
+		.ztree li span.button.root_ico_open, .ztree li span.button.root_ico_close{background-position:-95px -41px;}
+		.ztree .item-tools{position:absolute;top:0;right:10px;background:#34495E;}
+		.ztree .item-tools .icon-edit{font-family:FontAwesome;font-size:16px;color:#95A5A6;}
+		</style>
+	</head>
+	<body class="left-menu-body">
+		<div class="zTreeDemoBackground">
+			<ul id="treeDemo" class="ztree"></ul>
+		</div>
+		
+		<div class="left-bottom-box">
+			<p class="text-center">{$Think.config.a_copyright}</p>
+			<p class="text-center">{$Think.config.a_aftersales}</p>
+		</div>
+		
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/common.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+		<script type="text/javascript" src="__PUBLIC__/script/zTree_v3/js/jquery.ztree.exedit-3.5.js"></script>
+		<script type="text/javascript">
+		$(function($){
+			
+			var IDMark_Switch = "_switch",
+				IDMark_Icon = "_ico",
+				IDMark_Span = "_span",
+				IDMark_Input = "_input",
+				IDMark_Check = "_check",
+				IDMark_Edit = "_edit",
+				IDMark_Remove = "_remove",
+				IDMark_Ul = "_ul",
+				IDMark_A = "_a";
+
+			var setting = {
+				view: {
+					dblClickExpand: false,
+					showLine: true,
+					showIcon: true
+				},
+				callback: {
+					onClick: onClick
+				}
+			},
+			zNodes ={$sTree};
+
+			$(document).ready(function(){
+				$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+			});
+			
+			function onClick(e,treeId, treeNode) {
+				var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+				zTree.expandNode(treeNode);
+				$("#" + treeNode.tId).css({background : '#263747'});
+				pagePreLoader();
+			}
+			
+			function addHoverDom(treeId, treeNode) {
+				var aObj = $("#" + treeNode.tId);
+				if ($("#scenEdit_"+treeNode.id).length>0) return;
+				if (treeNode._dataType == 'scence') {
+					var editStr = '<div id="scenEdit_' + treeNode.id + '" class="item-tools" style="display:block;"><i class="icon-edit" data-sid="' + treeNode.id + '"></i></div>';
+					aObj.append(editStr);
+				}
+			}
+			
+			function removeHoverDom(treeId, treeNode) {
+				$("#scenEdit_"+treeNode.id).unbind().remove();
+			}
+		});
+		</script>
+	</body>
+</html>

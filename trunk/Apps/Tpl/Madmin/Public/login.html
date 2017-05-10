@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="UTF-8">
+		<title>管理登录 - {$Think.config.b_sitetitle}</title>
+		<link rel="stylesheet" href="__PUBLIC__/style/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/bt3/css/bootstrap.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/flib/flat-ui/css/flat-ui.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/style/madmin.css">
+		<link rel="shortcut icon" href="__PUBLIC__/images/favicon.ico">
+		<style>
+			#form-submit{position:relative;}
+			#form-submit span{display:none;position:absolute;top:0;left:0;width:100%;height:100%;padding:10px 19px;color:#000;font-size:16px;}
+		</style>
+	</head>
+	<body class="login-body">
+		<div class="login-header">
+			<div class="login-title">
+				<php> if (C('b_sitelogo')) { </php>
+					<img src="/{$Think.config.upload_comm_path}{$Think.config.b_sitelogo}?{:rand()}">
+				<php>	} else {	</php>
+					<img src="__PUBLIC__/images/logo.png?{:rand()}">
+				<php>	}	</php>
+				<if condition="$Think.config.b_sitename neq ''">
+					<p><span>{$Think.config.b_sitename}</span></p>
+				</if>
+			</div>
+		</div>
+		<div class="login-body">
+			<div class="login-area">
+				<div class="login-form">
+					<div class="alert alert-danger" style="display:none;padding:12px 15px;" role="alert"></div>
+					<form id="loginForm" method="" action="" autocomplete="off">
+						<div class="form-group">
+							<input type="text" name="account" class="form-control login-field" value="" placeholder="用户名...." id="login-name" style="padding-right:40px;" />
+							<label class="login-field-icon fui-user" for="login-name"></label>
+						</div>
+
+						<div class="form-group">
+							<input type="password" name="password" class="form-control login-field" value="" placeholder="密码...." id="login-pass" style="padding-right:40px;" />
+							<label class="login-field-icon fui-lock" for="login-pass"></label>
+						</div>
+
+						<if condition="$Think.config.s_login_vcode eq 1">
+						<div class="form-group">
+							<input type="text" name="vcode" class="form-control login-field" value="" placeholder="验证码...." id="login-vcode" style="width:162px;padding-right:40px;" />
+							<label class="login-field-icon fui-question-circle" for="login-vcode" style="right:166px;"></label>
+							<a href="#" class="reloadverify" title="换一张" style="position:absolute;top:12px;right:28px;font-size:14px;">看不清，换一张？</a>
+						</div>
+						
+						<div class="form-group">
+							<img src="" class="verifyimg reloadverify" title="点击切换" alt="点击切换" />
+						</div>
+						</if>
+
+						<button id="form-submit" class="btn btn-primary btn-lg btn-block">登 录<span><img src="__PUBLIC__/images/loading.gif" style="width:16px;"/> 正在登录....</span></button>
+					</form>
+                    <div style="position:absolute; top:60px; right:-320px;width:160px;height:100px;border:solid 0px #ff33ff;">
+                    	<div style="width:100%;text-align:center;color:#1abc9c;"><span class="glyphicon glyphicon-download-alt" aria-hidden="true" style="font-size:30pt;"></span></div>
+                        <div style="width:100%;text-align:center;color:#1abc9c;font-size:14pt;"><a href="__GROUP__/Home/Soft/index" target="_blank">插件下载</a></div>
+                    </div>                    
+				</div>
+			</div>
+			<div style="width:100%;padding:4px;text-align:center;position:absolute;bottom:0;background:url(__PUBLIC__/images/login-bg.png);">&copy; 2010-2015 北京华远盛亚科技有限责任公司 Beijing Huayuanshengya Technology Co.,LTd</div>
+		</div>
+		<script type="text/javascript" src="__PUBLIC__/script/jquery/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript">
+		$(function($) {
+			// 验证码显示更新
+            $('.verifyimg').attr('src', "__URL__/verifyCode?" + Math.random());
+	        $('.reloadverify').click(function(){
+	            $('.verifyimg').attr('src', "__URL__/verifyCode?" + Math.random());
+	        });
+	        
+	        // 登录验证
+	       $('#form-submit').click(function(){
+	    	   var uname = $.trim($('#login-name').val()),
+	    	   	   upwd	= $.trim($('#login-pass').val()),
+	    	   	   isVerify = {$Think.config.s_login_vcode|default=0},
+	    	   	   vcode = '';
+	    	   	   flag = true;
+	    	   
+	    	   	if (uname == '') {
+	    	   		$('#login-name').parent('div').first().addClass('has-error');
+	    	   		flag = false;
+	    	   	} else {
+	    	   		$('#login-name').parent('div').first().removeClass('has-error');
+	    	   	}
+	    	   
+	    	   	if (upwd == '') {
+	    	   		$('#login-pass').parent('div').first().addClass('has-error');
+	    	   		flag = false;
+	    	   	} else {
+	    	   		$('#login-pass').parent('div').first().removeClass('has-error');
+	    	   	}
+	    	   
+	    	   	if (isVerify) {
+	    	   		vcode = $.trim($('#login-vcode').val());
+		    	   	if (vcode == '') {
+		    	   		$('#login-vcode').parent('div').first().addClass('has-error');
+		    	   		flag = false;
+		    	   	} else {
+		    	   		$('#login-vcode').parent('div').first().removeClass('has-error');
+		    	   	}
+	    	   	}
+	    	   	
+	    	   	if (flag) {
+   	   				$('#form-submit').attr('disabled','disabled').children('span').show();	    	   				
+	    	   		$.ajax({
+	    	   			url:'__URL__/authGateway',
+	    	   			async:false,
+	    	   			data:{account:uname,password:upwd,vcode:vcode},
+	    	   			type:'POST',
+	    	   			dataType:'json',
+	    	   			success:function(re){
+	    	   				if(re.stat*1 > 0){
+	    	   					//showAlert('登陆成功！')
+	    	   					window.location.href = '/';
+	    	   				} else {
+	    	   					showAlert(re.msg);
+	    	   					$('#form-submit').removeAttr('disabled').children('span').hide();
+	    	   				}
+	    	   			},
+	    	   			error:function(){
+	    	   				showAlert('网络异常导致登录失败！请检查网络或刷新页面重试....');
+    	   					$('#form-submit').removeAttr('disabled').children('span').hide();
+	    	   			}
+	    	   		});
+	    	   	}
+	    	   	
+	    	   	$('.verifyimg').attr('src', "__URL__/verifyCode?" + Math.random());
+	    	   	$('#login-vcode').val('');
+	    	   	return false;
+	       }); 
+	        
+	       // 用户输入验证
+	       $('#login-name, #login-pass, #login-vcode').bind('keyup', function(){
+	    	   if ($.trim($(this).val()) == '') {
+	    		   $(this).parent('div').first().addClass('has-error');
+	    	   } else {
+	    		   $(this).parent('div').first().removeClass('has-error');
+	    	   }
+	       });
+	       
+	       function showAlert(msg){
+	    	   $('.login-form .alert').text(msg).fadeIn();
+	       }
+		})
+		</script>
+	</body>
+</html>

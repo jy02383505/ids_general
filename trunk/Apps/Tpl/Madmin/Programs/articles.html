@@ -1,0 +1,930 @@
+<include file="Public/header" />
+
+<link rel="stylesheet" href="__PUBLIC__/jui/css/jquery-ui.min.css">
+
+<style type="text/css">
+	a.tpl-sel{color:#666;}
+	a.tpl-sel:hover{color:green;}
+	.add-success{background:rgba(0,0,0,0.7);padding:4px 6px;text-align:center;color:#6a6;line-height:22px;border-radius:4px;}
+    .sortIt tr{
+        cursor:move;
+    }
+    .hint_order{
+        float: right;
+        position: relative;
+    }
+    .saveBtnWrapper{
+        display: none;
+        float: left;
+        position: relative;
+        top: -10px;
+    }
+    .sort{
+        width: 60px;
+        height: 24px;
+        border-radius: 4px;
+    }
+</style>
+
+<if condition="ACTION_NAME neq 'trashArticle'">
+    <ol class="breadcrumb">
+    	<li><a href="__URL__/index">节目管理</a></li>
+    	<li><a href="__URL__/groups/id/{$program.program_classid}">栏目组管理</a></li>
+    	<li><a href="__URL__/columns/pid/{$program.program_classid}/id/{$group.dirgroup_classid}">栏目管理</a></li>
+    	<li class="active"><if condition="$column.dir_type eq 'routedir' or $column.dir_type eq 'storedir'">商铺列表<else/>文章列表</if></li>
+    </ol>
+
+    <div id="pluginsInfo" class="row well">
+    	<div class="col-md-10">
+    		<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+    			<table class="table">
+    				<tbody>
+    					<tr>
+    						<td class="text-right" width="90"><b>所属节目：</b></td>
+    						<td>
+    							{$program.program_name}
+    						</td>
+    						<td class="text-right" width="90"><b>所属栏目组：</b></td>
+    						<td>
+    							{$group.dirgroup_name}
+    						</td>
+    						<td class="text-right" width="90"><b>所属栏目：</b></td>
+    						<td>
+    							{$column.dir_name}
+    						</td>
+    						<if condition="$column.dir_type neq 'routedir' and $column.dir_type neq 'storedir'">
+    						<td class="text-right" width="90"><b>文章名称：</b></td>
+    						<td>
+    							<input type="text" class="form-control input-sm" name="artiname" value="{$Think.get.artiname}" style="width:182px;">
+    							<button type="submit" class="btn btn-info btn-sm">搜索</button>
+    						</td>
+    						</if>
+    					</tr>
+    				</tbody>
+    			</table>
+    		</form>
+    	</div>
+    	<div class="col-md-2 text-right" style="padding:0;">
+    		<table class="table">
+    			<tbody>
+    				<tr>
+    					<td style="border:0;">
+    						<!-- <eq name="column.dir_type" value="newsdir">
+    							<a href="javascript:void(0);" type="button" class="btn btn-info btn-sm import-article-data" data-restype="news" id="">添加文章</a>
+    						<else />
+    							<a href="__URL__/addArticle/gid/{$group.dirgroup_classid}/cid/{$column.classid}" type="button" class="btn btn-info btn-sm" id="addNewArticle">添加文章</a>
+    						</eq> -->
+                            <h6 class="saveBtnWrapper">&nbsp;<button id="saveOrderBtn" class="btn btn-sm btn-success">确认修改顺序</button></h6>
+    						<php> if ($column['dir_type'] == 'newsdir') { </php>
+    							<a href="javascript:void(0);" type="button" class="btn btn-info btn-sm import-article-data" data-restype="news" id="">添加文章</a>
+    						<php> } elseif (in_array($column['dir_type'], array('routedir', 'storedir'))) { </php>
+    							<a href="javascript:void(0);" type="button" class="btn btn-info btn-sm import-article-data" data-restype="stores" id="">添加商铺</a>
+    						<php> } else { </php>
+    							<a href="__URL__/addArticle/gid/{$group.dirgroup_classid}/cid/{$column.classid}" type="button" class="btn btn-info btn-sm" id="addNewArticle">添加文章</a>
+    						<php> } </php>
+    						<eq name="column.dir_type" value="commdir">
+    							<a href="javascript:void(0);" type="button" class="btn btn-info btn-sm import-article-data" data-restype="" id="">导入资源</a>
+    						</eq>
+    					</td>
+    				</tr>
+    			</tbody>
+    		</table>
+    	</div>
+        <!-- 操作提示 -->
+            <code class="hint_order">注：文章顺序的修改，请直接拖动该条记录(跨页修改排序数值)并点击确认按钮</code>
+    </div>
+<else/>
+    <ol class="breadcrumb">
+        <li class="active">文章回收站</li>
+    </ol>
+</if>
+
+<div class="data-list">
+	<table class="table table-hover list-tbl">
+		<thead>
+			<tr>
+				<th width="36"><input type="checkbox" class="select-all" title="全选/全不选"></th>
+				<if condition="$column.dir_type eq 'routedir' or $column.dir_type eq 'storedir'">
+				<th>序号</th>
+                <th>#ID</th>
+				<th>商铺名称</th>
+				<th>类型</th>
+				<th>所在楼层</th>
+				<th>具体位置</th>
+				<th>操作</th>
+				<else/>
+				<th>序号</th>
+                <th>#ID</th>
+				<th>文章名称</th>
+				<th>类型</th>
+				<th>图标</th>
+                <if condition="ACTION_NAME neq 'trashArticle'">
+                    <th>排序</th>
+                </if>
+                <if condition="ACTION_NAME eq 'trashArticle'">
+                    <th>所属栏目</th>
+                </if>
+                <th>新建时间</th>
+                <th>修改时间</th>
+                <th>发布时间</th>
+                <if condition="ACTION_NAME eq 'trashArticle'">
+                    <th>回收时间</th>
+                </if>
+				<th>操作</th>
+				</if>
+			</tr>
+		</thead>
+        <if condition="ACTION_NAME neq 'trashArticle'">
+            <tbody class="sortIt">
+        <else/>
+            <tbody>
+        </if>
+			<volist name="stores" id="st">
+			<tr>
+				<td><input type="checkbox" value="{$st.Id}"></td>
+				<td>{$i}</td>
+                <td>{$st.Id}</td>
+				<td>{$st.sname}</td>
+				<td>{$st.type}</td>
+				<td>{$st.floor}层</td>
+				<td>{$st.adress}</td>
+				<td><a class="oper unbind-store" href="javascript:void(0);" data-id="{$st.Id}" title="移除"><i class="icon-remove"></i></a></td>
+			</tr>
+			</volist>
+			<volist name="articles" id="vo">
+			<tr data-id="{$vo[id]}">
+				<td><input type="checkbox" value="{$vo.id}" data-pid="{$vo.program_id}" data-id="{$vo.article_classid}"></td>
+                <td>{$i}</td>
+				<td>{$vo.id}</td>
+				<td>{$vo.article_name}</td>
+				<td>{$vo.article_content_type_txt}</td>
+				<td>
+					<notempty name="vo.article_ico_path">
+						<img src="/{$Think.config.upload_root_path}{$vo.article_ico_path}" style="max-width:40px;max-height:40px;">
+					</notempty>
+				</td>
+                <!-- 排序字段 -->
+                <if condition="ACTION_NAME neq 'trashArticle'">
+                    <td><input type="text" value="{$vo.sort}" readonly class="sort" data-id="{$vo[id]}" name="sort"></td>
+                </if>
+
+                <if condition="ACTION_NAME eq 'trashArticle'">
+                    <td>{$vo.dirname}</td>
+                </if>
+                <td>{$vo.create_time}</td>
+                <td>{$vo.update_time}</td>
+                <td>{$vo.publish_time}</td>
+                <if condition="ACTION_NAME eq 'trashArticle'">
+                    <td>{$vo.recycle_time}</td>
+                </if>
+				<td>
+					<neq name="column.dir_type" value="newsdir">
+                    <if condition="ACTION_NAME eq 'trashArticle'">
+                        <a class="oper" href={:U('restoreArticle', "id=$vo[id]")} title="恢复"><i class="glyphicon glyphicon-refresh"></i></a>
+                    <else/>
+                        <a class="oper edit" href="__URL__/editArticle/gid/{$group.dirgroup_classid}/cid/{$column.classid}/id/{$vo.article_classid}" title="编辑"><i class="icon-pencil"></i></a>
+                    </if>
+						<php>	if ($vo['editable'] > 0) {	</php>
+						
+						<php>	}	</php>
+					<else />
+						<a class="oper preview" href="__URL__/imageNewsArticle/id/{$vo.article_classid}" title="预览"><i class="icon-search"></i></a>
+					</neq>
+                    <if condition="ACTION_NAME eq trashArticle">
+                       <a class="oper del" href="javascript:void(0);" data-url="__URL__/delArticle/pid/{$vo.program_id}/id/{$vo.article_classid}" title="删除"><i class="icon-trash"></i></a>
+                    <else/>
+                       <a class="oper trashArticle" href="javascript:void(0);" data-id="{$vo.id}" title="移入回收站"><i class="glyphicon glyphicon-remove"></i></a>
+                    </if>
+				</td>
+			</tr>
+			</volist>
+		</tbody>
+	</table>
+	<table class="table">
+		<tr>
+			<td>
+				<input type="checkbox" class="select-all" title="全选/全不选">
+                <if condition="ACTION_NAME neq 'trashArticle'">
+				    <button type="button" class="btn btn-default btn-sm multiTrash" style="margin-left:10px;">批量<if condition="$column.dir_type eq 'routedir' or $column.dir_type eq 'storedir'">移除<else/>回收</if></button>
+                <else/>
+                    <button type="button" class="btn btn-success btn-sm multiRestore" style="margin-left:10px;">批量恢复</button>
+                    <button type="button" class="btn btn-default btn-sm multiDel" style="margin-left:10px;">批量<if condition="$column.dir_type eq 'routedir' or $column.dir_type eq 'storedir'">移除<else/>删除</if></button>
+                </if>
+				&nbsp;
+			</td>
+			<td class="page-box text-right" width="80%">
+                <h6>
+                    <form action="" method="get" style="display:inline;" id="pageForm">
+                        <label>每页显示</label>
+                        <input type="text" name="numPerPage" placeholder="<?php echo $_GET[numPerPage]?:50; ?>" style="width:30px;height:24px;border-radius:4px;font-size:14px;text-align:center;">
+                        <label>条记录</label>
+                        <input type="submit" value="更改" class="btn btn-xs btn-warning">
+                    </form>
+                    {$page}
+                </h6>
+            </td>
+		</tr>
+	</table>
+</div>
+
+<div class="my-cover" style="display:none;"></div> <!-- 遮罩层 -->
+<div id="resWindow" class="modal-dialog" style="display:none;/* min-width:360px; */top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close2" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">素材资源选择器</h5>
+		</div>
+		<div class="modal-body">
+			<!-- <div class="loading-box" style="text-align:center;display:none;">
+				<p style="font-size:48px;margin:80px auto 80px;"><i class="icon-spinner icon-spin"></i></p>
+				<p style="">正在加载数据，请稍等……</p>
+			</div> -->
+			<ul class="jl-nav-tabs clearfix" style="display:none;">
+				<li class="active"><a href="javascript:void(0);" data-restype="famousQuotes">名人名言</a></li>
+				<li class=""><a href="javascript:void(0);" data-restype="humorJokes">幽默笑话</a></li>
+				<li class=""><a href="javascript:void(0);" data-restype="baike">百科知识</a></li>
+				<li class=""><a href="javascript:void(0);" data-restype="historic">历史上的今天</a></li>
+			</ul>
+			<php> if (in_array($column['dir_type'], array('routedir', 'storedir'))) { </php>
+			<div class="well search-box" style="margin-bottom:10px;">
+				<form class="form-inline edit-form" role="form" method="get" action="__SELF__">
+					<table class="table">
+						<tbody>
+							<tr>
+								<td class="text-right"><b>楼层：</b></td>
+								<td>
+									<select class="form-control input-sm" name="floor" id="storeFloor" style="width:auto;">
+										<option value="">-- 全部 --</option>
+										<for start="1" end="$mallFloors" comparison="elt">
+											<eq name="i" value="$Think.get.floor">
+											<option value="{$i}" selected>{$i}层</option>
+											<else />
+											<option value="{$i}">{$i}层</option>
+											</eq>
+										</for>
+									</select>
+								</td>
+								<td class="text-right"><b>商铺分类：</b></td>
+								<td>
+									<select class="form-control input-sm" name="type_id" id="storeType">
+										<option value="">-- 全部 --</option>
+										<volist name="storeTypes" id="vo">
+											<eq name="vo.ID" value="$Think.get.type_id">
+												<option value="{$vo.ID}" selected>{$vo.space} {$vo.tName}</option>
+											<else/>
+												<option value="{$vo.ID}">{$vo.space} {$vo.tName}</option>
+											</eq>
+										</volist>
+									</select>
+								</td>
+								<td width="50%"><button type="button" class="btn btn-info btn-sm" id="storesFilter">搜索</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+			<php> } </php>
+			<table class="table table-hover reslist-tbl" style="display:none;">
+				<thead>
+					<tr>
+						<th width="36"><span class="jl-check un-checked res-select-all" title="全选/全不选" data-checked="0"></span></th>
+						<php> if ($column['dir_type'] == 'newsdir') { </php>
+						<th>#ID</th>
+						<th>新闻标题</th>
+						<th>发布日期</th>
+						<!-- <th>操作</th> -->
+						<php> } elseif (in_array($column['dir_type'], array('routedir', 'storedir'))) { </php>
+						<th>#ID</th>
+						<th>商铺名称</th>
+						<th>所在楼层</th>
+						<th>具体位置</th>
+						<th>操作</th>
+						<php> } </php>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<table class="table tooolbar-tbl" style="display:none;">
+				<tr>
+					<td>
+						<span class="jl-check un-checked res-select-all" title="全选/全不选" data-checked="0"></span>
+						<button type="button" class="btn btn-info btn-sm multi-import" style="margin-left:10px;"><if condition="$column.dir_type eq 'routedir' or $column.dir_type eq 'storedir'">添加选中商铺<else/>导入选中记录</if></button>&nbsp;
+						<php> if ($column['dir_type'] == 'newsdir') { </php>
+						<button type="button" class="btn btn-info btn-sm auto-import" style="margin-left:10px;">自动导入最新10条</button>&nbsp;
+						<php> } </php>
+						<span class="res-oper-help text-danger" style="display:none;">没有选中任何记录！</span>
+					</td>
+					<td class="page-box text-right" width="60%"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+<div id="resWindow2" class="modal-dialog" style="display:none;width:702px;top:28px !important;height:auto;">
+	<div class="modal-content">
+		<div id="alert-title" class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+			<h5 class="modal-title">资源选择器</h5>
+		</div>
+		<div class="modal-body">
+			<ul class="jl-nav-tabs clearfix">
+				<li class="active"><a href="javascript:void(0);" data-restype="localRes">本地资源</a></li>
+				<li class=""><a href="javascript:void(0);" data-restype="remoteRes">网络资源</a></li>
+			</ul>
+			<div id="localRes" class="tabs-content">
+				<p class="bg-warning text-center egp-msgbox" style="padding:8px 12px;color:#333;position:relative;">
+					<i class="icon-warning-sign" style="color:#a94442"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+					<span>每次导入都会删除该栏目下原有的所有文章内容！</span>
+					<i class="icon-remove fr hide" style="cursor:pointer"></i>
+				</p>
+				<p><button type="button" class="btn btn-primary btn-sm" data-restype="famousQuotes">导入 [名人名言] 到文章</button>&nbsp;&nbsp;自动导入100条名人名言并生成文章列表。</p>
+				<p><button type="button" class="btn btn-primary btn-sm" data-restype="humorJokes">导入 [幽默笑话] 到文章</button>&nbsp;&nbsp;自动导入100条幽默笑话并生成文章列表。</p>
+				<p><button type="button" class="btn btn-primary btn-sm" data-restype="baike">导入 [百科知识] 到文章</button>&nbsp;&nbsp;自动导入100条百科知识数据并生成文章列表。</p>
+				<p><button type="button" class="btn btn-primary btn-sm" data-restype="historic">导入 [历史上的今天] 到文章</button>&nbsp;&nbsp;自动导入近10天的历史事件数据并生成文章列表。</p>
+			</div>
+			<div id="remoteRes" class="tabs-content" style="display:none;">
+				<p><button type="button" class="btn btn-success btn-sm" data-restype="xwtz">导入 [新闻通知] 到文章</button></p>
+				<p><button type="button" class="btn btn-success btn-sm" data-restype="zytg">导入 [资源通告] 到文章</button></p>
+				<p><button type="button" class="btn btn-success btn-sm" data-restype="jzxx">导入 [讲座信息] 到文章</button></p>
+			</div>
+		</div>
+		<div class="modal-footer" style="text-align:center;">
+			<button type="button" class="btn btn-default btn-sm close2">关闭</button>
+		</div>
+	</div>
+</div>
+
+
+<include file="Public/jsLoader" />
+<script src="__PUBLIC__/jui/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(function($){
+	var columnClassId = $.trim('{$Think.get.id|default=""}');
+	var programClassId = $.trim('{$program.program_classid|default=""}');
+	var columnType = $.trim('{$column.dir_type|default=""}');
+
+    /**
+     * 刷新前提示并等候
+     * @param  {[int]} holdonSeconds=800    [刷新前的等候时间，单位毫秒，默认给出800毫秒]
+     * @param  {[string]} alertMessage='操作成功！' [刷新前的等候提示]
+     * @return {[type]}                      [description]
+     */
+    function send_post_to_reload(){
+        var holdonSeconds = arguments[0] ? arguments[0] : 800;
+        var alertMessage = arguments[1] ? arguments[1] : '操作成功！';
+        $.kw.alert(alertMessage);
+        setTimeout(function(){
+            location.reload();
+        }, holdonSeconds)
+    }
+
+    // 批量删除文章
+    $('.multiDel').click(function(){
+        var data = [];
+        $.each($('input:checkbox:checked'), function(i, o){
+            var temp = {};
+            temp.id = $(o).val();
+            temp.pid = $(o).attr('data-pid');
+            temp.aid = $(o).attr('data-id');
+            data.push(temp);
+        })
+        if(!data.length){
+            $.kw.alert('请选择文章！');
+        }else{
+            $.kw.confirm('确认操作吗？', function(){
+                $.post('{:U("multiDelArticles")}', {data: data}, function(re){
+                    if(re == '1'){
+                        send_post_to_reload();
+                    }else{
+                        $.kw.alert('服务器买药去了，请稍后再试！');
+                    }
+                })
+            })
+        }
+    })
+
+    // 批量恢复文章
+    $('.multiRestore').click(function(){
+        var ids = '';
+        $.each($('input:checkbox:checked'), function(i, o){
+            ids += o.value + ',';
+        })
+        if(!ids.length){
+            $.kw.alert('请选择文章！');
+        }else{
+            $.kw.confirm('确认操作吗？', function(){
+                $.post('{:U("Ajaxhandle/ajaxMultiTrashOrRestore")}', {ids: ids, operation: 'restore'}, function(data){
+                    if(data == '1'){
+                        send_post_to_reload();
+                    }else{
+                        $.kw.alert(data);
+                    }
+                })
+            })
+        }
+    })
+
+    // 文章批量回收
+    $('.multiTrash').click(function(){
+        var ids = '';
+        $.each($('input:checkbox:checked'), function(i, o){
+            ids += o.value + ',';
+        })
+        if(!ids.length){
+            $.kw.alert('请选择文章！');
+        }else{
+            $.kw.confirm('确认操作吗？', function(){
+                $.post('{:U("Ajaxhandle/ajaxMultiTrashOrRestore")}', {ids: ids, operation: 'trash'}, function(data){
+                    if(data == '1'){
+                        send_post_to_reload();
+                    }else{
+                        $.kw.alert(data);
+                    }
+                })
+            })
+        }
+    })
+
+    // 文章移入回收站
+    $('.trashArticle').click(function(){
+        var id = $(this).attr('data-id');
+        $.kw.confirm('确认操作吗？', function(){
+            $.post('{:U(trashArticle)}', {id: id}, function(data){
+                if(data == '1'){
+                    send_post_to_reload();
+                }else{
+                    $.kw.alert(data);
+                }
+            })
+        })
+    })
+    
+    <?php 
+        //$p--当前页码
+        //$numPerPage--每页显示记录条数
+        if(!$_GET[p] or $_GET[p]<1){
+            $p = 1;
+        }elseif($_GET[p]>$lastPage){
+            $p = $lastPage;
+        }else{
+            $p = $_GET[p];
+        }
+        if($_GET[numPerPage]>$totalNum){
+            $numPerPage = $totalNum;
+        }elseif(!$_GET[numPerPage] or $_GET[numPerPage]<0){
+            $numPerPage = 50;
+        }else{
+            $numPerPage = $_GET[numPerPage];
+        }
+     ?>
+
+    // 拖动排序
+    $('.sortIt').sortable({
+        placeholder: 'ui-state-highlight',
+        stop: function(){
+            $('.sortIt tr').each(function(i){
+                $(this).attr('data-order', $(this).index() + ({$p} - 1) * {$numPerPage});
+            })  
+        },
+        change: function(){
+            $('.saveBtnWrapper').show();
+        }
+    });
+    $('.sortIt').disableSelection();
+    // 拖动排序 end
+
+    // 点击"确认修改顺序"按钮之后，发起ajax请求，从后台服务器端更改该页面所有文章的顺序。
+    // 顺序更改完成后，弹出提示框告知用户“修改成功！”，0.8秒后，页面自动刷新，并以新的顺序展示之。
+    $('#saveOrderBtn').click(function(){
+        obj_list = [];
+        $('.sortIt tr').each(function(i){
+            jobj = {};
+            jobj["id"] = $(this).attr('data-id');
+            jobj["sort"] = $(this).attr('data-order');
+            obj_list.push(jobj);
+        })  
+
+        $.post('{:U("ajax_setArticleOrder")}', {result: obj_list}, function(data){
+            if(data == $('.sortIt tr').size()){
+                send_post_to_reload(alertMessage='播放顺序变更成功！');
+            }else{
+                $.kw.alert('服务器吃药去了，请稍后再试！');
+            }
+        })
+    })
+
+    // 按照数字大小进行排序，指定为sort参数。
+    function sortNumber(a, b){
+        return a - b;
+    }
+
+    // 判断sort字段是否重复，若是，直接发起ajax进行修改
+    var temp_sort_list = [];
+    $('input.sort').each(function(i){
+        temp_sort_list.push(this.value);
+    })
+    temp_sort_list.sort(sortNumber);
+
+    // 判断是否重复
+    var isRepeat = false;
+    // 判断是否连续
+    var notAdjacent = false;
+    // 判断是否有值
+    var isNotExist = false;
+    // 判断删除首文，每页的
+    var firstLost = false;
+    for(var i=0;i<temp_sort_list.length-1;i++){
+        if(temp_sort_list[i] == temp_sort_list[i+1]){
+            isRepeat = true;
+            break;
+        }
+        if(temp_sort_list[i]*1+1 != temp_sort_list[i+1]){
+            notAdjacent = true;
+            break;
+        }
+        if(temp_sort_list[i] != 0 && !temp_sort_list[i]){
+            isNotExist = true;
+            break;
+        }
+        if(temp_sort_list[0] != {$numPerPage}*({$p}-1)){
+            firstLost = true;
+            break;
+        }
+    }
+
+    // 若有重复或者不连续，则发起ajax进行顺序字段的初始化
+    if(isRepeat || notAdjacent || isNotExist || firstLost){
+        if({$totalNum} != {$numPerPage}){
+            return $('input[name=numPerPage]').val({$totalNum}).parent('form').submit();
+        }
+
+        var after_repeat_list = [];
+        $('input.sort').each(function(i){
+            sortObj = {};
+            sortObj['id'] = $(this).attr('data-id');
+            sortObj['sort'] = i+{$numPerPage}*({$p}-1);
+            after_repeat_list.push(sortObj);
+        })
+        $.post('{:U(ajax_initArticleOrder)}', {after_repeat_list: after_repeat_list}, function(data){
+            if(data == '1'){
+                $.kw.alert('正在初始化，请稍后...');
+                setTimeout(function(){
+                    window.location.href = '{$Think.server.PHP_SELF}';
+                }, 800)
+            }else{
+                $.kw.alert('服务器异常，攻城狮正玩儿命赶攻。')
+            }
+        })
+    }
+
+    // 文章顺序字段双击事件
+    $('.sort').dblclick(function() {
+        $(this).attr('readonly', false).select();
+        origin_order_val = $(this).val() < {$totalNum} ? $(this).val() : {$totalNum}-1;
+
+    });
+
+    // 文章顺序字段失焦事件
+    $('.sort').change(function(){
+        var article_id = $(this).attr('data-id');
+        var thisVal = $(this).val() < {$totalNum} ? $(this).val() : {$totalNum}-1;//排序数不能超过总数
+        var obj = $(this);
+		
+        $.post('{:U("ajax_changeArticleOrder")}', {'origin_order_val': origin_order_val, 'sort': thisVal, 'program_dir_classid': '<?php echo $_GET[id]; ?>','article_id':article_id}, function(data){
+            if(data == Math.abs(origin_order_val - thisVal)){
+                send_post_to_reload();
+                obj.attr('readonly', true);
+            }else{
+                $.kw.alert(data);
+                obj.val(origin_order_val).attr('readonly', true);
+            }
+        })
+    })
+
+	if (columnClassId != '') {
+		var programTrees = window.parent.programTree,
+			nodeObj = programTrees.getNodeByParam("unid", columnClassId, null);
+		
+		programTrees.expandNode(nodeObj, true, false, true);
+		$('#programs', window.parent.frame_left_menu.document).find('a').removeClass('curSelectedNode');
+		$("#" + nodeObj.tId + "_a", window.parent.frame_left_menu.document).addClass('curSelectedNode');
+	}
+	
+	$('.jl-nav-tabs a[data-restype]').click(function() {
+		var resContentID = $(this).attr('data-restype');
+		$(this).closest('.jl-nav-tabs').find('li').removeClass('active');
+		$(this).parent('li').addClass('active');
+		$(this).closest('.jl-nav-tabs').siblings('.tabs-content').hide();
+		$('#' + resContentID).show();
+	});
+	
+	$('#resWindow2 .modal-body button').click(function() {
+		var restype = $.trim($(this).attr('data-restype'));
+	});
+	
+	$('.import-article-data').click(function() {
+		var restype = $.trim($(this).attr('data-restype'));
+		
+		if (restype != '') {
+			$('#resWindow').attr({'data-restype' : restype});
+			getResDataList('__GROUP__/Ajaxhandle/getResListData', restype);
+		} else {
+			showFramesMasklayer();
+			setDivCenter('#resWindow2');
+		}
+	});
+	
+	$('#resWindow .table').find('.page-box').first().delegate('a', 'click', function() {
+		var requestURL = $(this).attr('href'),
+			restype = $('#resWindow').attr('data-restype');
+		getResDataList(requestURL, restype);
+		return false;
+	});
+	
+	$('#storesFilter').click(function() {
+		var floor = $('#storeFloor').val()*1,
+			type_id = $('#storeType').val()*1,
+			restype = $('#resWindow').attr('data-restype');
+		getResDataList('__GROUP__/Ajaxhandle/getResListData', restype, floor, type_id);
+	});
+	
+	function getResDataList(requestURL, restype, floor, type_id) {
+		showFramesMasklayer();
+		$('#resWindow').width($(window).width() - 160);
+		$('#resWindow').find('.jl-nav-tabs').hide();
+		$('#resWindow').find('.jl-check').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+		$('#resWindow .reslist-tbl').find('tbody').first().empty();
+		var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+			loadingHtml += '<p style="font-size:48px;margin:80px auto 80px"><i class="icon-spinner icon-spin"></i></p>';
+			loadingHtml += '<p style="">正在加载数据，请稍等……</p>';
+			loadingHtml += '</div>';
+		if (restype == 'stores' && (floor > 0 || type_id > 0)) {
+			$('#resWindow .modal-body p.bg-warning').remove();
+			$('#resWindow .modal-body .tooolbar-tbl').first().before(loadingHtml);
+		} else {
+			$('#resWindow .modal-body').first().append(loadingHtml);
+		}
+		setDivCenter('#resWindow');
+		
+		var postData = null;
+		if (restype == 'stores') {
+			postData = {type:restype, classid:columnClassId, floor:floor, type_id:type_id};
+		} else {		
+			postData = {type:restype};
+		}
+		
+		$.post(requestURL, postData, function(re) {
+			if (re.stat*1) {
+				$('#resWindow').find('.loading-box').remove();
+				$('#resWindow .table').show();
+				var trHtml = '';
+				$.each(re.data.resList, function(i, res) {
+					var res_id = restype == 'stores' ? res.Id : res.id;
+					trHtml += '<tr>';
+					trHtml += '<td><span class="jl-check un-checked" data-id="' + res_id + '"  data-checked="0"></span></td>';
+					trHtml += '<td>' + res_id + '</td>';
+					switch(restype) {
+						case 'news' : trHtml += '<td>' + res.news_title + '</td><td>' + res.news_date + '</td>'; break;
+						case 'famousQuotes' : trHtml += '<td>' + res.contents + '</td><td>' + res.author + '</td>'; break;
+						case 'humorJokes' : trHtml += '<td>' + res.title + '</td><td>' + res.contents + '</td>'; break;
+						case 'baike' : trHtml += '<td>' + res.title + '</td><td>' + res.contents + '</td>'; break;
+						case 'historic' : trHtml += '<td>' + res.today_month_day + '</td><td>' + res.event_title + '</td>'; break;
+						case 'stores' : trHtml += '<td>' + res.sname + '</td><td>' + res.floor + '层</td><td>' + res.adress + '</td><td><a href="javascript:void(0);" class="tpl-sel bind-store" data-id="' + res_id + '" title="添加"><i class="icon-plus-sign" style="font-size:22px;"></i></a></td>'; break;
+					}
+					//trHtml += '<td></td>';
+					trHtml += '</tr>';
+				});
+				
+				$('#resWindow .reslist-tbl').find('tbody').first().html(trHtml);
+				$('#resWindow .table').find('.page-box').first().html(re.data.pager);
+				$('#resWindow .reslist-tbl input').iCheck({
+					checkboxClass: 'icheckbox_flat-green',
+					radioClass: 'iradio_flat-green',
+					increaseArea: '20%' // optional
+				});
+			} else {
+				if (restype == 'stores' && (floor > 0 || type_id > 0)) {
+					$('#resWindow').find('.loading-box').remove();
+					var err_html = '<p class="bg-warning text-center egp-msgbox" style="padding:8px 12px;color:#333;position:relative;"><i class="icon-warning-sign" style="color:#a94442"></i>&nbsp;&nbsp;&nbsp;&nbsp;<span>' + re.msg + '请重新设置查询条件！</span></p>';
+					$('#resWindow .modal-body .tooolbar-tbl').first().before(err_html);
+					$('#resWindow .modal-body .tooolbar-tbl').first().hide();
+				} else {
+					$('#resWindow .search-box').hide();
+					$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+					$('#resWindow .loading-box').first().find('p:eq(1)').text(re.msg);
+				}
+			}
+		}, 'json');
+	};
+	
+	$('button.close, button.close2').click(function(){
+		$('#resWindow').hide();
+		$('#resWindow2').hide();
+		$('#resWindow').find('.table').hide();
+		$('#resWindow').find('.jl-nav-tabs').hide();
+		$('#resWindow').find('.reslist-tbl tbody').first().empty();
+		$('#resWindow').find('.loading-box').remove();
+		hideFramesMasklayer();
+		window.location.reload();
+	});
+	
+	$('#resWindow').delegate('.res-select-all', 'click', function(){
+		var isChecked = $(this).attr('data-checked')*1;
+		if (isChecked) {
+			$('#resWindow').find('.res-select-all, .jl-check').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+		} else {
+			$('#resWindow').find('.res-select-all, .jl-check').removeClass('un-checked checked').addClass('checked').attr('data-checked', 1);
+		}
+	});
+	
+	$('#resWindow').delegate('.reslist-tbl tbody .jl-check', 'click', function(){
+		var isChecked = $(this).attr('data-checked')*1;
+		if (isChecked) {
+			$(this).removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0)
+		} else {
+			$(this).removeClass('un-checked checked').addClass('checked').attr('data-checked', 1);
+		}
+		var allCheckCounts = $('.reslist-tbl tbody .jl-check').size(),
+			checkedCounts = $('.reslist-tbl tbody .checked').size();
+		if (allCheckCounts == checkedCounts) {
+			$('#resWindow').find('.res-select-all').removeClass('un-checked checked').addClass('checked').attr('data-checked', 1);
+		} else {
+			$('#resWindow').find('.res-select-all').removeClass('un-checked checked').addClass('un-checked').attr('data-checked', 0);
+		}
+	});
+	
+	$('.multi-import').click(function() {
+		dealwithData('selected');
+	});
+	
+	$('.auto-import').click(function() {
+		dealwithData('auto');
+	});
+	
+	function dealwithData(type) {
+		var ids = [];
+		var postData = '';
+		if (type == 'selected') {
+			$.each($('#resWindow .reslist-tbl tbody .checked'), function(i, res) {
+				ids.push($(res).attr('data-id'));
+			});
+			
+			if (ids.length <= 0) {
+				$('.res-oper-help').first().fadeIn().delay(3000).fadeOut();
+				return false;
+			}
+			
+			postData = ids.join(',');
+		}
+		
+		$('#resWindow .table').hide();
+		$('#resWindow .modal-body div.well').hide();
+		var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+			loadingHtml += '<p style="font-size:48px;margin:80px auto 80px"><i class="icon-spinner icon-spin"></i></p>';
+			loadingHtml += '<p style="">正在处理数据，请稍等……</p>';
+			loadingHtml += '</div>';
+		$('#resWindow .modal-body').first().append(loadingHtml);
+		
+		var requestURL = params = null;
+		if (columnType == 'routedir' || columnType == 'storedir') {
+			requestURL = '__GROUP__/Ajaxhandle/bingStoresToColumn';
+			params = {coluClassID : columnClassId, postData : postData};
+		} else {
+			requestURL = '__URL__/imageNewsToAticle';
+			params = {porgClassId : programClassId, coluClassID : columnClassId, type : type, postData : postData};
+		}
+		
+		$.post(requestURL, params, function(re) {
+			if (re.stat*1) {
+				$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+				$('#resWindow .loading-box').first().find('p:eq(1)').text(re.msg);
+			} else {
+				$('#resWindow .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+				$('#resWindow .loading-box').first().find('p:eq(1)').text(re.msg);
+			}
+		}, 'json');
+	}
+	
+	$('#resWindow').delegate('.bind-store', 'click', function() {
+		var res_id = $(this).attr('data-id'), that = this;
+		var requestURL = '__GROUP__/Ajaxhandle/bingStoresToColumn';
+		var params = {coluClassID : columnClassId, postData : res_id};
+		
+		$.post(requestURL, params, function(re) {
+			if (re.stat*1) {
+				$(that).closest('td').append('<span class="add-success">已添加</span>');
+				$(that).remove();
+			} else {
+				$.kw.alert(re.msg);
+			}
+		}, 'json');
+	});
+	
+	$('.unbind-store').click(function() {
+		var res_id = $(this).attr('data-id')*1, that = this;
+		var requestURL = '__GROUP__/Ajaxhandle/unbingStoresToColumn';
+		var params = {coluClassID : columnClassId, postData : res_id};
+		
+		$.post(requestURL, params, function(re) {
+			if (re.stat*1) {
+				$.kw.alert(re.msg, '', function() {
+					window.location.reload();
+				});
+			} else {
+				$.kw.alert(re.msg);
+			}
+		}, 'json');
+	});
+	
+	$('#resWindow2 .modal-body button').click(function() {
+		var restype = $.trim($(this).attr('data-restype'));
+		var loadingHtml = '<div class="loading-box" style="text-align:center;">';
+			loadingHtml += '<p style="font-size:48px;margin:80px auto 80px"><i class="icon-spinner icon-spin"></i></p>';
+			loadingHtml += '<p style="">正在处理数据，请稍等……</p>';
+			loadingHtml += '</div>';
+		$('#resWindow2 .modal-body').first().html(loadingHtml);
+		
+		if (restype == 'xwtz' || restype == 'zytg' || restype == 'jzxx') {
+			$.get('/Data/dataGather/latestNoticeGet.php', {progClassId : programClassId, classid : columnClassId, type : restype}, function(re) {
+				if (re.stat*1) {
+					$('#resWindow2 .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+					$('#resWindow2 .loading-box').first().find('p:eq(1)').text(re.msg);
+				} else {
+					$('#resWindow2 .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+					$('#resWindow2 .loading-box').first().find('p:eq(1)').text(re.msg);
+				}
+			}, 'json');
+		} else {
+			$.post('__GROUP__/Ajaxhandle/importResDataToArticle', {coluClassID : columnClassId, type : restype}, function(re) {
+				if (re.stat*1) {
+					$('#resWindow2 .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-ok-sign text-success');
+					$('#resWindow2 .loading-box').first().find('p:eq(1)').text(re.msg);
+				} else {
+					$('#resWindow2 .loading-box').first().find('i').first().removeClass('icon-spinner icon-spin').addClass('icon-exclamation-sign text-danger');
+					$('#resWindow2 .loading-box').first().find('p:eq(1)').text(re.msg);
+				}
+			}, 'json');
+		}
+	});
+
+	$('.del').click(function() {
+		var targetUrl = $.trim($(this).attr('data-url'));
+		$.kw.confirm('确认要删除该文章吗？', function() {
+			window.location.href = targetUrl;
+		});
+	});
+	
+	// $('.table .multi-del').click(function(){
+	// 	var aids = '',
+	// 		requestURL = params = null;
+	// 		checkedItems = $('.list-tbl').first().find('tbody').first().find(':checkbox:checked');
+	// 		$.each(checkedItems, function(i, o){
+	// 			aids += $(o).val() + ';';
+	// 		});
+		
+	// 	if (columnType == 'routedir' || columnType == 'storedir') {
+	// 		requestURL = '__GROUP__/Ajaxhandle/unbingStoresToColumn';
+	// 		params = {coluClassID : columnClassId, postData : aids};
+	// 	} else {
+	// 		requestURL = '__URL__/multiDelArticles';
+	// 		params = {aids : aids, pid : programClassId};
+	// 	}
+		
+	// 	if (checkedItems.size() > 0) {
+	// 		$.kw.confirm('确认要删除吗？', function() {
+	// 			$.ajax({
+	// 				url:requestURL,
+	// 				type:'post',
+	// 				async:false,
+	// 				data:params,
+	// 				dataType:'json',
+	// 				success:function(re){
+	// 					if (re.stat*1) {
+	// 						$.kw.alert('操作成功！', '', function() {
+	// 							window.location.reload();
+	// 						});
+	// 					} else {
+	// 						$.kw.alert(re.msg);
+	// 					}
+	// 				},
+	// 				error:function(){
+	// 					$.kw.alert('由于网络异常导致操作失败，请刷新页面重试....');
+	// 				}
+	// 			});
+	// 		});
+	// 	} else {
+	// 		$.kw.alert('至少选择一条记录！');
+	// 	}
+	// });
+});
+</script>
+<include file="Public/footer" />
